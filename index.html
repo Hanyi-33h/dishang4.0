@@ -1,62 +1,144 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-:root{--brand:#6B8FA8;--navy:#1C2B3A;--cream:#F8F6F3;--white:#fff;--gold:#B8976A;--text:#1E1E1E;--muted:#777;--border:#E0DDD9;}
+:root{
+  --brand:#6B8FA8;--navy:#1C2B3A;--cream:#F8F6F3;--white:#fff;
+  --gold:#B8976A;--text:#1E1E1E;--muted:#666;--border:#E0DDD9;
+  /* TYPOGRAPHY SCALE */
+  --f-body:16px; --f-min:12px; --f-sub:22px; --f-title:30px;
+  --f-label:12px; --f-small:13px; --f-nav:11px;
+}
 html{scroll-behavior:smooth;}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Hiragino Sans','Noto Sans JP',Arial,sans-serif;color:var(--text);background:var(--white);overflow-x:hidden;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Hiragino Sans','Noto Sans JP',Arial,sans-serif;color:var(--text);background:var(--white);overflow-x:hidden;font-size:var(--f-body);}
 
 /* ── NAV ── */
-#nav{position:fixed;top:0;left:0;right:0;z-index:999;height:66px;background:rgba(255,255,255,.97);border-bottom:.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 60px;transition:box-shadow .3s;gap:16px;}
+#nav{position:fixed;top:0;left:0;right:0;z-index:999;height:66px;background:transparent;display:flex;align-items:center;justify-content:space-between;padding:0 52px;transition:background .4s,box-shadow .3s;gap:16px;}
+#nav.scrolled{background:rgba(255,255,255,.97);border-bottom:.5px solid var(--border);}
 .nl{display:flex;flex-direction:column;gap:2px;cursor:pointer;}
-.nl-main{font-family:Georgia,serif;font-size:20px;font-weight:400;letter-spacing:6px;color:var(--navy);}
-.nl-sub{font-size:8px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;}
+.nl-main{font-family:Georgia,serif;font-size:20px;font-weight:400;letter-spacing:6px;color:#fff;transition:color .4s;}
+#nav.scrolled .nl-main{color:var(--navy);}
+.nl-sub{font-size:var(--f-min);letter-spacing:3px;color:rgba(255,255,255,.6);text-transform:uppercase;transition:color .4s;}
+#nav.scrolled .nl-sub{color:var(--muted);}
 .nlinks{display:flex;gap:32px;list-style:none;flex:1;justify-content:center;}
-.nlinks a{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text);text-decoration:none;padding-bottom:3px;position:relative;transition:color .2s;white-space:nowrap;}
+.nlinks a{font-size:var(--f-nav);letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.85);text-decoration:none;padding-bottom:3px;position:relative;transition:color .2s;white-space:nowrap;}
+#nav.scrolled .nlinks a{color:var(--text);}
 .nlinks a::after{content:'';position:absolute;bottom:0;left:0;width:0;height:1px;background:var(--gold);transition:width .3s;}
 .nlinks a:hover::after{width:100%;}
-.nlinks a:hover{color:var(--brand);}
 .nav-right{display:flex;align-items:center;gap:14px;flex-shrink:0;}
 .lang-sw{display:flex;align-items:center;gap:4px;}
-.lb{background:none;border:none;font-size:11px;letter-spacing:1px;cursor:pointer;color:var(--muted);padding:4px 5px;transition:color .2s;font-family:inherit;}
-.lb.active{color:var(--navy);font-weight:700;border-bottom:1.5px solid var(--gold);}
-.lb:hover{color:var(--navy);}
-.ls{color:var(--border);font-size:12px;}
+.lb{background:none;border:none;font-size:var(--f-min);letter-spacing:1px;cursor:pointer;color:rgba(255,255,255,.7);padding:4px 5px;transition:color .2s;font-family:inherit;}
+#nav.scrolled .lb{color:var(--muted);}
+.lb.active{font-weight:700;border-bottom:1.5px solid var(--gold);color:#fff;}
+#nav.scrolled .lb.active{color:var(--navy);}
+.lb:hover{color:#fff;}
+#nav.scrolled .lb:hover{color:var(--navy);}
+.ls{color:rgba(255,255,255,.3);font-size:var(--f-min);transition:color .4s;}
+#nav.scrolled .ls{color:var(--border);}
 .ham{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px;background:none;border:none;}
-.ham span{display:block;width:22px;height:1.5px;background:var(--navy);transition:.3s;}
+.ham span{display:block;width:22px;height:1.5px;background:#fff;transition:.3s;}
+#nav.scrolled .ham span{background:var(--navy);}
 .mob-menu{display:none;position:fixed;top:66px;left:0;right:0;background:rgba(255,255,255,.98);border-bottom:.5px solid var(--border);z-index:998;flex-direction:column;padding:10px 0;}
-.mob-menu a{display:block;padding:13px 28px;font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--text);text-decoration:none;border-bottom:.5px solid var(--border);}
+.mob-menu a{display:block;padding:14px 28px;font-size:var(--f-nav);letter-spacing:2px;text-transform:uppercase;color:var(--text);text-decoration:none;border-bottom:.5px solid var(--border);}
 .mob-menu.open{display:flex;}
 
-/* ── MAIN PAGE ── */
-#mainPage{}
+/* ══════════════════════════════════
+   HERO — CSS CYBER TECH BACKGROUND
+══════════════════════════════════ */
+#hero{position:relative;height:100vh;min-height:640px;overflow:hidden;background:#07081a;}
 
-/* ── HERO ── */
-#hero{height:100vh;min-height:560px;background:var(--brand);display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;padding-top:66px;}
-.h-wm{position:absolute;font-family:Georgia,serif;font-size:32vw;font-weight:700;color:rgba(255,255,255,.05);letter-spacing:-1vw;user-select:none;pointer-events:none;white-space:nowrap;}
-.h-content{text-align:center;color:#fff;position:relative;z-index:2;padding:0 32px;}
-.h-eye{font-size:10px;letter-spacing:7px;opacity:.7;text-transform:uppercase;margin-bottom:24px;}
-.h-cn{font-family:Georgia,serif;font-size:clamp(24px,4.5vw,60px);font-weight:400;letter-spacing:8px;margin-bottom:14px;line-height:1.3;}
-.h-en{font-size:clamp(13px,1.8vw,22px);font-weight:300;letter-spacing:7px;opacity:.8;margin-bottom:34px;}
-.h-line{width:60px;height:1px;background:rgba(255,255,255,.4);margin:0 auto 34px;}
-.h-tag{font-size:12px;letter-spacing:1.5px;opacity:.65;font-weight:300;line-height:2;}
-.h-scroll{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:10px;color:rgba(255,255,255,.5);font-size:9px;letter-spacing:4px;text-transform:uppercase;}
-.h-bar{width:1px;height:44px;background:rgba(255,255,255,.4);animation:sbar 2s ease-in-out infinite;}
-@keyframes sbar{0%{opacity:0;transform:scaleY(0);transform-origin:top}50%{opacity:1;transform:scaleY(1);transform-origin:top}100%{opacity:0;transform:scaleY(1);transform-origin:bottom}}
+/* Gradient base */
+.hero-scene{position:absolute;inset:0;background:radial-gradient(ellipse 120% 80% at 30% 60%,#1a0a4a 0%,#07081a 55%),radial-gradient(ellipse 60% 70% at 80% 20%,#1e2d6e 0%,transparent 60%),radial-gradient(ellipse 50% 50% at 10% 10%,#0d1a5c 0%,transparent 50%);}
 
-/* ── SHARED ── */
+/* Grid lines */
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(140,160,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(140,160,255,.07) 1px,transparent 1px);background-size:60px 60px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 0%,transparent 100%);}
+
+/* Floating glass panels */
+.gp{position:absolute;border-radius:40px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);backdrop-filter:blur(2px);}
+.gp1{width:520px;height:340px;top:8%;left:-60px;transform:rotate(-14deg);background:linear-gradient(135deg,rgba(130,100,255,.10),rgba(60,120,255,.06));border-color:rgba(160,140,255,.18);}
+.gp2{width:380px;height:260px;top:30%;right:-40px;transform:rotate(10deg);background:linear-gradient(135deg,rgba(80,160,255,.09),rgba(140,80,255,.06));border-color:rgba(140,180,255,.15);}
+.gp3{width:300px;height:200px;bottom:12%;left:10%;transform:rotate(6deg);background:linear-gradient(135deg,rgba(100,80,255,.08),rgba(255,255,255,.04));border-color:rgba(180,160,255,.12);}
+.gp4{width:200px;height:140px;top:15%;right:22%;transform:rotate(-6deg);background:linear-gradient(135deg,rgba(200,220,255,.07),rgba(100,140,255,.05));border-color:rgba(200,220,255,.14);}
+.gp5{width:160px;height:110px;bottom:22%;right:8%;transform:rotate(14deg);background:linear-gradient(135deg,rgba(255,255,255,.06),rgba(120,100,255,.05));border-color:rgba(220,220,255,.12);}
+
+/* Glow blobs */
+.gb{position:absolute;border-radius:50%;filter:blur(80px);pointer-events:none;}
+.gb1{width:420px;height:420px;top:-60px;left:-80px;background:radial-gradient(circle,rgba(80,60,200,.35),transparent 70%);}
+.gb2{width:360px;height:360px;top:20%;right:-60px;background:radial-gradient(circle,rgba(60,120,255,.28),transparent 70%);}
+.gb3{width:300px;height:300px;bottom:-40px;left:30%;background:radial-gradient(circle,rgba(140,80,255,.22),transparent 70%);}
+.gb4{width:220px;height:220px;top:40%;left:45%;background:radial-gradient(circle,rgba(180,200,255,.18),transparent 70%);}
+
+/* Light beam */
+.beam{position:absolute;top:0;left:55%;width:1px;height:100%;background:linear-gradient(to bottom,transparent,rgba(180,200,255,.18) 30%,rgba(220,230,255,.08) 60%,transparent);transform:skewX(-12deg);transform-origin:top;}
+.beam2{left:35%;opacity:.5;transform:skewX(8deg);}
+
+/* Floating dots */
+.dots{position:absolute;inset:0;pointer-events:none;}
+.dots::before,.dots::after{content:'';position:absolute;border-radius:50%;}
+.dots::before{width:3px;height:3px;background:rgba(180,200,255,.5);top:22%;left:62%;box-shadow:120px 80px 0 rgba(200,220,255,.3),240px -40px 0 rgba(160,180,255,.4),-80px 160px 0 rgba(140,160,255,.35),300px 120px 0 rgba(200,200,255,.25),180px 200px 0 rgba(180,200,255,.3),-120px -30px 0 rgba(200,210,255,.2);}
+.dots::after{width:2px;height:2px;background:rgba(255,255,255,.4);top:60%;left:25%;box-shadow:80px -60px 0 rgba(200,220,255,.3),160px 40px 0 rgba(180,200,255,.25),240px -80px 0 rgba(160,180,255,.35),-60px 80px 0 rgba(200,210,255,.2);}
+
+/* hero overlay */
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(105deg,rgba(7,8,26,.6) 0%,rgba(7,8,26,.2) 60%,transparent 100%);}
+
+/* hero content */
+.hero-body{position:absolute;bottom:140px;left:52px;right:52px;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;}
+.hero-left{flex:1;}
+.hero-eyebrow{font-size:var(--f-min);letter-spacing:8px;color:var(--gold);text-transform:uppercase;margin-bottom:18px;opacity:0;animation:fadeUp .7s .3s forwards;}
+.hero-title{font-family:Georgia,serif;font-size:clamp(44px,7vw,96px);font-weight:400;color:#fff;line-height:1.0;letter-spacing:2px;margin-bottom:22px;opacity:0;animation:fadeUp .7s .5s forwards;}
+.hero-desc{font-size:var(--f-body);line-height:1.9;color:rgba(255,255,255,.72);max-width:440px;opacity:0;animation:fadeUp .7s .7s forwards;letter-spacing:.2px;}
+
+/* UP NEXT card */
+.hero-card{width:230px;flex-shrink:0;background:rgba(10,14,40,.75);border:.5px solid rgba(180,180,255,.18);padding:28px 24px 24px;opacity:0;animation:fadeUp .7s .9s forwards;backdrop-filter:blur(12px);}
+.card-uptxt{font-size:var(--f-min);letter-spacing:5px;text-transform:uppercase;color:rgba(180,200,255,.45);margin-bottom:22px;}
+.card-arrow{width:32px;height:32px;border:1px solid rgba(180,180,255,.25);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-bottom:18px;}
+.card-arrow svg{width:14px;height:14px;stroke:#a0b4ff;fill:none;stroke-width:1.5;}
+.card-name{font-family:Georgia,serif;font-size:18px;color:#fff;letter-spacing:2px;margin-bottom:5px;}
+.card-sub{font-size:var(--f-min);color:rgba(180,200,255,.45);letter-spacing:2px;}
+.card-preview{margin-top:18px;height:64px;background:rgba(140,160,255,.06);border:.5px solid rgba(180,180,255,.12);display:flex;align-items:center;justify-content:center;}
+.card-preview span{font-size:var(--f-min);letter-spacing:2px;color:rgba(180,200,255,.45);text-transform:uppercase;}
+
+/* bottom bar */
+.hero-bottom{position:absolute;bottom:0;left:0;right:0;padding:22px 52px;display:flex;align-items:center;justify-content:space-between;border-top:.5px solid rgba(180,180,255,.1);background:rgba(7,8,26,.45);backdrop-filter:blur(8px);}
+.hero-stats{display:flex;gap:60px;}
+.stat-label{font-size:var(--f-body);font-weight:500;color:#fff;margin-bottom:4px;letter-spacing:.3px;}
+.stat-val{font-size:var(--f-min);color:rgba(180,200,255,.5);letter-spacing:.5px;}
+.hero-nav{display:flex;align-items:center;gap:18px;}
+.slide-count{font-size:var(--f-min);color:rgba(255,255,255,.4);letter-spacing:3px;display:flex;align-items:center;gap:10px;}
+.slide-line{width:40px;height:1px;background:rgba(255,255,255,.2);}
+.slide-btn{width:38px;height:38px;border-radius:50%;background:rgba(180,180,255,.1);border:.5px solid rgba(180,180,255,.22);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .2s;}
+.slide-btn:hover{background:rgba(180,180,255,.22);}
+.slide-btn svg{width:14px;height:14px;stroke:#a0b4ff;fill:none;stroke-width:1.5;}
+
+/* scroll indicator */
+.hero-scroll{position:absolute;right:52px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:center;gap:10px;writing-mode:vertical-rl;}
+.scroll-txt{font-size:var(--f-min);letter-spacing:4px;color:rgba(180,200,255,.35);text-transform:uppercase;}
+.scroll-bar{width:1px;height:56px;background:rgba(180,200,255,.15);position:relative;overflow:hidden;}
+.scroll-bar::after{content:'';position:absolute;top:-100%;left:0;right:0;height:100%;background:rgba(180,200,255,.5);animation:scbar 2s ease-in-out infinite;}
+@keyframes scbar{0%{top:-100%}100%{top:100%}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+
+/* Subtle panel animation */
+.gp1{animation:drift1 12s ease-in-out infinite alternate;}
+.gp2{animation:drift2 10s ease-in-out infinite alternate;}
+.gp3{animation:drift3 14s ease-in-out infinite alternate;}
+@keyframes drift1{from{transform:rotate(-14deg) translateY(0)}to{transform:rotate(-12deg) translateY(-18px)}}
+@keyframes drift2{from{transform:rotate(10deg) translateY(0)}to{transform:rotate(8deg) translateY(14px)}}
+@keyframes drift3{from{transform:rotate(6deg) translateY(0)}to{transform:rotate(8deg) translateY(-10px)}}
+
+/* ── SHARED SECTIONS ── */
 .sec{padding:96px 60px;}
 .sec.cream{background:var(--cream);}
 .sec.white{background:var(--white);}
 .sh{text-align:center;margin-bottom:60px;}
-.slabel{font-size:10px;letter-spacing:5px;text-transform:uppercase;color:var(--brand);font-weight:500;margin-bottom:14px;}
-.stcn{font-family:Georgia,serif;font-size:clamp(22px,3vw,42px);font-weight:400;color:var(--navy);letter-spacing:4px;margin-bottom:8px;}
-.sten{font-family:Georgia,serif;font-size:clamp(12px,1.4vw,18px);font-weight:400;color:var(--muted);letter-spacing:4px;font-style:italic;margin-top:6px;}
+.slabel{font-size:var(--f-label);letter-spacing:5px;text-transform:uppercase;color:var(--brand);font-weight:500;margin-bottom:14px;}
+.stcn{font-family:Georgia,serif;font-size:var(--f-title);font-weight:400;color:var(--navy);letter-spacing:4px;margin-bottom:8px;}
+.sten{font-family:Georgia,serif;font-size:var(--f-sub);font-weight:400;color:var(--muted);letter-spacing:3px;font-style:italic;margin-top:6px;}
 .dv{display:flex;align-items:center;gap:14px;margin:20px auto 0;max-width:460px;}
 .dvl{flex:1;height:.5px;background:var(--border);}
 .dvd{width:5px;height:5px;border-radius:50%;background:var(--gold);flex-shrink:0;}
 
 /* ── ABOUT ── */
 .about-in{max-width:800px;margin:0 auto;}
-.acn{font-size:15px;line-height:2.2;color:var(--text);margin-bottom:22px;}
+.acn{font-size:var(--f-body);line-height:2.1;color:var(--text);margin-bottom:24px;}
 
 /* ── STATS ── */
 .stats-band{background:var(--cream);border-top:.5px solid var(--border);border-bottom:.5px solid var(--border);padding:56px 60px;}
@@ -65,8 +147,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Hiragino Sans','No
 .si:last-child{border-right:none;}
 .snum{font-family:Georgia,serif;font-size:46px;font-weight:400;color:var(--navy);line-height:1;margin-bottom:10px;}
 .snum sup{font-size:17px;color:var(--gold);vertical-align:top;line-height:1.6;}
-.scn{font-size:11px;color:var(--muted);letter-spacing:1.5px;margin-bottom:3px;}
-.sen{font-size:9px;color:#bbb;letter-spacing:1.5px;}
+.scn{font-size:var(--f-small);color:var(--muted);letter-spacing:1.5px;margin-bottom:3px;}
+.sen{font-size:var(--f-min);color:#bbb;letter-spacing:1.5px;}
 
 /* ── PRODUCTS ── */
 .pgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;max-width:1200px;margin:0 auto;}
@@ -74,58 +156,58 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Hiragino Sans','No
 .pimg-wrap{width:100%;aspect-ratio:3/4;overflow:hidden;background:#f5f3f0;position:relative;}
 .pimg-wrap img{width:100%;height:100%;object-fit:contain;padding:16px;transition:transform .5s;}
 .pc:hover .pimg-wrap img{transform:scale(1.04);}
-.pimg-wrap::after{content:'';position:absolute;inset:0;background:rgba(28,43,58,0);transition:background .3s;}
-.pc:hover .pimg-wrap::after{background:rgba(28,43,58,.07);}
-.view-more{position:absolute;bottom:16px;left:50%;transform:translateX(-50%) translateY(8px);opacity:0;background:var(--navy);color:#fff;font-size:10px;letter-spacing:2px;padding:8px 20px;white-space:nowrap;transition:all .3s;pointer-events:none;}
+.pimg-wrap::after{content:'';position:absolute;inset:0;background:rgba(28,43,58,0);transition:.3s;}
+.pc:hover .pimg-wrap::after{background:rgba(28,43,58,.06);}
+.view-more{position:absolute;bottom:16px;left:50%;transform:translateX(-50%) translateY(8px);opacity:0;background:var(--navy);color:#fff;font-size:var(--f-min);letter-spacing:2px;padding:10px 24px;white-space:nowrap;transition:all .3s;pointer-events:none;}
 .pc:hover .view-more{opacity:1;transform:translateX(-50%) translateY(0);}
-.pinfo{padding:14px 4px 0;}
-.pcn{font-family:Georgia,serif;font-size:17px;font-weight:400;color:var(--navy);letter-spacing:2px;margin-bottom:4px;}
-.pen{font-size:10px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;}
+.pinfo{padding:16px 4px 0;}
+.pcn{font-family:Georgia,serif;font-size:var(--f-sub);font-weight:400;color:var(--navy);letter-spacing:2px;margin-bottom:5px;}
+.pen{font-size:var(--f-small);letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;}
 
 /* ── WORKSHOPS ── */
 .wgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:3px;max-width:1200px;margin:0 auto;}
 .wi{position:relative;aspect-ratio:16/9;overflow:hidden;}
 .wi img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s;}
 .wi:hover img{transform:scale(1.03);}
-.wlbl{position:absolute;bottom:0;left:0;right:0;padding:20px 24px;background:linear-gradient(to top,rgba(20,35,48,.8) 0%,transparent 100%);}
-.wcn{font-family:Georgia,serif;font-size:19px;color:#fff;letter-spacing:3px;margin-bottom:4px;}
-.wen{font-size:9px;color:rgba(255,255,255,.82);letter-spacing:3px;text-transform:uppercase;}
+.wlbl{position:absolute;bottom:0;left:0;right:0;padding:22px 26px;background:linear-gradient(to top,rgba(20,35,48,.82) 0%,transparent 100%);}
+.wcn{font-family:Georgia,serif;font-size:var(--f-sub);color:#fff;letter-spacing:3px;margin-bottom:5px;}
+.wen{font-size:var(--f-min);color:rgba(255,255,255,.82);letter-spacing:3px;text-transform:uppercase;}
 
-/* ── OVERSEAS PROD ── */
+/* ── OVERSEAS ── */
 .ovs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;max-width:1200px;margin:0 auto;}
 .ovs-block{position:relative;aspect-ratio:4/3;overflow:hidden;}
 .ovs-block img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s;}
 .ovs-block:hover img{transform:scale(1.04);}
-.ovs-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(20,35,48,.8) 0%,rgba(20,35,48,.1) 55%,transparent 100%);display:flex;align-items:flex-end;padding:28px;}
-.ovs-cn{font-family:Georgia,serif;font-size:28px;letter-spacing:5px;color:#fff;margin-bottom:6px;}
-.ovs-en{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.65);margin-bottom:12px;}
-.ovs-tag{display:inline-block;font-size:10px;letter-spacing:1px;color:rgba(255,255,255,.82);border:.5px solid rgba(255,255,255,.36);padding:5px 14px;}
+.ovs-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(20,35,48,.82) 0%,rgba(20,35,48,.1) 55%,transparent 100%);display:flex;align-items:flex-end;padding:30px;}
+.ovs-cn{font-family:Georgia,serif;font-size:var(--f-title);letter-spacing:4px;color:#fff;margin-bottom:6px;}
+.ovs-en{font-size:var(--f-small);letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.65);margin-bottom:13px;}
+.ovs-tag{display:inline-block;font-size:var(--f-min);letter-spacing:1px;color:rgba(255,255,255,.82);border:.5px solid rgba(255,255,255,.36);padding:6px 16px;}
 
 /* ── DESIGN ── */
 .dgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;max-width:1200px;margin:0 auto;}
 .dcard{position:relative;aspect-ratio:4/3;overflow:hidden;}
 .dcard img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s;}
 .dcard:hover img{transform:scale(1.04);}
-.d-overlay{position:absolute;bottom:0;left:0;right:0;padding:22px 26px;background:linear-gradient(to top,rgba(20,35,48,.78) 0%,transparent 100%);}
-.ddcn{font-family:Georgia,serif;font-size:26px;color:#fff;letter-spacing:4px;margin-bottom:4px;}
-.dden{font-size:10px;letter-spacing:3px;color:rgba(255,255,255,.7);text-transform:uppercase;}
+.d-overlay{position:absolute;bottom:0;left:0;right:0;padding:24px 28px;background:linear-gradient(to top,rgba(20,35,48,.78) 0%,transparent 100%);}
+.ddcn{font-family:Georgia,serif;font-size:var(--f-title);color:#fff;letter-spacing:3px;margin-bottom:5px;}
+.dden{font-size:var(--f-small);letter-spacing:3px;color:rgba(255,255,255,.7);text-transform:uppercase;}
 
 /* ── CERTS ── */
-.cgrid{display:flex;flex-wrap:wrap;justify-content:center;gap:28px;max-width:880px;margin:0 auto;}
-.ci{display:flex;flex-direction:column;align-items:center;gap:12px;width:128px;}
-.cc{width:94px;height:94px;border-radius:50%;border:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--white);cursor:default;transition:all .3s;gap:2px;}
+.cgrid{display:flex;flex-wrap:wrap;justify-content:center;gap:28px;max-width:900px;margin:0 auto;}
+.ci{display:flex;flex-direction:column;align-items:center;gap:12px;width:132px;}
+.cc{width:96px;height:96px;border-radius:50%;border:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--white);cursor:default;transition:all .3s;gap:2px;}
 .cc:hover{border-color:var(--navy);background:var(--navy);}
 .cc:hover .ca,.cc:hover .cs{color:#fff!important;}
-.ca{font-size:12px;font-weight:500;color:var(--navy);letter-spacing:1px;transition:color .3s;line-height:1;}
-.cs{font-family:Georgia,serif;font-size:18px;font-weight:400;color:var(--navy);transition:color .3s;line-height:1.15;}
-.cn2{font-size:11px;color:var(--muted);text-align:center;line-height:1.7;}
+.ca{font-size:var(--f-small);font-weight:500;color:var(--navy);letter-spacing:1px;transition:color .3s;line-height:1;}
+.cs{font-family:Georgia,serif;font-size:19px;font-weight:400;color:var(--navy);transition:color .3s;line-height:1.15;}
+.cn2{font-size:var(--f-small);color:var(--muted);text-align:center;line-height:1.7;}
 
 /* ── PARTNERS ── */
 .pgrid2{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;max-width:1100px;margin:0 auto;}
-.pcircle{width:134px;height:134px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;padding:14px;cursor:default;transition:all .3s;background:var(--white);}
+.pcircle{width:136px;height:136px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;padding:14px;cursor:default;transition:all .3s;background:var(--white);}
 .pcircle:hover{border-color:var(--navy);background:var(--navy);}
 .pcircle:hover .pn{color:#fff;}
-.pn{font-family:Georgia,serif;font-size:12.5px;font-weight:400;color:var(--navy);text-align:center;letter-spacing:.5px;line-height:1.45;transition:color .3s;}
+.pn{font-family:Georgia,serif;font-size:var(--f-small);font-weight:400;color:var(--navy);text-align:center;letter-spacing:.5px;line-height:1.45;transition:color .3s;}
 .pdark{background:var(--navy);border-color:var(--navy);}.pdark .pn{color:#fff;}.pdark:hover{background:var(--brand);}
 .pred{background:#9b1c1c;border-color:#9b1c1c;}.pred .pn{color:#fff;}
 .pmm{border-color:#9b1c1c;}.pmm .pn{color:#9b1c1c;}.pmm:hover{background:#9b1c1c;}.pmm:hover .pn{color:#fff;}
@@ -134,37 +216,34 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Hiragino Sans','No
 /* ── FOOTER ── */
 footer{background:var(--navy);padding:80px 60px 40px;}
 .ftop{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:60px;margin-bottom:56px;}
-.flogo{font-family:Georgia,serif;font-size:24px;font-weight:400;color:#fff;letter-spacing:6px;margin-bottom:5px;}
-.flogocn{font-size:11px;color:rgba(255,255,255,.4);letter-spacing:3px;margin-bottom:20px;}
-.fbrand p{font-size:12px;line-height:1.9;color:rgba(255,255,255,.38);max-width:280px;}
-.fcol h4{font-size:10px;letter-spacing:3.5px;text-transform:uppercase;color:#fff;margin-bottom:20px;font-weight:500;}
+.flogo-wrap{margin-bottom:20px;}
+.flogo-wrap img{height:48px;width:auto;display:block;}
+.flogocn{font-size:var(--f-small);color:rgba(255,255,255,.45);letter-spacing:3px;margin-bottom:22px;}
+.fbrand p{font-size:var(--f-body);line-height:2;color:rgba(255,255,255,.4);max-width:280px;}
+.fcol h4{font-size:var(--f-min);letter-spacing:3.5px;text-transform:uppercase;color:#fff;margin-bottom:20px;font-weight:500;}
 .fcol ul{list-style:none;}
-.fcol li{font-size:12px;color:rgba(255,255,255,.38);margin-bottom:9px;cursor:default;transition:color .2s;}
+.fcol li{font-size:var(--f-body);color:rgba(255,255,255,.4);margin-bottom:10px;cursor:default;transition:color .2s;letter-spacing:.3px;}
 .fcol li:hover{color:rgba(255,255,255,.8);}
 .fhr{height:.5px;background:rgba(255,255,255,.1);margin-bottom:26px;}
-.fbot{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:rgba(255,255,255,.26);}
-.fgold{color:var(--gold);font-size:11px;letter-spacing:3px;}
+.fbot{display:flex;justify-content:space-between;align-items:center;font-size:var(--f-small);color:rgba(255,255,255,.28);}
+.fgold{color:var(--gold);font-size:var(--f-small);letter-spacing:3px;}
 
 /* ── ANIMATIONS ── */
 .fi{opacity:0;transform:translateY(20px);transition:opacity .65s ease,transform .65s ease;}
 .fi.in{opacity:1;transform:translateY(0);}
 .d1{transition-delay:.08s;}.d2{transition-delay:.18s;}.d3{transition-delay:.28s;}.d4{transition-delay:.38s;}
 
-/* ══════════════════════════════════════
-   GALLERY PAGE
-══════════════════════════════════════ */
+/* ══ GALLERY PAGE ══ */
 #galleryPage{display:none;position:fixed;inset:0;z-index:1000;background:var(--white);overflow-y:auto;padding-top:66px;}
 #galleryPage.active{display:block;}
-
 .gal-header{background:var(--navy);padding:72px 60px 56px;text-align:center;position:relative;}
-.gal-back{position:absolute;top:50%;left:60px;transform:translateY(-50%);display:flex;align-items:center;gap:10px;color:rgba(255,255,255,.65);font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:color .2s;background:none;border:none;font-family:inherit;}
+.gal-back{position:absolute;top:50%;left:60px;transform:translateY(-50%);display:flex;align-items:center;gap:10px;color:rgba(255,255,255,.65);font-size:var(--f-small);letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:color .2s;background:none;border:none;font-family:inherit;}
 .gal-back:hover{color:#fff;}
 .gal-back svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.5;}
-.gal-label{font-size:10px;letter-spacing:6px;text-transform:uppercase;color:var(--gold);margin-bottom:14px;}
-.gal-title{font-family:Georgia,serif;font-size:clamp(26px,4vw,52px);font-weight:400;color:#fff;letter-spacing:6px;margin-bottom:10px;}
-.gal-sub{font-family:Georgia,serif;font-size:clamp(13px,1.6vw,20px);font-weight:400;color:rgba(255,255,255,.5);letter-spacing:4px;font-style:italic;}
-.gal-count{font-size:11px;letter-spacing:3px;color:rgba(255,255,255,.35);margin-top:16px;}
-
+.gal-label{font-size:var(--f-min);letter-spacing:6px;text-transform:uppercase;color:var(--gold);margin-bottom:14px;}
+.gal-title{font-family:Georgia,serif;font-size:clamp(var(--f-title),4vw,52px);font-weight:400;color:#fff;letter-spacing:6px;margin-bottom:10px;}
+.gal-sub{font-family:Georgia,serif;font-size:var(--f-sub);font-weight:400;color:rgba(255,255,255,.5);letter-spacing:4px;font-style:italic;}
+.gal-count{font-size:var(--f-small);letter-spacing:3px;color:rgba(255,255,255,.35);margin-top:16px;}
 .gal-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;padding:3px;background:var(--border);}
 .gal-item{overflow:hidden;cursor:pointer;position:relative;background:var(--cream);}
 .gal-item img{width:100%;aspect-ratio:3/4;object-fit:contain;padding:12px;display:block;transition:transform .4s;}
@@ -173,22 +252,27 @@ footer{background:var(--navy);padding:80px 60px 40px;}
 .gal-item:hover::after{background:rgba(28,43,58,.06);}
 
 /* ── LIGHTBOX ── */
-#lightbox{display:none;position:fixed;inset:0;z-index:2000;background:rgba(10,18,28,.94);align-items:center;justify-content:center;}
+#lightbox{display:none;position:fixed;inset:0;z-index:2000;background:rgba(7,8,26,.95);align-items:center;justify-content:center;}
 #lightbox.open{display:flex;}
 .lb-img{max-width:88vw;max-height:90vh;object-fit:contain;user-select:none;}
-.lb-close{position:absolute;top:22px;right:28px;background:none;border:none;color:rgba(255,255,255,.7);font-size:28px;cursor:pointer;line-height:1;transition:color .2s;}
+.lb-close{position:absolute;top:22px;right:28px;background:none;border:none;color:rgba(255,255,255,.6);font-size:28px;cursor:pointer;transition:color .2s;}
 .lb-close:hover{color:#fff;}
-.lb-prev,.lb-next{position:absolute;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(255,255,255,.6);cursor:pointer;padding:16px;transition:color .2s;font-size:0;}
+.lb-prev,.lb-next{position:absolute;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(255,255,255,.5);cursor:pointer;padding:16px;transition:color .2s;font-size:0;}
 .lb-prev:hover,.lb-next:hover{color:#fff;}
 .lb-prev{left:16px;}.lb-next{right:16px;}
 .lb-prev svg,.lb-next svg{width:28px;height:28px;stroke:currentColor;fill:none;stroke-width:1.5;}
-.lb-count{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.4);font-size:11px;letter-spacing:3px;}
+.lb-count{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);color:rgba(180,200,255,.4);font-size:var(--f-small);letter-spacing:3px;}
 
 /* ════ RESPONSIVE ════ */
 @media(max-width:900px){
   #nav{padding:0 24px;}
   .nlinks{display:none;}
   .ham{display:flex;}
+  .hero-body{bottom:120px;left:28px;right:28px;flex-direction:column;align-items:flex-start;}
+  .hero-card{width:100%;max-width:320px;}
+  .hero-bottom{padding:18px 28px;}
+  .hero-stats{gap:36px;}
+  .hero-scroll{display:none;}
   .sec{padding:72px 32px;}
   .stats-band{padding:44px 32px;}
   .sgrid{grid-template-columns:repeat(2,1fr);}
@@ -196,11 +280,8 @@ footer{background:var(--navy);padding:80px 60px 40px;}
   .si:nth-child(3){border-top:.5px solid var(--border);}
   .si:nth-child(4){border-top:.5px solid var(--border);border-right:none;}
   .pgrid{grid-template-columns:repeat(2,1fr);gap:14px;}
-  .wgrid{grid-template-columns:repeat(2,1fr);}
-  .ovs-grid{grid-template-columns:1fr;}
-  .ovs-block{aspect-ratio:16/7;}
-  .dgrid{grid-template-columns:1fr;}
-  .dcard{aspect-ratio:16/7;}
+  .wgrid,.ovs-grid,.dgrid{grid-template-columns:repeat(2,1fr);}
+  .ovs-block,.dcard{aspect-ratio:4/3;}
   .pcircle{width:112px;height:112px;}
   .ftop{grid-template-columns:1fr;gap:36px;}
   .fbot{flex-direction:column;gap:10px;text-align:center;}
@@ -213,27 +294,29 @@ footer{background:var(--navy);padding:80px 60px 40px;}
   #nav{padding:0 18px;height:58px;}
   .nl-main{font-size:17px;letter-spacing:4px;}
   .mob-menu{top:58px;}
-  .lb{font-size:12px;padding:3px 4px;}
-  #hero{min-height:100svh;padding-top:58px;}
-  .h-cn{font-size:clamp(20px,7vw,34px);letter-spacing:4px;}
-  .h-en{font-size:clamp(11px,3.5vw,16px);letter-spacing:4px;}
-  .h-wm{font-size:50vw;}
+  #hero{min-height:100svh;}
+  .hero-title{font-size:clamp(34px,9vw,56px);}
+  .hero-body{bottom:100px;left:18px;right:18px;gap:16px;}
+  .hero-card{display:none;}
+  .hero-bottom{padding:14px 18px;}
+  .hero-stats{gap:20px;}
+  .stat-label{font-size:var(--f-small);}
+  .slide-count{display:none;}
   .sec{padding:56px 20px;}
   .stats-band{padding:36px 20px;}
   .si{padding:28px 12px;}
   .snum{font-size:34px;}
   .pgrid{grid-template-columns:repeat(2,1fr);gap:10px;}
-  .wgrid{grid-template-columns:1fr;}
-  .wi{aspect-ratio:4/3;}
-  .ovs-block{aspect-ratio:4/3;}
-  .dcard{aspect-ratio:4/3;}
-  .cgrid{gap:16px;}
-  .ci{width:90px;}
-  .cc{width:72px;height:72px;}
+  .wgrid,.ovs-grid,.dgrid{grid-template-columns:1fr;}
+  .wi,.ovs-block,.dcard{aspect-ratio:4/3;}
+  .cgrid{gap:18px;}
+  .ci{width:96px;}
+  .cc{width:76px;height:76px;}
   .pgrid2{gap:8px;}
-  .pcircle{width:84px;height:84px;padding:8px;}
-  .pn{font-size:9.5px;}
+  .pcircle{width:86px;height:86px;padding:8px;}
+  .pn{font-size:12px;}
   footer{padding:48px 20px 30px;}
+  .fbot{font-size:var(--f-min);}
   .gal-header{padding:48px 20px 36px;}
   .gal-back{position:static;transform:none;margin-bottom:20px;justify-content:center;}
   .gal-grid{grid-template-columns:repeat(2,1fr);}
@@ -279,24 +362,54 @@ footer{background:var(--navy);padding:80px 60px 40px;}
 <!-- ══ MAIN PAGE ══ -->
 <div id="mainPage">
 
+<!-- HERO — CSS CYBER TECH -->
 <section id="hero">
-  <div class="h-wm">DS</div>
-  <div class="h-content fi">
-    <p class="h-eye">Dalian · China · Dishang Group</p>
-    <h1 class="h-cn">大连迪尚華盛時裝</h1>
-    <h2 class="h-en">DISHANG HUASHENG</h2>
-    <div class="h-line"></div>
-    <p class="h-tag" id="hTag">高端时装制造的卓越典范<br>卓越品质 · 全球服务</p>
+  <div class="hero-scene"></div>
+  <div class="hero-grid"></div>
+  <div class="gb gb1"></div><div class="gb gb2"></div><div class="gb gb3"></div><div class="gb gb4"></div>
+  <div class="gp gp1"></div><div class="gp gp2"></div><div class="gp gp3"></div>
+  <div class="gp gp4"></div><div class="gp gp5"></div>
+  <div class="beam"></div><div class="beam beam2"></div>
+  <div class="dots"></div>
+  <div class="hero-overlay"></div>
+
+  <div class="hero-scroll">
+    <span class="scroll-txt">Scroll</span>
+    <div class="scroll-bar"></div>
   </div>
-  <div class="h-scroll"><div class="h-bar"></div><span id="hScroll">向下滚动</span></div>
+
+  <div class="hero-body">
+    <div class="hero-left">
+      <p class="hero-eyebrow" id="hEye">迪尚集团 · 高端时装制造</p>
+      <h1 class="hero-title" id="hTitle">大连迪尚<br>華盛時裝</h1>
+      <p class="hero-desc" id="hDesc">作为迪尚集团旗下高端时装制造板块的核心企业，聚焦双面呢大衣、风衣、西服及羽绒服等品类的精细化生产，为全球客户提供高品质服装解决方案。</p>
+    </div>
+    <div class="hero-card">
+      <p class="card-uptxt" id="hCardUp">产品系列</p>
+      <div class="card-arrow"><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+      <p class="card-name" id="hCardName">西服 · 风衣</p>
+      <p class="card-sub" id="hCardSub">点击探索</p>
+      <div class="card-preview"><span id="hCardPrev">400,000 件 / 年</span></div>
+    </div>
+  </div>
+
+  <div class="hero-bottom">
+    <div class="hero-stats">
+      <div class="stat-item"><div class="stat-label" id="hS1L">卓越品质</div><div class="stat-val" id="hS1V">高端时装制造专家</div></div>
+      <div class="stat-item"><div class="stat-label" id="hS2L">全球布局</div><div class="stat-val" id="hS2V">缅甸 · 孟加拉国 · 柬埔寨</div></div>
+    </div>
+    <div class="hero-nav">
+      <div class="slide-count">01 <div class="slide-line"></div> 04</div>
+      <div class="slide-btn"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg></div>
+      <div class="slide-btn"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+    </div>
+  </div>
 </section>
 
+<!-- ABOUT -->
 <section id="about" class="sec white">
   <div class="sh fi"><p class="slabel" id="aLbl">Company Profile</p><h2 class="stcn" id="aTitle">公司简介</h2><div class="dv"><div class="dvl"></div><div class="dvd"></div><div class="dvl"></div></div></div>
-  <div class="about-in">
-    <p class="acn fi d1" id="aP1"></p>
-    <p class="acn fi d2" id="aP2"></p>
-  </div>
+  <div class="about-in"><p class="acn fi d1" id="aP1"></p><p class="acn fi d2" id="aP2"></p></div>
 </section>
 
 <div class="stats-band fi">
@@ -308,16 +421,18 @@ footer{background:var(--navy);padding:80px 60px 40px;}
   </div>
 </div>
 
+<!-- PRODUCTS -->
 <section id="products" class="sec cream">
   <div class="sh fi"><p class="slabel" id="pLbl">Our Products</p><h2 class="stcn" id="pTitle">产品系列</h2><div class="dv"><div class="dvl"></div><div class="dvd"></div><div class="dvl"></div></div></div>
   <div class="pgrid">
     <div class="pc fi d1" onclick="openGallery('suit')"><div class="pimg-wrap"><img src="https://i.ibb.co/Z1R9WVBm/image.jpg" alt="suit"/><div class="view-more" id="vm1">查看更多</div></div><div class="pinfo"><div class="pcn" id="p1n">西服</div><div class="pen" id="p1e">Suit / Blazer</div></div></div>
-    <div class="pc fi d2" onclick="openGallery('wool')"><div class="pimg-wrap"><img src="https://i.ibb.co/spy5Xnq1/image.jpg" alt="wool coat"/><div class="view-more" id="vm2">查看更多</div></div><div class="pinfo"><div class="pcn" id="p2n">双面呢大衣</div><div class="pen" id="p2e">Double-Faced Wool Coat</div></div></div>
-    <div class="pc fi d3" onclick="openGallery('trench')"><div class="pimg-wrap"><img src="https://i.ibb.co/2Yqr1sHS/image.jpg" alt="trench coat"/><div class="view-more" id="vm3">查看更多</div></div><div class="pinfo"><div class="pcn" id="p3n">风衣</div><div class="pen" id="p3e">Trench Coat</div></div></div>
-    <div class="pc fi d4" onclick="openGallery('down')"><div class="pimg-wrap"><img src="https://i.ibb.co/yc23866v/1.jpg" alt="down jacket"/><div class="view-more" id="vm4">查看更多</div></div><div class="pinfo"><div class="pcn" id="p4n">羽绒服</div><div class="pen" id="p4e">Down Jacket</div></div></div>
+    <div class="pc fi d2" onclick="openGallery('wool')"><div class="pimg-wrap"><img src="https://i.ibb.co/spy5Xnq1/image.jpg" alt="wool"/><div class="view-more" id="vm2">查看更多</div></div><div class="pinfo"><div class="pcn" id="p2n">双面呢大衣</div><div class="pen" id="p2e">Double-Faced Wool Coat</div></div></div>
+    <div class="pc fi d3" onclick="openGallery('trench')"><div class="pimg-wrap"><img src="https://i.ibb.co/2Yqr1sHS/image.jpg" alt="trench"/><div class="view-more" id="vm3">查看更多</div></div><div class="pinfo"><div class="pcn" id="p3n">风衣</div><div class="pen" id="p3e">Trench Coat</div></div></div>
+    <div class="pc fi d4" onclick="openGallery('down')"><div class="pimg-wrap"><img src="https://i.ibb.co/yc23866v/1.jpg" alt="down"/><div class="view-more" id="vm4">查看更多</div></div><div class="pinfo"><div class="pcn" id="p4n">羽绒服</div><div class="pen" id="p4e">Down Jacket</div></div></div>
   </div>
 </section>
 
+<!-- WORKSHOPS -->
 <section id="workshops" class="sec white">
   <div class="sh fi"><p class="slabel" id="wLbl">Manufacturing Excellence</p><h2 class="stcn" id="wTitle">生产车间</h2><div class="dv"><div class="dvl"></div><div class="dvd"></div><div class="dvl"></div></div></div>
   <div class="wgrid">
@@ -328,6 +443,7 @@ footer{background:var(--navy);padding:80px 60px 40px;}
   </div>
 </section>
 
+<!-- GLOBAL -->
 <section id="global" class="sec cream">
   <div class="sh fi"><p class="slabel" id="oLbl">Global Manufacturing</p><h2 class="stcn" id="oTitle">海外生产基地</h2><h3 class="sten" id="oSub">Overseas Factory</h3><div class="dv"><div class="dvl"></div><div class="dvd"></div><div class="dvl"></div></div></div>
   <div class="ovs-grid">
@@ -337,6 +453,7 @@ footer{background:var(--navy);padding:80px 60px 40px;}
   </div>
 </section>
 
+<!-- DESIGN -->
 <section id="design" class="sec white">
   <div class="sh fi"><p class="slabel" id="dLbl">Creative Network</p><h2 class="stcn" id="dTitle">海外设计公司</h2><h3 class="sten" id="dSub">Our Overseas Design Company</h3><div class="dv"><div class="dvl"></div><div class="dvd"></div><div class="dvl"></div></div></div>
   <div class="dgrid">
@@ -346,21 +463,23 @@ footer{background:var(--navy);padding:80px 60px 40px;}
   </div>
 </section>
 
+<!-- CERTS -->
 <section id="certifications" class="sec cream" style="text-align:center;">
   <div class="sh fi"><p class="slabel" id="cLbl">Quality Assurance</p><h2 class="stcn" id="cTitle">国际认证</h2><h3 class="sten" id="cSub">International Certification</h3><div class="dv"><div class="dvl"></div><div class="dvd"></div><div class="dvl"></div></div></div>
   <div class="cgrid">
     <div class="ci fi d1"><div class="cc"><span class="ca">R·D·S</span></div><div class="cn2" id="c1">Responsible Down Standard</div></div>
     <div class="ci fi d2"><div class="cc"><span class="ca">R·W·S</span></div><div class="cn2" id="c2">Responsible Wool Standard</div></div>
-    <div class="ci fi d3"><div class="cc"><span class="ca" style="font-size:10px;">ORGANIC</span><span class="cs">100</span></div><div class="cn2" id="c3">Organic 100 Content Standard</div></div>
+    <div class="ci fi d3"><div class="cc"><span class="ca" style="font-size:11px;">ORGANIC</span><span class="cs">100</span></div><div class="cn2" id="c3">Organic 100 Content Standard</div></div>
     <div class="ci fi d4"><div class="cc"><span class="cs">ISO</span></div><div class="cn2" id="c4">ISO International Standard</div></div>
     <div class="ci fi d1"><div class="cc"><span class="ca">ISO</span><span class="cs">9001</span></div><div class="cn2" id="c5">ISO 9001 Quality Management</div></div>
     <div class="ci fi d2"><div class="cc"><span class="ca">ISO</span><span class="cs">14001</span></div><div class="cn2" id="c6">ISO 14001 Environmental</div></div>
     <div class="ci fi d3"><div class="cc"><span class="cs">BSCI</span></div><div class="cn2" id="c7">Business Social Compliance Initiative</div></div>
-    <div class="ci fi d4"><div class="cc"><span class="ca" style="font-size:11px;">SMETA</span></div><div class="cn2" id="c8">SMETA Sedex Audit</div></div>
-    <div class="ci fi d1"><div class="cc"><span class="ca" style="font-size:9px;line-height:1.4;text-align:center;">Global<br>Recycled</span></div><div class="cn2" id="c9">Global Recycled Standard</div></div>
+    <div class="ci fi d4"><div class="cc"><span class="ca">SMETA</span></div><div class="cn2" id="c8">SMETA Sedex Audit</div></div>
+    <div class="ci fi d1"><div class="cc"><span class="ca" style="font-size:10px;line-height:1.4;text-align:center;">Global<br>Recycled</span></div><div class="cn2" id="c9">Global Recycled Standard</div></div>
   </div>
 </section>
 
+<!-- PARTNERS -->
 <section id="partners" class="sec white" style="text-align:center;">
   <div class="sh fi"><p class="slabel" id="ptLbl">Collaborations</p><h2 class="stcn" id="ptTitle">合作夥伴</h2><h3 class="sten" id="ptSub">Business Partners</h3><div class="dv"><div class="dvl"></div><div class="dvd"></div><div class="dvl"></div></div></div>
   <div class="pgrid2">
@@ -370,23 +489,23 @@ footer{background:var(--navy);padding:80px 60px 40px;}
 
 <footer>
   <div class="ftop">
-    <div class="fbrand"><div class="flogo">DISHANG</div><div class="flogocn">大连迪尚华盛时装有限公司</div><p id="ftDesc">以高端时装制造为核心，集研发、生产、贸易于一体，为全球客户提供高品质服装解决方案。</p></div>
+    <div class="fbrand">
+      <div class="flogo-wrap"><img src="https://i.ibb.co/SG0ZN8Z/logo.png" alt="Dishang Logo"/></div>
+      <div class="flogocn">大连迪尚华盛时装有限公司</div>
+      <p id="ftDesc">以高端时装制造为核心，集研发、生产、贸易于一体，为全球客户提供高品质服装解决方案。</p>
+    </div>
     <div class="fcol"><h4 id="ftC1T">Company</h4><ul id="ftC1"></ul></div>
     <div class="fcol"><h4 id="ftC2T">Global Network</h4><ul id="ftC2"></ul></div>
   </div>
   <div class="fhr"></div>
   <div class="fbot"><span id="ftCopy"></span><span class="fgold">DISHANG HUASHENG</span></div>
 </footer>
+</div>
 
-</div><!-- end mainPage -->
-
-<!-- ══ GALLERY PAGE ══ -->
+<!-- GALLERY PAGE -->
 <div id="galleryPage">
   <div class="gal-header">
-    <button class="gal-back" onclick="backToMain()">
-      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
-      <span id="galBackTxt">返回</span>
-    </button>
+    <button class="gal-back" onclick="backToMain()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg><span id="galBackTxt">返回</span></button>
     <p class="gal-label" id="galLabel">产品系列</p>
     <h2 class="gal-title" id="galTitle">西服</h2>
     <p class="gal-sub" id="galSub">Suit / Blazer</p>
@@ -405,112 +524,63 @@ footer{background:var(--navy);padding:80px 60px 40px;}
 </div>
 
 <script>
-/* ═══ IMAGE DATA ═══ */
-const IMGS = {
-  suit:[
-    'https://i.ibb.co/zhNZgb2T/307.png','https://i.ibb.co/Pv1xXydY/AI-2026-05-13.jpg','https://i.ibb.co/XfrfzbgF/AI-2026-05-13-2.jpg','https://i.ibb.co/wFbbgNLc/94ccfb90-4e67-11f1-8e84-4e4c8cfc4b0c.jpg','https://i.ibb.co/YTKBSf9c/273.png','https://i.ibb.co/cStcp8SP/c3627192-4e6c-11f1-8e84-4e4c8cfc4b0c.jpg','https://i.ibb.co/Z6RVt2ZW/AI-2026-05-13-5.jpg','https://i.ibb.co/qMqRwRTk/AI-2026-05-13-6.jpg','https://i.ibb.co/5hdcM5vV/AI-2026-05-13-7.jpg','https://i.ibb.co/V0sYRwhF/AI-2026-05-13-8.jpg','https://i.ibb.co/3Prdyb5/AI-2026-05-13-9.jpg','https://i.ibb.co/0pp4bJTY/AI-2026-05-13-10.jpg','https://i.ibb.co/vvRPYQL5/AI-2026-05-13-11.jpg','https://i.ibb.co/hx31Dfn7/AI-2026-05-13-17.jpg','https://i.ibb.co/gLCRVrX0/AI-2026-05-13-16.jpg','https://i.ibb.co/5XfPtDRS/AI-2026-05-13-15.jpg','https://i.ibb.co/840RK0jf/AI-2026-05-13-14.jpg','https://i.ibb.co/4ggVNdGw/AI-2026-05-13-13.jpg','https://i.ibb.co/qLKQYcYP/AI-2026-05-13-12.jpg','https://i.ibb.co/TD0JTnFV/AI-2026-05-13-23.jpg','https://i.ibb.co/Nd8MmVR9/AI-2026-05-13-22.jpg','https://i.ibb.co/CKcs5NNy/AI-2026-05-13-21.jpg','https://i.ibb.co/FLC4p30P/AI-2026-05-13-20.jpg','https://i.ibb.co/TDfQg1Pb/AI-2026-05-13-19.jpg','https://i.ibb.co/S45CHV1r/AI-2026-05-13-18.jpg','https://i.ibb.co/7xT5YnPM/AI-2026-05-13-29.jpg','https://i.ibb.co/7JMfwnGS/AI-2026-05-13-28.jpg','https://i.ibb.co/fd36B3hx/AI-2026-05-13-27.jpg','https://i.ibb.co/y73Kpcn/AI-2026-05-13-26.jpg','https://i.ibb.co/GQFt4ydy/AI-2026-05-13-25.jpg','https://i.ibb.co/rKXvR25z/AI-2026-05-13-24.jpg','https://i.ibb.co/ymtS9tLv/AI-2026-05-13-35.jpg','https://i.ibb.co/NgYzWhyt/AI-2026-05-13-34.jpg','https://i.ibb.co/6RTHkDN9/AI-2026-05-13-33.jpg','https://i.ibb.co/fdbdYnV3/AI-2026-05-13-32.jpg','https://i.ibb.co/DPhxhT6v/AI-2026-05-13-31.jpg','https://i.ibb.co/WWcZvC4p/AI-2026-05-13-30.jpg','https://i.ibb.co/LD6qtjq9/AI-2026-05-13-38.jpg','https://i.ibb.co/N25z3D2D/AI-2026-05-13-37.jpg','https://i.ibb.co/zWQ7HjkH/AI-2026-05-13-36.jpg'
-  ],
-  wool:[
-    'https://i.ibb.co/TBMT1vvr/AI-2026-05-13-50.jpg','https://i.ibb.co/pBYsLxqJ/AI-2026-05-13-49.jpg','https://i.ibb.co/z0GNtJJ/AI-2026-05-13-48.jpg','https://i.ibb.co/dScxXPS/AI-2026-05-13-56.jpg','https://i.ibb.co/R4NcnSfM/AI-2026-05-13-55.jpg','https://i.ibb.co/sDQs2Tg/AI-2026-05-13-54.jpg','https://i.ibb.co/Jjjp3h38/AI-2026-05-13-53.jpg','https://i.ibb.co/yB8XgzgS/AI-2026-05-13-64.jpg','https://i.ibb.co/LdwzzCyV/AI-2026-05-13-74.jpg','https://i.ibb.co/kVk4PRTm/AI-2026-05-13-73.jpg','https://i.ibb.co/27h4cnSz/AI-2026-05-13-72.jpg','https://i.ibb.co/gcWQhKd/AI-2026-05-13-71.jpg','https://i.ibb.co/0p2dhMnF/AI-2026-05-13-70.jpg','https://i.ibb.co/p61bGHMW/AI-2026-05-13-69.jpg','https://i.ibb.co/R4gSmdDL/AI-2026-05-13-80.jpg','https://i.ibb.co/SDGchzhc/AI-2026-05-13-79.jpg','https://i.ibb.co/6RcWpT0y/AI-2026-05-13-78.jpg','https://i.ibb.co/8LWyQ2nj/AI-2026-05-13-77.jpg','https://i.ibb.co/Zzfv1myQ/AI-2026-05-13-76.jpg','https://i.ibb.co/Swbs9mft/AI-2026-05-13-75.jpg','https://i.ibb.co/jP1WVLT6/AI-2026-05-13-86.jpg','https://i.ibb.co/jkXf3PyJ/AI-2026-05-13-85.jpg','https://i.ibb.co/7dVtf6rw/AI-2026-05-13-84.jpg','https://i.ibb.co/TMLG2qnV/AI-2026-05-13-83.jpg','https://i.ibb.co/21RcqcCp/AI-2026-05-13-82.jpg','https://i.ibb.co/qFmH1FFk/AI-2026-05-13-81.jpg','https://i.ibb.co/3YNq6tw6/AI-2026-05-13-92.jpg','https://i.ibb.co/q2WNytx/AI-2026-05-13-91.jpg','https://i.ibb.co/XfBkBJBh/AI-2026-05-13-90.jpg','https://i.ibb.co/gFtcpfgG/AI-2026-05-13-89.jpg','https://i.ibb.co/Tq1Nr8Xz/AI-2026-05-13-88.jpg','https://i.ibb.co/VYZTvCS4/AI-2026-05-13-87.jpg','https://i.ibb.co/sv7NsXr2/AI-2026-05-13-100.jpg','https://i.ibb.co/zW1G2PcL/AI-2026-05-13-99.jpg','https://i.ibb.co/60grm0ks/AI-2026-05-13-98.jpg','https://i.ibb.co/RkFHQSP9/AI-2026-05-13-97.jpg','https://i.ibb.co/jc0KgNX/AI-2026-05-13-96.jpg','https://i.ibb.co/8DdrgYJT/AI-2026-05-13-95.jpg','https://i.ibb.co/sJvCnSXX/AI-2026-05-13-94.jpg','https://i.ibb.co/7tjV8GP8/AI-2026-05-13-93.jpg'
-  ],
-  trench:[
-    'https://i.ibb.co/4gwtKWHM/AI-2026-05-13-47.jpg','https://i.ibb.co/BppTpp4/AI-2026-05-13-52.jpg','https://i.ibb.co/DX01WpR/AI-2026-05-13-51.jpg','https://i.ibb.co/nvWzjX6/AI-2026-05-13-63.jpg','https://i.ibb.co/wrwx1TTt/AI-2026-05-13-68.jpg','https://i.ibb.co/zh0bvRtF/AI-2026-05-13-67.jpg','https://i.ibb.co/zh43NV4x/AI-2026-05-13-66.jpg','https://i.ibb.co/5XBtftWk/AI-2026-05-13-65.jpg','https://i.ibb.co/C38ck71v/IMG-0591.jpg','https://i.ibb.co/DNyF3qL/AI-2026-05-13-128.jpg','https://i.ibb.co/ds0QZY3p/AI-2026-05-13-127.jpg','https://i.ibb.co/Hf7SJhzy/AI-2026-05-13-126.jpg','https://i.ibb.co/1tKZTzgv/AI-2026-05-13-125.jpg','https://i.ibb.co/4RCNswgH/AI-2026-05-13-124.jpg','https://i.ibb.co/BVC0hXVN/AI-2026-05-13-123.jpg','https://i.ibb.co/8LwGxMf7/AI-2026-05-13-122.jpg','https://i.ibb.co/6RpshHGy/AI-2026-05-13-134.jpg','https://i.ibb.co/nsBvwJhR/AI-2026-05-13-133.jpg','https://i.ibb.co/Xxr32BTR/AI-2026-05-13-132.jpg','https://i.ibb.co/mFdvFKwt/AI-2026-05-13-131.jpg','https://i.ibb.co/60GDjv00/AI-2026-05-13-130.jpg','https://i.ibb.co/bR6vkdT8/AI-2026-05-13-129.jpg'
-  ],
-  down:[
-    'https://i.ibb.co/4wPn2wrn/AI-2026-05-13-3.jpg','https://i.ibb.co/k2kWqLm1/AI-2026-05-13-4.jpg','https://i.ibb.co/nMn9YyCx/a34c96e6-4e6a-11f1-b180-32122d3eb903.jpg','https://i.ibb.co/mrDMd303/275.png','https://i.ibb.co/S7QRqJzQ/AI-2026-05-13-44.jpg','https://i.ibb.co/V0XqQmdD/AI-2026-05-13-43.jpg','https://i.ibb.co/Y4Kzb2z1/AI-2026-05-13-42.jpg','https://i.ibb.co/zT6bbxjv/AI-2026-05-13-41.jpg','https://i.ibb.co/nsNwZqs6/AI-2026-05-13-40.jpg','https://i.ibb.co/prRBFd96/AI-2026-05-13-39.jpg','https://i.ibb.co/tMx2jH3x/AI-2026-05-13-46.jpg','https://i.ibb.co/RTGvZZqF/AI-2026-05-13-45.jpg','https://i.ibb.co/ks5w9HxL/AI-2026-05-13-62.jpg','https://i.ibb.co/6JRS8N0j/AI-2026-05-13-61.jpg','https://i.ibb.co/d0wnCb2m/AI-2026-05-13-60.jpg','https://i.ibb.co/VY6SSXKZ/AI-2026-05-13-59.jpg','https://i.ibb.co/cX7kv6Nv/AI-2026-05-13-58.jpg','https://i.ibb.co/Gfh9tLRB/AI-2026-05-13-57.jpg','https://i.ibb.co/1GJF8CGr/AI-2026-05-13-108.jpg','https://i.ibb.co/99tm4XDS/AI-2026-05-13-107.jpg','https://i.ibb.co/kg0KtwjM/AI-2026-05-13-106.jpg','https://i.ibb.co/G3bC7gF3/AI-2026-05-13-105.jpg','https://i.ibb.co/b5nQwMsv/AI-2026-05-13-104.jpg','https://i.ibb.co/gb2k7Whm/AI-2026-05-13-103.jpg','https://i.ibb.co/HpXncjKc/AI-2026-05-13-102.jpg','https://i.ibb.co/YFVszR2G/AI-2026-05-13-101.jpg','https://i.ibb.co/zTyBMVM9/AI-2026-05-13-116.jpg','https://i.ibb.co/TBWMtYkQ/AI-2026-05-13-115.jpg','https://i.ibb.co/KcZsLydW/AI-2026-05-13-114.jpg','https://i.ibb.co/KcPHG1th/AI-2026-05-13-113.jpg','https://i.ibb.co/Sw47WHrr/AI-2026-05-13-112.jpg','https://i.ibb.co/TDQgQhHm/AI-2026-05-13-111.jpg','https://i.ibb.co/zWNW4mTf/AI-2026-05-13-110.jpg','https://i.ibb.co/vWKMtsh/AI-2026-05-13-109.jpg','https://i.ibb.co/ch29zmBr/AI-2026-05-13-120.jpg','https://i.ibb.co/PzJRkkXD/AI-2026-05-13-121.jpg','https://i.ibb.co/ZzJnS3z1/AI-2026-05-13-119.jpg','https://i.ibb.co/wrjxLq5H/AI-2026-05-13-118.jpg','https://i.ibb.co/k2Z5nJj6/AI-2026-05-13-117.jpg'
-  ]
+const IMGS={
+  suit:['https://i.ibb.co/zhNZgb2T/307.png','https://i.ibb.co/Pv1xXydY/AI-2026-05-13.jpg','https://i.ibb.co/XfrfzbgF/AI-2026-05-13-2.jpg','https://i.ibb.co/wFbbgNLc/94ccfb90-4e67-11f1-8e84-4e4c8cfc4b0c.jpg','https://i.ibb.co/YTKBSf9c/273.png','https://i.ibb.co/cStcp8SP/c3627192-4e6c-11f1-8e84-4e4c8cfc4b0c.jpg','https://i.ibb.co/Z6RVt2ZW/AI-2026-05-13-5.jpg','https://i.ibb.co/qMqRwRTk/AI-2026-05-13-6.jpg','https://i.ibb.co/5hdcM5vV/AI-2026-05-13-7.jpg','https://i.ibb.co/V0sYRwhF/AI-2026-05-13-8.jpg','https://i.ibb.co/3Prdyb5/AI-2026-05-13-9.jpg','https://i.ibb.co/0pp4bJTY/AI-2026-05-13-10.jpg','https://i.ibb.co/vvRPYQL5/AI-2026-05-13-11.jpg','https://i.ibb.co/hx31Dfn7/AI-2026-05-13-17.jpg','https://i.ibb.co/gLCRVrX0/AI-2026-05-13-16.jpg','https://i.ibb.co/5XfPtDRS/AI-2026-05-13-15.jpg','https://i.ibb.co/840RK0jf/AI-2026-05-13-14.jpg','https://i.ibb.co/4ggVNdGw/AI-2026-05-13-13.jpg','https://i.ibb.co/qLKQYcYP/AI-2026-05-13-12.jpg','https://i.ibb.co/TD0JTnFV/AI-2026-05-13-23.jpg','https://i.ibb.co/Nd8MmVR9/AI-2026-05-13-22.jpg','https://i.ibb.co/CKcs5NNy/AI-2026-05-13-21.jpg','https://i.ibb.co/FLC4p30P/AI-2026-05-13-20.jpg','https://i.ibb.co/TDfQg1Pb/AI-2026-05-13-19.jpg','https://i.ibb.co/S45CHV1r/AI-2026-05-13-18.jpg','https://i.ibb.co/7xT5YnPM/AI-2026-05-13-29.jpg','https://i.ibb.co/7JMfwnGS/AI-2026-05-13-28.jpg','https://i.ibb.co/fd36B3hx/AI-2026-05-13-27.jpg','https://i.ibb.co/y73Kpcn/AI-2026-05-13-26.jpg','https://i.ibb.co/GQFt4ydy/AI-2026-05-13-25.jpg','https://i.ibb.co/rKXvR25z/AI-2026-05-13-24.jpg','https://i.ibb.co/ymtS9tLv/AI-2026-05-13-35.jpg','https://i.ibb.co/NgYzWhyt/AI-2026-05-13-34.jpg','https://i.ibb.co/6RTHkDN9/AI-2026-05-13-33.jpg','https://i.ibb.co/fdbdYnV3/AI-2026-05-13-32.jpg','https://i.ibb.co/DPhxhT6v/AI-2026-05-13-31.jpg','https://i.ibb.co/WWcZvC4p/AI-2026-05-13-30.jpg','https://i.ibb.co/LD6qtjq9/AI-2026-05-13-38.jpg','https://i.ibb.co/N25z3D2D/AI-2026-05-13-37.jpg','https://i.ibb.co/zWQ7HjkH/AI-2026-05-13-36.jpg'],
+  wool:['https://i.ibb.co/TBMT1vvr/AI-2026-05-13-50.jpg','https://i.ibb.co/pBYsLxqJ/AI-2026-05-13-49.jpg','https://i.ibb.co/z0GNtJJ/AI-2026-05-13-48.jpg','https://i.ibb.co/dScxXPS/AI-2026-05-13-56.jpg','https://i.ibb.co/R4NcnSfM/AI-2026-05-13-55.jpg','https://i.ibb.co/sDQs2Tg/AI-2026-05-13-54.jpg','https://i.ibb.co/Gv33CFH5/AI-2026-05-14.jpg','https://i.ibb.co/yB8XgzgS/AI-2026-05-13-64.jpg','https://i.ibb.co/LdwzzCyV/AI-2026-05-13-74.jpg','https://i.ibb.co/kVk4PRTm/AI-2026-05-13-73.jpg','https://i.ibb.co/27h4cnSz/AI-2026-05-13-72.jpg','https://i.ibb.co/gcWQhKd/AI-2026-05-13-71.jpg','https://i.ibb.co/0p2dhMnF/AI-2026-05-13-70.jpg','https://i.ibb.co/p61bGHMW/AI-2026-05-13-69.jpg','https://i.ibb.co/R4gSmdDL/AI-2026-05-13-80.jpg','https://i.ibb.co/SDGchzhc/AI-2026-05-13-79.jpg','https://i.ibb.co/6RcWpT0y/AI-2026-05-13-78.jpg','https://i.ibb.co/8LWyQ2nj/AI-2026-05-13-77.jpg','https://i.ibb.co/Zzfv1myQ/AI-2026-05-13-76.jpg','https://i.ibb.co/Swbs9mft/AI-2026-05-13-75.jpg','https://i.ibb.co/jP1WVLT6/AI-2026-05-13-86.jpg','https://i.ibb.co/jkXf3PyJ/AI-2026-05-13-85.jpg','https://i.ibb.co/7dVtf6rw/AI-2026-05-13-84.jpg','https://i.ibb.co/TMLG2qnV/AI-2026-05-13-83.jpg','https://i.ibb.co/21RcqcCp/AI-2026-05-13-82.jpg','https://i.ibb.co/qFmH1FFk/AI-2026-05-13-81.jpg','https://i.ibb.co/3YNq6tw6/AI-2026-05-13-92.jpg','https://i.ibb.co/q2WNytx/AI-2026-05-13-91.jpg','https://i.ibb.co/XfBkBJBh/AI-2026-05-13-90.jpg','https://i.ibb.co/gFtcpfgG/AI-2026-05-13-89.jpg','https://i.ibb.co/Tq1Nr8Xz/AI-2026-05-13-88.jpg','https://i.ibb.co/VYZTvCS4/AI-2026-05-13-87.jpg','https://i.ibb.co/sv7NsXr2/AI-2026-05-13-100.jpg','https://i.ibb.co/zW1G2PcL/AI-2026-05-13-99.jpg','https://i.ibb.co/60grm0ks/AI-2026-05-13-98.jpg','https://i.ibb.co/RkFHQSP9/AI-2026-05-13-97.jpg','https://i.ibb.co/jc0KgNX/AI-2026-05-13-96.jpg','https://i.ibb.co/8DdrgYJT/AI-2026-05-13-95.jpg','https://i.ibb.co/sJvCnSXX/AI-2026-05-13-94.jpg','https://i.ibb.co/7tjV8GP8/AI-2026-05-13-93.jpg'],
+  trench:['https://i.ibb.co/4gwtKWHM/AI-2026-05-13-47.jpg','https://i.ibb.co/BppTpp4/AI-2026-05-13-52.jpg','https://i.ibb.co/DX01WpR/AI-2026-05-13-51.jpg','https://i.ibb.co/nvWzjX6/AI-2026-05-13-63.jpg','https://i.ibb.co/wrwx1TTt/AI-2026-05-13-68.jpg','https://i.ibb.co/zh0bvRtF/AI-2026-05-13-67.jpg','https://i.ibb.co/zh43NV4x/AI-2026-05-13-66.jpg','https://i.ibb.co/5XBtftWk/AI-2026-05-13-65.jpg','https://i.ibb.co/C38ck71v/IMG-0591.jpg','https://i.ibb.co/DNyF3qL/AI-2026-05-13-128.jpg','https://i.ibb.co/ds0QZY3p/AI-2026-05-13-127.jpg','https://i.ibb.co/Hf7SJhzy/AI-2026-05-13-126.jpg','https://i.ibb.co/1tKZTzgv/AI-2026-05-13-125.jpg','https://i.ibb.co/4RCNswgH/AI-2026-05-13-124.jpg','https://i.ibb.co/BVC0hXVN/AI-2026-05-13-123.jpg','https://i.ibb.co/8LwGxMf7/AI-2026-05-13-122.jpg','https://i.ibb.co/0ydSq9qK/AI-2026-05-14-19.jpg','https://i.ibb.co/nsBvwJhR/AI-2026-05-13-133.jpg','https://i.ibb.co/Xxr32BTR/AI-2026-05-13-132.jpg','https://i.ibb.co/mFdvFKwt/AI-2026-05-13-131.jpg','https://i.ibb.co/60GDjv00/AI-2026-05-13-130.jpg','https://i.ibb.co/bR6vkdT8/AI-2026-05-13-129.jpg','https://i.ibb.co/nqskYscL/AI-2026-05-14-7.jpg','https://i.ibb.co/tp75JzYS/AI-2026-05-14-6.jpg','https://i.ibb.co/DDkLddwr/AI-2026-05-14-5.jpg','https://i.ibb.co/27wwnWhB/AI-2026-05-14-4.jpg','https://i.ibb.co/9mYpHV1m/AI-2026-05-14-3.jpg','https://i.ibb.co/vCKsn5qs/AI-2026-05-14-2.jpg','https://i.ibb.co/C5VBQ3Gz/AI-2026-05-14-13.jpg','https://i.ibb.co/399R7TY4/AI-2026-05-14-12.jpg','https://i.ibb.co/C5SrqqMy/AI-2026-05-14-11.jpg','https://i.ibb.co/PZXKfg2s/AI-2026-05-14-10.jpg','https://i.ibb.co/1Gpnd9WK/AI-2026-05-14-9.jpg','https://i.ibb.co/vCTCW2jw/AI-2026-05-14-8.jpg','https://i.ibb.co/pjBpFtPX/AI-2026-05-14-18.jpg','https://i.ibb.co/tT17tFPb/AI-2026-05-14-17.jpg','https://i.ibb.co/zVTzxjxk/AI-2026-05-14-16.jpg','https://i.ibb.co/JwVB49qK/AI-2026-05-14-15.jpg','https://i.ibb.co/hJb8hh4q/AI-2026-05-14-14.jpg','https://i.ibb.co/bMRjmbNg/AI-2026-05-14-20.jpg'],
+  down:['https://i.ibb.co/4wPn2wrn/AI-2026-05-13-3.jpg','https://i.ibb.co/k2kWqLm1/AI-2026-05-13-4.jpg','https://i.ibb.co/nMn9YyCx/a34c96e6-4e6a-11f1-b180-32122d3eb903.jpg','https://i.ibb.co/mrDMd303/275.png','https://i.ibb.co/S7QRqJzQ/AI-2026-05-13-44.jpg','https://i.ibb.co/V0XqQmdD/AI-2026-05-13-43.jpg','https://i.ibb.co/Y4Kzb2z1/AI-2026-05-13-42.jpg','https://i.ibb.co/zT6bbxjv/AI-2026-05-13-41.jpg','https://i.ibb.co/nsNwZqs6/AI-2026-05-13-40.jpg','https://i.ibb.co/prRBFd96/AI-2026-05-13-39.jpg','https://i.ibb.co/tMx2jH3x/AI-2026-05-13-46.jpg','https://i.ibb.co/RTGvZZqF/AI-2026-05-13-45.jpg','https://i.ibb.co/ks5w9HxL/AI-2026-05-13-62.jpg','https://i.ibb.co/6JRS8N0j/AI-2026-05-13-61.jpg','https://i.ibb.co/d0wnCb2m/AI-2026-05-13-60.jpg','https://i.ibb.co/VY6SSXKZ/AI-2026-05-13-59.jpg','https://i.ibb.co/cX7kv6Nv/AI-2026-05-13-58.jpg','https://i.ibb.co/Gfh9tLRB/AI-2026-05-13-57.jpg','https://i.ibb.co/1GJF8CGr/AI-2026-05-13-108.jpg','https://i.ibb.co/99tm4XDS/AI-2026-05-13-107.jpg','https://i.ibb.co/kg0KtwjM/AI-2026-05-13-106.jpg','https://i.ibb.co/G3bC7gF3/AI-2026-05-13-105.jpg','https://i.ibb.co/b5nQwMsv/AI-2026-05-13-104.jpg','https://i.ibb.co/gb2k7Whm/AI-2026-05-13-103.jpg','https://i.ibb.co/HpXncjKc/AI-2026-05-13-102.jpg','https://i.ibb.co/YFVszR2G/AI-2026-05-13-101.jpg','https://i.ibb.co/zTyBMVM9/AI-2026-05-13-116.jpg','https://i.ibb.co/TBWMtYkQ/AI-2026-05-13-115.jpg','https://i.ibb.co/KcZsLydW/AI-2026-05-13-114.jpg','https://i.ibb.co/KcPHG1th/AI-2026-05-13-113.jpg','https://i.ibb.co/Sw47WHrr/AI-2026-05-13-112.jpg','https://i.ibb.co/TDQgQhHm/AI-2026-05-13-111.jpg','https://i.ibb.co/zWNW4mTf/AI-2026-05-13-110.jpg','https://i.ibb.co/vWKMtsh/AI-2026-05-13-109.jpg','https://i.ibb.co/ch29zmBr/AI-2026-05-13-120.jpg','https://i.ibb.co/PzJRkkXD/AI-2026-05-13-121.jpg','https://i.ibb.co/ZzJnS3z1/AI-2026-05-13-119.jpg','https://i.ibb.co/wrjxLq5H/AI-2026-05-13-118.jpg','https://i.ibb.co/k2Z5nJj6/AI-2026-05-13-117.jpg']
 };
 
-/* ═══ GALLERY META per language ═══ */
-const GAL_META = {
-  suit:{
-    cn:{label:'产品系列',title:'西服',sub:'Suit / Blazer',back:'返回主页',count:'件'},
-    en:{label:'Product Range',title:'Suit',sub:'Suit / Blazer',back:'Back',count:'pieces'},
-    ja:{label:'製品シリーズ',title:'スーツ',sub:'Suit / Blazer',back:'戻る',count:'点'}
-  },
-  wool:{
-    cn:{label:'产品系列',title:'双面呢大衣',sub:'Double-Faced Wool Coat',back:'返回主页',count:'件'},
-    en:{label:'Product Range',title:'Wool Coat',sub:'Double-Faced Wool Coat',back:'Back',count:'pieces'},
-    ja:{label:'製品シリーズ',title:'ウールコート',sub:'Double-Faced Wool Coat',back:'戻る',count:'点'}
-  },
-  trench:{
-    cn:{label:'产品系列',title:'风衣',sub:'Trench Coat',back:'返回主页',count:'件'},
-    en:{label:'Product Range',title:'Trench Coat',sub:'Trench Coat',back:'Back',count:'pieces'},
-    ja:{label:'製品シリーズ',title:'トレンチコート',sub:'Trench Coat',back:'戻る',count:'点'}
-  },
-  down:{
-    cn:{label:'产品系列',title:'羽绒服',sub:'Down Jacket',back:'返回主页',count:'件'},
-    en:{label:'Product Range',title:'Down Jacket',sub:'Down Jacket',back:'Back',count:'pieces'},
-    ja:{label:'製品シリーズ',title:'ダウンジャケット',sub:'Down Jacket',back:'戻る',count:'点'}
-  }
+const GAL_META={
+  suit:{cn:{label:'产品系列',title:'西服',sub:'Suit / Blazer',back:'返回主页',count:'件'},en:{label:'Product Range',title:'Suit',sub:'Suit / Blazer',back:'Back',count:'pieces'},ja:{label:'製品シリーズ',title:'スーツ',sub:'Suit / Blazer',back:'戻る',count:'点'}},
+  wool:{cn:{label:'产品系列',title:'双面呢大衣',sub:'Double-Faced Wool Coat',back:'返回主页',count:'件'},en:{label:'Product Range',title:'Wool Coat',sub:'Double-Faced Wool Coat',back:'Back',count:'pieces'},ja:{label:'製品シリーズ',title:'ウールコート',sub:'Double-Faced Wool Coat',back:'戻る',count:'点'}},
+  trench:{cn:{label:'产品系列',title:'风衣',sub:'Trench Coat',back:'返回主页',count:'件'},en:{label:'Product Range',title:'Trench Coat',sub:'Trench Coat',back:'Back',count:'pieces'},ja:{label:'製品シリーズ',title:'トレンチコート',sub:'Trench Coat',back:'戻る',count:'点'}},
+  down:{cn:{label:'产品系列',title:'羽绒服',sub:'Down Jacket',back:'返回主页',count:'件'},en:{label:'Product Range',title:'Down Jacket',sub:'Down Jacket',back:'Back',count:'pieces'},ja:{label:'製品シリーズ',title:'ダウンジャケット',sub:'Down Jacket',back:'戻る',count:'点'}}
 };
 
-let curLang='cn', curCat='suit', curLbIdx=0;
+let curLang='cn',curCat='suit',curLbIdx=0;
 
-/* ═══ GALLERY OPEN/CLOSE ═══ */
 function openGallery(cat){
-  curCat = cat;
-  const meta = GAL_META[cat][curLang];
-  const imgs = IMGS[cat];
-  document.getElementById('galLabel').textContent = meta.label;
-  document.getElementById('galTitle').textContent = meta.title;
-  document.getElementById('galSub').textContent = meta.sub;
-  document.getElementById('galBackTxt').textContent = meta.back;
-  document.getElementById('galCount').textContent = imgs.length + ' ' + meta.count;
-
-  const grid = document.getElementById('galGrid');
-  grid.innerHTML = '';
+  curCat=cat;
+  const m=GAL_META[cat][curLang],imgs=IMGS[cat];
+  document.getElementById('galLabel').textContent=m.label;
+  document.getElementById('galTitle').textContent=m.title;
+  document.getElementById('galSub').textContent=m.sub;
+  document.getElementById('galBackTxt').textContent=m.back;
+  document.getElementById('galCount').textContent=imgs.length+' '+m.count;
+  const g=document.getElementById('galGrid');
+  g.innerHTML='';
   imgs.forEach((src,i)=>{
-    const div = document.createElement('div');
-    div.className = 'gal-item';
-    div.onclick = ()=>openLb(i);
-    const img = document.createElement('img');
-    img.src = src;
-    img.alt = meta.title + ' ' + (i+1);
-    img.loading = 'lazy';
-    div.appendChild(img);
-    grid.appendChild(div);
+    const d=document.createElement('div');d.className='gal-item';d.onclick=()=>openLb(i);
+    const im=document.createElement('img');im.src=src;im.loading='lazy';
+    d.appendChild(im);g.appendChild(d);
   });
-
-  document.getElementById('mainPage').style.display = 'none';
-  const gp = document.getElementById('galleryPage');
-  gp.classList.add('active');
-  gp.scrollTop = 0;
+  document.getElementById('mainPage').style.display='none';
+  const gp=document.getElementById('galleryPage');gp.classList.add('active');gp.scrollTop=0;
 }
-
 function backToMain(){
   document.getElementById('galleryPage').classList.remove('active');
-  document.getElementById('mainPage').style.display = '';
+  document.getElementById('mainPage').style.display='';
   closeMobMenu();
 }
-
-/* ═══ LIGHTBOX ═══ */
 function openLb(i){
-  curLbIdx = i;
-  const imgs = IMGS[curCat];
-  document.getElementById('lbImg').src = imgs[i];
-  document.getElementById('lbCount').textContent = (i+1) + ' / ' + imgs.length;
+  curLbIdx=i;const imgs=IMGS[curCat];
+  document.getElementById('lbImg').src=imgs[i];
+  document.getElementById('lbCount').textContent=(i+1)+' / '+imgs.length;
   document.getElementById('lightbox').classList.add('open');
 }
 function closeLb(){document.getElementById('lightbox').classList.remove('open');}
-function lbNav(dir){
-  const imgs = IMGS[curCat];
-  curLbIdx = (curLbIdx + dir + imgs.length) % imgs.length;
-  openLb(curLbIdx);
-}
+function lbNav(dir){const imgs=IMGS[curCat];curLbIdx=(curLbIdx+dir+imgs.length)%imgs.length;openLb(curLbIdx);}
 document.addEventListener('keydown',e=>{
-  if(!document.getElementById('lightbox').classList.contains('open')) return;
-  if(e.key==='ArrowLeft') lbNav(-1);
-  if(e.key==='ArrowRight') lbNav(1);
-  if(e.key==='Escape') closeLb();
+  if(!document.getElementById('lightbox').classList.contains('open'))return;
+  if(e.key==='ArrowLeft')lbNav(-1);if(e.key==='ArrowRight')lbNav(1);if(e.key==='Escape')closeLb();
 });
 document.getElementById('lightbox').addEventListener('click',function(e){if(e.target===this)closeLb();});
 
-/* ═══ TRANSLATIONS ═══ */
 const TR={
-  cn:{nav:['公司简介','产品系列','生产车间','全球布局','国际认证','合作伙伴'],hTag:'高端时装制造的卓越典范<br>卓越品质 · 全球服务',hScroll:'向下滚动',aLbl:'Company Profile',aTitle:'公司简介',aP1:'作为迪尚集团旗下高端时装制造板块的核心企业，大连迪尚华盛时装有限公司注册资本1.2亿元人民币，厂区占地约15000平方米，拥有12000平方米现代化生产车间，核心团队与一线员工共600余人，年产能40万件。',aP2:'公司聚焦高端时装，尤其是双面呢大衣、风衣、西服及羽绒服等品类的精细化生产，以服装加工制造为核心，联动进出口贸易业务，构建了集研发、生产、贸易于一体的全流程服务体系，为全球客户提供高品质服装解决方案。',s1l:'注册资本（元）',s2l:'厂区占地面积',s3l:'核心团队与员工',s4l:'年产能',pLbl:'Our Products',pTitle:'产品系列',p1n:'西服',p1e:'Suit / Blazer',p2n:'双面呢大衣',p2e:'Double-Faced Wool Coat',p3n:'风衣',p3e:'Trench Coat',p4n:'羽绒服',p4e:'Down Jacket',vm:'查看更多',wLbl:'Manufacturing Excellence',wTitle:'生产车间',w1n:'縫製車間',w1e:'SEWING WORKSHOP',w2n:'模板車間',w2e:'MOULDING WORKSHOP',w3n:'整熨車間',w3e:'IRONING WORKSHOP',w4n:'包裝車間',w4e:'PACKAGING WORKSHOP',oLbl:'Global Manufacturing',oTitle:'海外生产基地',oSub:'Overseas Factory',o1n:'缅甸',o1e:'Myanmar',o1t:'仰光工业园 · 迪尚凯尼',o2n:'孟加拉国',o2e:'Bangladesh',o2t:'ACE APPAREL · 锦鸿',o3n:'柬埔寨',o3e:'Cambodia',o3t:'华宽 · 迪尚瑞华盛',dLbl:'Creative Network',dTitle:'海外设计公司',dSub:'Our Overseas Design Company',d1n:'英国',d1e:'United Kingdom',d2n:'西班牙',d2e:'Spain',d3n:'加拿大',d3e:'Canada',cLbl:'Quality Assurance',cTitle:'国际认证',cSub:'International Certification',c1:'Responsible Down Standard',c2:'Responsible Wool Standard',c3:'Organic 100 Content Standard',c4:'ISO International Standard',c5:'ISO 9001 Quality Management',c6:'ISO 14001 Environmental',c7:'Business Social Compliance Initiative',c8:'SMETA Sedex Audit',c9:'Global Recycled Standard',ptLbl:'Collaborations',ptTitle:'合作夥伴',ptSub:'Business Partners',ftDesc:'以高端时装制造为核心，集研发、生产、贸易于一体，为全球客户提供高品质服装解决方案。',ftC1T:'Company',ftC1:['公司简介','产品系列','生产车间','全球布局','国际认证','合作伙伴'],ftC2T:'Global Network',ftC2:['UK — Design Office','Spain — Design Office','Canada — Design Office','Myanmar — Production','Bangladesh — Production','Cambodia — Production'],ftCopy:'© 2024 大连迪尚华盛时装有限公司 · Dalian Dishang Huasheng Fashion Co., Ltd. All rights reserved.'},
-  en:{nav:['About','Products','Workshops','Global','Certifications','Partners'],hTag:'The Benchmark of Premium Fashion Manufacturing<br>Superior Quality · Global Service',hScroll:'Scroll',aLbl:'Company Profile',aTitle:'About Us',aP1:'A core high-end fashion manufacturer under Dishang Group, Dalian Dishang Huasheng Fashion Co., Ltd. has RMB 120 million in registered capital. Our plant spans ~15,000 sqm, with 12,000 sqm of modern workshops, a team of over 600 employees, and an annual capacity of 400,000 pieces.',aP2:'Specializing in high-end fashion — double-faced wool coats, trenchcoats, suits and down jackets — we integrate garment manufacturing with import/export trade. With a full R&D-production-trade service system, we deliver premium garment solutions to global clients.',s1l:'Registered Capital',s2l:'Plant Area',s3l:'Employees',s4l:'Annual Capacity',pLbl:'Our Products',pTitle:'Product Range',p1n:'Suit',p1e:'Suit / Blazer',p2n:'Wool Coat',p2e:'Double-Faced Wool Coat',p3n:'Trench Coat',p3e:'Trench Coat',p4n:'Down Jacket',p4e:'Down Jacket',vm:'View More',wLbl:'Manufacturing Excellence',wTitle:'Workshops',w1n:'Sewing',w1e:'SEWING WORKSHOP',w2n:'Moulding',w2e:'MOULDING WORKSHOP',w3n:'Ironing',w3e:'IRONING WORKSHOP',w4n:'Packaging',w4e:'PACKAGING WORKSHOP',oLbl:'Global Manufacturing',oTitle:'Overseas Factories',oSub:'Global Production Network',o1n:'Myanmar',o1e:'Myanmar',o1t:'Yangon Industrial Park · Dishang Kenny',o2n:'Bangladesh',o2e:'Bangladesh',o2t:'ACE Apparel · Jinhong',o3n:'Cambodia',o3e:'Cambodia',o3t:'Huakuan · Dishang Ruihuasheng',dLbl:'Creative Network',dTitle:'Design Offices',dSub:'Our Overseas Design Network',d1n:'United Kingdom',d1e:'United Kingdom',d2n:'Spain',d2e:'Spain',d3n:'Canada',d3e:'Canada',cLbl:'Quality Assurance',cTitle:'Certifications',cSub:'International Certification',c1:'Responsible Down Standard',c2:'Responsible Wool Standard',c3:'Organic 100 Content Standard',c4:'ISO International Standard',c5:'ISO 9001 Quality Management',c6:'ISO 14001 Environmental',c7:'Business Social Compliance Initiative',c8:'SMETA Sedex Audit',c9:'Global Recycled Standard',ptLbl:'Collaborations',ptTitle:'Partners',ptSub:'Business Partners',ftDesc:'A premium fashion manufacturer integrating R&D, production and trade to deliver high-quality garment solutions to global clients.',ftC1T:'Company',ftC1:['About','Products','Workshops','Global','Certifications','Partners'],ftC2T:'Global Network',ftC2:['UK — Design Office','Spain — Design Office','Canada — Design Office','Myanmar — Production','Bangladesh — Production','Cambodia — Production'],ftCopy:'© 2024 Dalian Dishang Huasheng Fashion Co., Ltd. All rights reserved.'},
-  ja:{nav:['会社概要','製品ライン','生産工場','グローバル','国際認証','パートナー'],hTag:'高級ファッション製造のベンチマーク<br>優れた品質 · グローバルサービス',hScroll:'スクロール',aLbl:'会社概要',aTitle:'会社について',aP1:'迪尚グループ傘下の高級ファッション製造の中核企業として、大連迪尚華盛時装有限公司は登録資本金1億2,000万元を有します。工場総面積は約15,000㎡、近代的な生産工場12,000㎡を備え、600名超のスタッフが年間40万点の生産能力を支えています。',aP2:'ダブルフェイスウールコート、トレンチコート、スーツ、ダウンジャケットなどの高級ファッションに特化し、製造と輸出入貿易を統合。研究開発から生産・貿易まで一体化したフルサービス体制で、グローバルクライアントに高品質なソリューションを提供します。',s1l:'登録資本金',s2l:'工場総面積',s3l:'従業員数',s4l:'年間生産能力',pLbl:'製品ライン',pTitle:'製品シリーズ',p1n:'スーツ',p1e:'Suit / Blazer',p2n:'ウールコート',p2e:'Double-Faced Wool Coat',p3n:'トレンチコート',p3e:'Trench Coat',p4n:'ダウンジャケット',p4e:'Down Jacket',vm:'もっと見る',wLbl:'製造の卓越性',wTitle:'生産工場',w1n:'縫製工場',w1e:'SEWING WORKSHOP',w2n:'型板工場',w2e:'MOULDING WORKSHOP',w3n:'プレス工場',w3e:'IRONING WORKSHOP',w4n:'包装工場',w4e:'PACKAGING WORKSHOP',oLbl:'グローバル製造',oTitle:'海外生産拠点',oSub:'Overseas Factory',o1n:'ミャンマー',o1e:'Myanmar',o1t:'ヤンゴン工業団地 · 迪尚凱尼',o2n:'バングラデシュ',o2e:'Bangladesh',o2t:'ACE APPAREL · 錦鴻',o3n:'カンボジア',o3e:'Cambodia',o3t:'華寛 · 迪尚瑞華盛',dLbl:'クリエイティブネットワーク',dTitle:'海外デザイン拠点',dSub:'Overseas Design Offices',d1n:'イギリス',d1e:'United Kingdom',d2n:'スペイン',d2e:'Spain',d3n:'カナダ',d3e:'Canada',cLbl:'品質保証',cTitle:'国際認証',cSub:'International Certification',c1:'責任あるダウン基準',c2:'責任あるウール基準',c3:'オーガニック100含有基準',c4:'ISO国際基準',c5:'ISO 9001 品質管理',c6:'ISO 14001 環境管理',c7:'ビジネス社会的コンプライアンス',c8:'SMETAセデックス審査',c9:'グローバルリサイクル基準',ptLbl:'コラボレーション',ptTitle:'ビジネスパートナー',ptSub:'Business Partners',ftDesc:'高級ファッション製造を核心に、研究開発・生産・貿易を統合し、グローバルクライアントに高品質なソリューションを提供します。',ftC1T:'会社',ftC1:['会社概要','製品ライン','生産工場','グローバル','国際認証','パートナー'],ftC2T:'グローバルネットワーク',ftC2:['イギリス — デザイン拠点','スペイン — デザイン拠点','カナダ — デザイン拠点','ミャンマー — 生産拠点','バングラデシュ — 生産拠点','カンボジア — 生産拠点'],ftCopy:'© 2024 大連迪尚華盛時装有限公司 · All rights reserved.'}
+  cn:{nav:['公司简介','产品系列','生产车间','全球布局','国际认证','合作伙伴'],hEye:'迪尚集团 · 高端时装制造',hTitle:'大连迪尚<br>華盛時裝',hDesc:'作为迪尚集团旗下高端时装制造板块的核心企业，聚焦双面呢大衣、风衣、西服及羽绒服等品类的精细化生产，为全球客户提供高品质服装解决方案。',hCardUp:'产品系列',hCardName:'西服 · 风衣',hCardSub:'点击探索',hCardPrev:'400,000 件 / 年',hS1L:'卓越品质',hS1V:'高端时装制造专家',hS2L:'全球布局',hS2V:'缅甸 · 孟加拉国 · 柬埔寨',aLbl:'Company Profile',aTitle:'公司简介',aP1:'作为迪尚集团旗下高端时装制造板块的核心企业，大连迪尚华盛时装有限公司注册资本1.2亿元人民币，厂区占地约15000平方米，拥有12000平方米现代化生产车间，核心团队与一线员工共600余人，年产能40万件。',aP2:'公司聚焦高端时装，尤其是双面呢大衣、风衣、西服及羽绒服等品类的精细化生产，以服装加工制造为核心，联动进出口贸易业务，构建了集研发、生产、贸易于一体的全流程服务体系，为全球客户提供高品质服装解决方案。',s1l:'注册资本（元）',s2l:'厂区占地面积',s3l:'核心团队与员工',s4l:'年产能',pLbl:'Our Products',pTitle:'产品系列',p1n:'西服',p1e:'Suit / Blazer',p2n:'双面呢大衣',p2e:'Double-Faced Wool Coat',p3n:'风衣',p3e:'Trench Coat',p4n:'羽绒服',p4e:'Down Jacket',vm:'查看更多',wLbl:'Manufacturing Excellence',wTitle:'生产车间',w1n:'縫製車間',w1e:'SEWING WORKSHOP',w2n:'模板車間',w2e:'MOULDING WORKSHOP',w3n:'整熨車間',w3e:'IRONING WORKSHOP',w4n:'包裝車間',w4e:'PACKAGING WORKSHOP',oLbl:'Global Manufacturing',oTitle:'海外生产基地',oSub:'Overseas Factory',o1n:'缅甸',o1e:'Myanmar',o1t:'仰光工业园 · 迪尚凯尼',o2n:'孟加拉国',o2e:'Bangladesh',o2t:'ACE APPAREL · 锦鸿',o3n:'柬埔寨',o3e:'Cambodia',o3t:'华宽 · 迪尚瑞华盛',dLbl:'Creative Network',dTitle:'海外设计公司',dSub:'Our Overseas Design Company',d1n:'英国',d1e:'United Kingdom',d2n:'西班牙',d2e:'Spain',d3n:'加拿大',d3e:'Canada',cLbl:'Quality Assurance',cTitle:'国际认证',cSub:'International Certification',c1:'Responsible Down Standard',c2:'Responsible Wool Standard',c3:'Organic 100 Content Standard',c4:'ISO International Standard',c5:'ISO 9001 Quality Management',c6:'ISO 14001 Environmental',c7:'Business Social Compliance Initiative',c8:'SMETA Sedex Audit',c9:'Global Recycled Standard',ptLbl:'Collaborations',ptTitle:'合作夥伴',ptSub:'Business Partners',ftDesc:'以高端时装制造为核心，集研发、生产、贸易于一体，为全球客户提供高品质服装解决方案。',ftC1T:'Company',ftC1:['公司简介','产品系列','生产车间','全球布局','国际认证','合作伙伴'],ftC2T:'Global Network',ftC2:['UK — Design Office','Spain — Design Office','Canada — Design Office','Myanmar — Production','Bangladesh — Production','Cambodia — Production'],ftCopy:'© 2024 大连迪尚华盛时装有限公司 · Dalian Dishang Huasheng Fashion Co., Ltd. All rights reserved.'},
+  en:{nav:['About','Products','Workshops','Global','Certifications','Partners'],hEye:'Dishang Group · Premium Fashion',hTitle:'Dalian Dishang<br>Huasheng',hDesc:'A core high-end fashion manufacturer under Dishang Group, specializing in wool coats, trench coats, suits and down jackets — delivering premium garment solutions to global clients.',hCardUp:'Products',hCardName:'Suits · Coats',hCardSub:'Explore',hCardPrev:'400,000 pcs / year',hS1L:'Premium Quality',hS1V:'High-End Fashion Manufacturer',hS2L:'Global Network',hS2V:'Myanmar · Bangladesh · Cambodia',aLbl:'Company Profile',aTitle:'About Us',aP1:'A core high-end fashion manufacturer under Dishang Group, Dalian Dishang Huasheng Fashion Co., Ltd. has RMB 120 million in registered capital. Our plant spans ~15,000 sqm, with 12,000 sqm of modern workshops, a team of over 600 employees, and an annual capacity of 400,000 pieces.',aP2:'Specializing in high-end fashion — double-faced wool coats, trenchcoats, suits and down jackets — we integrate garment manufacturing with import/export trade. With a full R&D-production-trade service system, we deliver premium garment solutions to global clients.',s1l:'Registered Capital',s2l:'Plant Area',s3l:'Employees',s4l:'Annual Capacity',pLbl:'Our Products',pTitle:'Product Range',p1n:'Suit',p1e:'Suit / Blazer',p2n:'Wool Coat',p2e:'Double-Faced Wool Coat',p3n:'Trench Coat',p3e:'Trench Coat',p4n:'Down Jacket',p4e:'Down Jacket',vm:'View More',wLbl:'Manufacturing Excellence',wTitle:'Workshops',w1n:'Sewing',w1e:'SEWING WORKSHOP',w2n:'Moulding',w2e:'MOULDING WORKSHOP',w3n:'Ironing',w3e:'IRONING WORKSHOP',w4n:'Packaging',w4e:'PACKAGING WORKSHOP',oLbl:'Global Manufacturing',oTitle:'Overseas Factories',oSub:'Global Production Network',o1n:'Myanmar',o1e:'Myanmar',o1t:'Yangon Industrial Park · Dishang Kenny',o2n:'Bangladesh',o2e:'Bangladesh',o2t:'ACE Apparel · Jinhong',o3n:'Cambodia',o3e:'Cambodia',o3t:'Huakuan · Dishang Ruihuasheng',dLbl:'Creative Network',dTitle:'Design Offices',dSub:'Our Overseas Design Network',d1n:'United Kingdom',d1e:'United Kingdom',d2n:'Spain',d2e:'Spain',d3n:'Canada',d3e:'Canada',cLbl:'Quality Assurance',cTitle:'Certifications',cSub:'International Certification',c1:'Responsible Down Standard',c2:'Responsible Wool Standard',c3:'Organic 100 Content Standard',c4:'ISO International Standard',c5:'ISO 9001 Quality Management',c6:'ISO 14001 Environmental',c7:'Business Social Compliance Initiative',c8:'SMETA Sedex Audit',c9:'Global Recycled Standard',ptLbl:'Collaborations',ptTitle:'Partners',ptSub:'Business Partners',ftDesc:'A premium fashion manufacturer integrating R&D, production and trade to deliver high-quality garment solutions to global clients.',ftC1T:'Company',ftC1:['About','Products','Workshops','Global','Certifications','Partners'],ftC2T:'Global Network',ftC2:['UK — Design Office','Spain — Design Office','Canada — Design Office','Myanmar — Production','Bangladesh — Production','Cambodia — Production'],ftCopy:'© 2024 Dalian Dishang Huasheng Fashion Co., Ltd. All rights reserved.'},
+  ja:{nav:['会社概要','製品ライン','生産工場','グローバル','国際認証','パートナー'],hEye:'迪尚グループ · 高級ファッション',hTitle:'大連迪尚<br>華盛時裝',hDesc:'迪尚グループ傘下の高級ファッション製造の中核企業。ダブルフェイスウールコート、トレンチコート、スーツ、ダウンジャケットを専門に製造し、グローバルクライアントへ高品質なソリューションを提供します。',hCardUp:'製品ライン',hCardName:'スーツ · コート',hCardSub:'探索する',hCardPrev:'年間 40万点',hS1L:'プレミアム品質',hS1V:'高級ファッション製造のエキスパート',hS2L:'グローバル展開',hS2V:'ミャンマー · バングラデシュ · カンボジア',aLbl:'会社概要',aTitle:'会社について',aP1:'迪尚グループ傘下の高級ファッション製造の中核企業として、大連迪尚華盛時装有限公司は登録資本金1億2,000万元を有します。工場総面積は約15,000㎡、近代的な生産工場12,000㎡を備え、600名超のスタッフが年間40万点の生産能力を支えています。',aP2:'ダブルフェイスウールコート、トレンチコート、スーツ、ダウンジャケットなどの高級ファッションに特化し、製造と輸出入貿易を統合。研究開発から生産・貿易まで一体化したフルサービス体制で、グローバルクライアントに高品質なソリューションを提供します。',s1l:'登録資本金',s2l:'工場総面積',s3l:'従業員数',s4l:'年間生産能力',pLbl:'製品ライン',pTitle:'製品シリーズ',p1n:'スーツ',p1e:'Suit / Blazer',p2n:'ウールコート',p2e:'Double-Faced Wool Coat',p3n:'トレンチコート',p3e:'Trench Coat',p4n:'ダウンジャケット',p4e:'Down Jacket',vm:'もっと見る',wLbl:'製造の卓越性',wTitle:'生産工場',w1n:'縫製工場',w1e:'SEWING WORKSHOP',w2n:'型板工場',w2e:'MOULDING WORKSHOP',w3n:'プレス工場',w3e:'IRONING WORKSHOP',w4n:'包装工場',w4e:'PACKAGING WORKSHOP',oLbl:'グローバル製造',oTitle:'海外生産拠点',oSub:'Overseas Factory',o1n:'ミャンマー',o1e:'Myanmar',o1t:'ヤンゴン工業団地 · 迪尚凱尼',o2n:'バングラデシュ',o2e:'Bangladesh',o2t:'ACE APPAREL · 錦鴻',o3n:'カンボジア',o3e:'Cambodia',o3t:'華寛 · 迪尚瑞華盛',dLbl:'クリエイティブネットワーク',dTitle:'海外デザイン拠点',dSub:'Overseas Design Offices',d1n:'イギリス',d1e:'United Kingdom',d2n:'スペイン',d2e:'Spain',d3n:'カナダ',d3e:'Canada',cLbl:'品質保証',cTitle:'国際認証',cSub:'International Certification',c1:'責任あるダウン基準',c2:'責任あるウール基準',c3:'オーガニック100含有基準',c4:'ISO国際基準',c5:'ISO 9001 品質管理',c6:'ISO 14001 環境管理',c7:'ビジネス社会的コンプライアンス',c8:'SMETAセデックス審査',c9:'グローバルリサイクル基準',ptLbl:'コラボレーション',ptTitle:'ビジネスパートナー',ptSub:'Business Partners',ftDesc:'高級ファッション製造を核心に、研究開発・生産・貿易を統合し、グローバルクライアントに高品質なソリューションを提供します。',ftC1T:'会社',ftC1:['会社概要','製品ライン','生産工場','グローバル','国際認証','パートナー'],ftC2T:'グローバルネットワーク',ftC2:['イギリス — デザイン拠点','スペイン — デザイン拠点','カナダ — デザイン拠点','ミャンマー — 生産拠点','バングラデシュ — 生産拠点','カンボジア — 生産拠点'],ftCopy:'© 2024 大連迪尚華盛時装有限公司 · All rights reserved.'}
 };
 
 function $i(id){return document.getElementById(id);}
@@ -518,64 +588,58 @@ function st(id,v){const e=$i(id);if(e)e.textContent=v;}
 function sh(id,v){const e=$i(id);if(e)e.innerHTML=v;}
 
 function setLang(l){
-  curLang=l;
-  const t=TR[l];
+  curLang=l;const t=TR[l];
   document.querySelectorAll('.nlinks a').forEach((a,i)=>a.textContent=t.nav[i]);
   document.querySelectorAll('.mob-menu a').forEach((a,i)=>{if(t.nav[i])a.textContent=t.nav[i];});
-  sh('hTag',t.hTag); st('hScroll',t.hScroll);
-  st('aLbl',t.aLbl); st('aTitle',t.aTitle); st('aP1',t.aP1); st('aP2',t.aP2);
-  st('s1l',t.s1l); st('s2l',t.s2l); st('s3l',t.s3l); st('s4l',t.s4l);
-  st('pLbl',t.pLbl); st('pTitle',t.pTitle);
-  st('p1n',t.p1n); st('p1e',t.p1e); st('p2n',t.p2n); st('p2e',t.p2e);
-  st('p3n',t.p3n); st('p3e',t.p3e); st('p4n',t.p4n); st('p4e',t.p4e);
+  sh('hEye',t.hEye);sh('hTitle',t.hTitle);st('hDesc',t.hDesc);
+  st('hCardUp',t.hCardUp);st('hCardName',t.hCardName);st('hCardSub',t.hCardSub);st('hCardPrev',t.hCardPrev);
+  st('hS1L',t.hS1L);st('hS1V',t.hS1V);st('hS2L',t.hS2L);st('hS2V',t.hS2V);
+  st('aLbl',t.aLbl);st('aTitle',t.aTitle);st('aP1',t.aP1);st('aP2',t.aP2);
+  st('s1l',t.s1l);st('s2l',t.s2l);st('s3l',t.s3l);st('s4l',t.s4l);
+  st('pLbl',t.pLbl);st('pTitle',t.pTitle);
+  st('p1n',t.p1n);st('p1e',t.p1e);st('p2n',t.p2n);st('p2e',t.p2e);
+  st('p3n',t.p3n);st('p3e',t.p3e);st('p4n',t.p4n);st('p4e',t.p4e);
   document.querySelectorAll('.view-more').forEach(el=>el.textContent=t.vm);
-  st('wLbl',t.wLbl); st('wTitle',t.wTitle);
-  st('w1n',t.w1n); st('w1e',t.w1e); st('w2n',t.w2n); st('w2e',t.w2e);
-  st('w3n',t.w3n); st('w3e',t.w3e); st('w4n',t.w4n); st('w4e',t.w4e);
-  st('oLbl',t.oLbl); st('oTitle',t.oTitle); st('oSub',t.oSub);
-  st('o1n',t.o1n); st('o1e',t.o1e); st('o1t',t.o1t);
-  st('o2n',t.o2n); st('o2e',t.o2e); st('o2t',t.o2t);
-  st('o3n',t.o3n); st('o3e',t.o3e); st('o3t',t.o3t);
-  st('dLbl',t.dLbl); st('dTitle',t.dTitle); st('dSub',t.dSub);
-  st('d1n',t.d1n); st('d1e',t.d1e); st('d2n',t.d2n); st('d2e',t.d2e); st('d3n',t.d3n); st('d3e',t.d3e);
-  st('cLbl',t.cLbl); st('cTitle',t.cTitle); st('cSub',t.cSub);
+  st('wLbl',t.wLbl);st('wTitle',t.wTitle);
+  st('w1n',t.w1n);st('w1e',t.w1e);st('w2n',t.w2n);st('w2e',t.w2e);
+  st('w3n',t.w3n);st('w3e',t.w3e);st('w4n',t.w4n);st('w4e',t.w4e);
+  st('oLbl',t.oLbl);st('oTitle',t.oTitle);st('oSub',t.oSub);
+  st('o1n',t.o1n);st('o1e',t.o1e);st('o1t',t.o1t);
+  st('o2n',t.o2n);st('o2e',t.o2e);st('o2t',t.o2t);
+  st('o3n',t.o3n);st('o3e',t.o3e);st('o3t',t.o3t);
+  st('dLbl',t.dLbl);st('dTitle',t.dTitle);st('dSub',t.dSub);
+  st('d1n',t.d1n);st('d1e',t.d1e);st('d2n',t.d2n);st('d2e',t.d2e);st('d3n',t.d3n);st('d3e',t.d3e);
+  st('cLbl',t.cLbl);st('cTitle',t.cTitle);st('cSub',t.cSub);
   for(let i=1;i<=9;i++) st('c'+i,t['c'+i]);
-  st('ptLbl',t.ptLbl); st('ptTitle',t.ptTitle); st('ptSub',t.ptSub);
-  st('ftDesc',t.ftDesc); st('ftCopy',t.ftCopy); st('ftC1T',t.ftC1T); st('ftC2T',t.ftC2T);
+  st('ptLbl',t.ptLbl);st('ptTitle',t.ptTitle);st('ptSub',t.ptSub);
+  st('ftDesc',t.ftDesc);st('ftCopy',t.ftCopy);st('ftC1T',t.ftC1T);st('ftC2T',t.ftC2T);
   ['ftC1','ftC2'].forEach(id=>{
-    const ul=$i(id); if(!ul) return;
-    ul.innerHTML='';
+    const ul=$i(id);if(!ul)return;ul.innerHTML='';
     t[id].forEach(txt=>{const li=document.createElement('li');li.textContent=txt;ul.appendChild(li);});
   });
   document.querySelectorAll('.lb').forEach(b=>b.classList.toggle('active',b.dataset.l===l));
 }
 
-/* ═══ LANG BUTTONS ═══ */
 document.querySelectorAll('.lb').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.l)));
 
-/* ═══ HAMBURGER ═══ */
 function closeMobMenu(){
-  const mm=$i('mobMenu'); mm.classList.remove('open');
+  $i('mobMenu').classList.remove('open');
   $i('hamBtn').querySelectorAll('span').forEach(s=>{s.style.transform='';s.style.opacity='1';});
 }
 $i('hamBtn').addEventListener('click',()=>{
-  const mm=$i('mobMenu'); mm.classList.toggle('open');
-  const bars=$i('hamBtn').querySelectorAll('span');
-  const open=mm.classList.contains('open');
+  const mm=$i('mobMenu');mm.classList.toggle('open');
+  const bars=$i('hamBtn').querySelectorAll('span'),open=mm.classList.contains('open');
   bars[0].style.transform=open?'translateY(6.5px) rotate(45deg)':'';
   bars[1].style.opacity=open?'0':'1';
   bars[2].style.transform=open?'translateY(-6.5px) rotate(-45deg)':'';
 });
 $i('mobMenu').querySelectorAll('a').forEach(a=>a.addEventListener('click',closeMobMenu));
 
-/* ═══ SCROLL ANIMATION ═══ */
+window.addEventListener('scroll',()=>{
+  $i('nav').classList.toggle('scrolled',window.scrollY>80);
+});
 const obs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('in');});},{threshold:.08});
 document.querySelectorAll('.fi').forEach(el=>obs.observe(el));
-
-window.addEventListener('scroll',()=>{
-  $i('nav').style.boxShadow=window.scrollY>40?'0 1px 18px rgba(0,0,0,.08)':'none';
-});
-
 document.querySelectorAll('a[href^="#"]').forEach(a=>{
   a.addEventListener('click',e=>{
     e.preventDefault();
@@ -584,6 +648,5 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
   });
 });
 
-/* ═══ INIT ═══ */
 setLang('cn');
 </script>
