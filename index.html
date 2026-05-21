@@ -614,7 +614,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
   });
 });
 
-/* ═══ MOSAIC CANVAS — Subdivision Reveal ═══ */
+/* ═══ MOSAIC CANVAS — Grid Circles with Gaps + Subdivision ═══ */
 (function(){
   const SRC='https://i.ibb.co/4R6QMjzw/1fc166ee-5414-11f1-b180-32122d3eb903.jpg';
   const mc=document.getElementById('mosaicCanvas');
@@ -622,85 +622,99 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
   const wrap=document.getElementById('mosaicWrap');
   const hint=document.getElementById('mosaicHint');
 
+  /* Off-screen image buffer */
   let offC=null,offCtx=null,offW=1,offH=1,imgOK=false;
-  let W=0,H=0,roots=[],mx=-1,my=-1;
-  const MAX_DEPTH=3;
-  const INIT={c:2,r:4};                   // initial 8 circles (2 col × 4 row)
-  const SCHEMES=[{c:2,r:4},{c:4,r:2}];    // alternating subdivision (always 8 children)
-  const FB=['#dbeafe','#93c5fd','#60a5fa','#3b82f6','#2563eb','#1d4ed8','#1e40af','#bfdbfe'];
+  let W=0,H=0,roots=[],mx=-1,my=-1,hintGone=false;
 
-  /* ── colour sampling ── */
-  function avgColor(ix,iy,iw,ih){
-    ix=Math.max(0,Math.round(ix));iy=Math.max(0,Math.round(iy));
-    iw=Math.max(1,Math.min(Math.round(iw),offW-ix));
-    ih=Math.max(1,Math.min(Math.round(ih),offH-iy));
+  /* Grid gap as fraction of cell size — creates the white diagonal gaps */
+  const GAP_F=0.13;
+  /* Initial layout: COLS × ROWS = ~8 circles */
+  const INIT_C=2,INIT_R=4;
+  const MAX_DEPTH=3;
+  /* Each level subdivides 1 parent → 4 children (2×2) for a clean square grid */
+  const SUB=2; // SUB × SUB children per node
+
+  const FB=['#dbeafe','#93c5fd','#60a5fa','#3b82f6','#2563eb','#1d4ed8','#1e3a8a','#bfdbfe','#7dd3fc','#e0f2fe'];
+
+  /* ── sample average colour from off-screen image region ── */
+  function avgCol(ix,iy,iw,ih){
+    ix=Math.max(0,ix|0); iy=Math.max(0,iy|0);
+    iw=Math.max(1,Math.min(iw|0,offW-ix));
+    ih=Math.max(1,Math.min(ih|0,offH-iy));
     try{
       const d=offCtx.getImageData(ix,iy,iw,ih).data;
       let r=0,g=0,b=0,n=0;
-      const s=Math.max(4,Math.floor(d.length/1200)*4);
-      for(let i=0;i<d.length;i+=s){r+=d[i];g+=d[i+1];b+=d[i+2];n++;}
-      return n?`rgb(${r/n|0},${g/n|0},${b/n|0})`:'#6b8fa8';
-    }catch(e){ return FB[Math.floor(Math.random()*FB.length)]; }
+      /* sample stride keeps it fast */
+      const stride=Math.max(4,((iw*ih)|0)*4/800|0)*4;
+      for(let i=0;i<d.length;i+=stride){r+=d[i];g+=d[i+1];b+=d[i+2];n++;}
+      return n?`rgb(${r/n|0},${g/n|0},${b/n|0})`:FB[0];
+    }catch(e){ return FB[(ix+iy)%FB.length]; }
   }
 
-  /* ── node factory ── */
-  function makeNode(x,y,w,h,ix,iy,iw,ih,depth,anim){
-    const cx=x+w/2,cy=y+h/2;
-    const tr=Math.sqrt((w/2)**2+(h/2)**2)*0.98; // radius covers rect corners
-    const color=imgOK?avgColor(ix,iy,iw,ih):FB[(depth*3+(roots?roots.length:0))%FB.length];
-    return{x,y,w,h,cx,cy,tr,cr:anim?0:tr,ix,iy,iw,ih,depth,color,children:null};
+  /* ── create a node ──
+     (x,y,w,h)  = canvas cell bounds
+     (ix,iy,iw,ih) = corresponding image region
+     radius = half of shortest side, minus gap padding → full circle always fits */
+  function mkNode(x,y,w,h,ix,iy,iw,ih,depth,animate){
+    const gap=Math.min(w,h)*GAP_F;
+    const r=(Math.min(w,h)-gap)/2;
+    const color=imgOK?avgCol(ix,iy,iw,ih):FB[Math.floor(Math.random()*FB.length)];
+    return{x,y,w,h,cx:x+w/2,cy:y+h/2,
+           tr:r,cr:animate?0:r,
+           ix,iy,iw,ih,depth,color,children:null};
   }
 
-  /* ── build initial 8 nodes ── */
+  /* ── build root grid ── */
   function build(){
-    const{c,r}=INIT;
-    const cw=W/c,ch=H/r,icw=offW/c,ich=offH/r;
+    const cw=W/INIT_C,ch=H/INIT_R;
+    const icw=offW/INIT_C,ich=offH/INIT_R;
     roots=[];
-    for(let row=0;row<r;row++)
-      for(let col=0;col<c;col++)
-        roots.push(makeNode(col*cw,row*ch,cw,ch,col*icw,row*ich,icw,ich,0,false));
+    for(let row=0;row<INIT_R;row++)
+      for(let col=0;col<INIT_C;col++)
+        roots.push(mkNode(col*cw,row*ch,cw,ch,col*icw,row*ich,icw,ich,0,false));
   }
 
-  /* ── subdivide a leaf into 8 children ── */
+  /* ── subdivide leaf → SUB×SUB children ── */
   function subdivide(node){
     if(node.children||node.depth>=MAX_DEPTH)return;
-    const{c,r}=SCHEMES[node.depth%2];  // alternate 2×4 / 4×2
+    const cw=node.w/SUB,ch=node.h/SUB;
+    const icw=node.iw/SUB,ich=node.ih/SUB;
     node.children=[];
-    const cw=node.w/c,ch=node.h/r,icw=node.iw/c,ich=node.ih/r;
-    for(let row=0;row<r;row++)
-      for(let col=0;col<c;col++)
-        node.children.push(makeNode(
-          node.x+col*cw,node.y+row*ch,cw,ch,
-          node.ix+col*icw,node.iy+row*ich,icw,ich,
-          node.depth+1,true  // animate in
+    for(let row=0;row<SUB;row++)
+      for(let col=0;col<SUB;col++)
+        node.children.push(mkNode(
+          node.x+col*cw, node.y+row*ch, cw, ch,
+          node.ix+col*icw, node.iy+row*ich, icw, ich,
+          node.depth+1, true
         ));
   }
 
-  /* ── hit-test: find leaf under cursor ── */
+  /* ── find leaf node at canvas (px,py) ── */
   function findLeaf(arr,px,py){
     for(const n of arr){
       if(px<n.x||px>n.x+n.w||py<n.y||py>n.y+n.h)continue;
-      if(n.children)return findLeaf(n.children,px,py);
-      return n;
+      if(n.children){const f=findLeaf(n.children,px,py);if(f)return f;}
+      else return n;
     }
     return null;
   }
 
-  /* ── smooth radius animation ── */
-  function update(arr){
+  /* ── animate radii ── */
+  function animate(arr){
     for(const n of arr){
-      n.cr+=(n.tr-n.cr)*0.18;
-      if(n.children)update(n.children);
+      n.cr+=(n.tr-n.cr)*0.16;
+      if(n.children)animate(n.children);
     }
   }
 
-  /* ── draw all leaf nodes ── */
-  function draw(arr){
+  /* ── draw ── */
+  function drawNodes(arr){
     for(const n of arr){
-      if(n.children){draw(n.children);continue;}
-      const r=Math.max(0,n.cr);if(r<0.4)continue;
+      if(n.children){drawNodes(n.children);continue;}
+      const r=Math.max(0,n.cr);
+      if(r<0.3)continue;
       if(n.depth>=MAX_DEPTH&&imgOK){
-        // Final depth: reveal actual image, clipped to circle
+        /* deepest level: show actual image cropped to circle */
         ctx.save();
         ctx.beginPath();ctx.arc(n.cx,n.cy,r,0,Math.PI*2);ctx.clip();
         ctx.drawImage(offC,n.ix,n.iy,n.iw,n.ih,n.x,n.y,n.w,n.h);
@@ -712,30 +726,30 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
     }
   }
 
-  /* ── resize & rebuild ── */
-  function resize(){
-    const rect=wrap.getBoundingClientRect();
-    W=mc.width=rect.width;H=mc.height=rect.height;
-    build();
-  }
-
   /* ── main loop ── */
-  let hintGone=false;
   function loop(){
+    /* white canvas background → creates white diagonal gaps between circles */
     ctx.clearRect(0,0,W,H);
-    if(mx>=0){
+    if(mx>=0&&my>=0){
       const leaf=findLeaf(roots,mx,my);
       if(leaf&&!leaf.children){
         subdivide(leaf);
         if(!hintGone){hint.style.opacity='0';hintGone=true;}
       }
     }
-    update(roots);
-    draw(roots);
+    animate(roots);
+    drawNodes(roots);
     requestAnimationFrame(loop);
   }
 
-  /* ── events ── */
+  /* ── resize ── */
+  function resize(){
+    const rc=wrap.getBoundingClientRect();
+    W=mc.width=rc.width; H=mc.height=rc.height;
+    build();
+  }
+
+  /* ── pointer events ── */
   mc.addEventListener('mousemove',e=>{
     const rc=mc.getBoundingClientRect();mx=e.clientX-rc.left;my=e.clientY-rc.top;
   });
@@ -748,8 +762,12 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
   mc.addEventListener('touchend',()=>{mx=-1;my=-1;});
   window.addEventListener('resize',resize);
 
-  /* ── start with fallback colours, upgrade when image loads ── */
-  resize();loop();
+  /* ── boot: run immediately with fallback colours, upgrade when image loads ── */
+  resize();
+  loop();
+
+  /* Set canvas background white so gaps show white */
+  mc.style.background='rgba(255,255,255,0.92)';
 
   const img=new Image();
   img.crossOrigin='anonymous';
@@ -760,9 +778,8 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
     offCtx=offC.getContext('2d');
     offCtx.drawImage(img,0,0);
     imgOK=true;
-    build(); // rebuild nodes with real average colours
+    build(); // repaint with real colours
   };
-  img.onerror=()=>{}; // fallback palette already running
   img.src=SRC;
 })();
 
