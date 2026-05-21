@@ -10,91 +10,68 @@ html{scroll-behavior:smooth;}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Hiragino Sans','Noto Sans JP',Arial,sans-serif;color:var(--text);background:var(--white);overflow-x:hidden;font-size:var(--f-body);}
 
 /* ── NAV ── */
-#nav{position:fixed;top:0;left:0;right:0;z-index:999;height:66px;background:transparent;display:flex;align-items:center;justify-content:space-between;padding:0 52px;transition:background .4s,box-shadow .3s;gap:16px;}
+#nav{position:fixed;top:0;left:0;right:0;z-index:999;height:66px;background:rgba(255,255,255,.04);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:space-between;padding:0 52px;transition:background .4s,box-shadow .3s;gap:16px;border-bottom:.5px solid rgba(255,255,255,.12);}
 #nav.scrolled{background:rgba(255,255,255,.97);border-bottom:.5px solid var(--border);}
 .nl{display:flex;flex-direction:column;gap:2px;cursor:pointer;}
-.nl-main{font-family:Georgia,serif;font-size:20px;font-weight:400;letter-spacing:6px;color:var(--navy);transition:color .4s;}
+.nl-main{font-family:Georgia,serif;font-size:20px;font-weight:400;letter-spacing:6px;color:#fff;transition:color .4s;}
 #nav.scrolled .nl-main{color:var(--navy);}
-.nl-sub{font-size:var(--f-min);letter-spacing:3px;color:rgba(20,60,160,.5);text-transform:uppercase;transition:color .4s;}
+.nl-sub{font-size:var(--f-min);letter-spacing:3px;color:rgba(255,255,255,.5);text-transform:uppercase;transition:color .4s;}
 #nav.scrolled .nl-sub{color:var(--muted);}
 .nlinks{display:flex;gap:32px;list-style:none;flex:1;justify-content:center;}
-.nlinks a{font-size:var(--f-nav);letter-spacing:2px;text-transform:uppercase;color:rgba(15,40,110,.75);text-decoration:none;padding-bottom:3px;position:relative;transition:color .2s;white-space:nowrap;}
+.nlinks a{font-size:var(--f-nav);letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.8);text-decoration:none;padding-bottom:3px;position:relative;transition:color .2s;white-space:nowrap;}
 #nav.scrolled .nlinks a{color:var(--text);}
 .nlinks a::after{content:'';position:absolute;bottom:0;left:0;width:0;height:1px;background:var(--gold);transition:width .3s;}
 .nlinks a:hover::after{width:100%;}
 .nav-right{display:flex;align-items:center;gap:14px;flex-shrink:0;}
 .lang-sw{display:flex;align-items:center;gap:4px;}
-.lb{background:none;border:none;font-size:var(--f-min);letter-spacing:1px;cursor:pointer;color:rgba(15,40,110,.6);padding:4px 5px;transition:color .2s;font-family:inherit;}
+.lb{background:none;border:none;font-size:var(--f-min);letter-spacing:1px;cursor:pointer;color:rgba(255,255,255,.6);padding:4px 5px;transition:color .2s;font-family:inherit;}
 #nav.scrolled .lb{color:var(--muted);}
-.lb.active{font-weight:700;border-bottom:1.5px solid var(--gold);color:var(--navy);}
+.lb.active{font-weight:700;border-bottom:1.5px solid var(--gold);color:#fff;}
 #nav.scrolled .lb.active{color:var(--navy);}
-.lb:hover{color:var(--navy);}
-.ls{color:rgba(15,40,110,.2);font-size:var(--f-min);}
+.lb:hover{color:#fff;}
+#nav.scrolled .lb:hover{color:var(--navy);}
+.ls{color:rgba(255,255,255,.25);font-size:var(--f-min);}
 #nav.scrolled .ls{color:var(--border);}
 .ham{display:none;flex-direction:column;gap:5px;cursor:pointer;padding:4px;background:none;border:none;}
-.ham span{display:block;width:22px;height:1.5px;background:var(--navy);transition:.3s;}
+.ham span{display:block;width:22px;height:1.5px;background:#fff;transition:.3s;}
+#nav.scrolled .ham span{background:var(--navy);}
 .mob-menu{display:none;position:fixed;top:66px;left:0;right:0;background:rgba(255,255,255,.98);border-bottom:.5px solid var(--border);z-index:998;flex-direction:column;padding:10px 0;}
 .mob-menu a{display:block;padding:14px 28px;font-size:var(--f-nav);letter-spacing:2px;text-transform:uppercase;color:var(--text);text-decoration:none;border-bottom:.5px solid var(--border);}
 .mob-menu.open{display:flex;}
 
-/* ══════════════════════════════════════
-   HERO — SPLIT LAYOUT: MOSAIC + CONTENT
-══════════════════════════════════════ */
-#hero{
-  position:relative;height:100vh;min-height:640px;overflow:hidden;padding-top:66px;
-  display:flex;
-  background:linear-gradient(to bottom,
-    #ffffff 0%,#eef6ff 12%,#d0e8fc 28%,#93c5fd 50%,
-    #3b82f6 68%,#1d4ed8 82%,#1e3a8a 100%);
-}
+/* ── HERO ── */
+#hero{position:relative;height:100vh;min-height:640px;overflow:hidden;padding-top:66px;display:flex;
+  background:linear-gradient(160deg,#0c1a3a 0%,#112255 25%,#1a3a6e 50%,#1e4d8c 70%,#1565c0 90%,#1976d2 100%);}
 
-/* LEFT — mosaic canvas panel */
-.mosaic-wrap{
-  flex:0 0 48%;position:relative;overflow:hidden;cursor:crosshair;
-}
+/* LEFT: canvas panel */
+.mosaic-wrap{flex:0 0 52%;position:relative;overflow:hidden;}
 #mosaicCanvas{position:absolute;inset:0;width:100%;height:100%;}
+.liquid-hint{position:absolute;bottom:32px;left:0;right:0;text-align:center;font-size:var(--f-min);letter-spacing:5px;color:rgba(255,255,255,.28);text-transform:uppercase;pointer-events:none;transition:opacity .8s;}
 
-/* RIGHT — content panel (glass) */
-.hero-rp{
-  flex:1;display:flex;flex-direction:column;justify-content:center;
-  align-items:flex-end;text-align:right;
-  padding:80px 60px 80px 36px;position:relative;z-index:2;
-  background:rgba(255,255,255,.13);
-  backdrop-filter:blur(18px);
-  border-left:1px solid rgba(255,255,255,.35);
-}
-.hero-rp::before{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(to bottom,rgba(255,255,255,.22) 0%,rgba(255,255,255,.08) 60%,rgba(30,60,160,.08) 100%);
-  pointer-events:none;
-}
+/* RIGHT: content panel */
+.hero-rp{flex:1;display:flex;flex-direction:column;justify-content:center;align-items:flex-end;text-align:right;padding:80px 60px 80px 40px;position:relative;z-index:2;}
+.hero-rp::before{content:'';position:absolute;inset:0;background:linear-gradient(to right,rgba(255,255,255,.02) 0%,rgba(255,255,255,.05) 100%);border-left:.5px solid rgba(255,255,255,.1);pointer-events:none;}
 .h-eye{font-size:var(--f-min);letter-spacing:8px;color:var(--gold);text-transform:uppercase;margin-bottom:20px;opacity:0;animation:fadeUp .7s .3s forwards;position:relative;}
-.h-bigcn{font-family:Georgia,serif;font-size:clamp(32px,4.5vw,64px);font-weight:400;color:#fff;line-height:1.05;letter-spacing:3px;margin-bottom:8px;opacity:0;animation:fadeUp .7s .45s forwards;text-shadow:0 2px 20px rgba(10,30,100,.3);position:relative;}
-.h-bigen{font-family:Georgia,serif;font-size:clamp(14px,1.8vw,22px);font-weight:400;color:rgba(255,255,255,.55);letter-spacing:6px;margin-bottom:28px;opacity:0;animation:fadeUp .7s .55s forwards;font-style:italic;position:relative;}
-.h-desc{font-size:var(--f-body);line-height:1.85;color:rgba(255,255,255,.82);max-width:400px;margin-left:auto;opacity:0;animation:fadeUp .7s .65s forwards;letter-spacing:.2px;position:relative;}
-.h-divider{width:48px;height:1px;background:rgba(255,255,255,.4);margin:28px 0 28px auto;opacity:0;animation:fadeUp .7s .75s forwards;position:relative;}
+.h-bigcn{font-family:Georgia,serif;font-size:clamp(32px,4.2vw,62px);font-weight:400;color:#fff;line-height:1.05;letter-spacing:3px;margin-bottom:8px;opacity:0;animation:fadeUp .7s .45s forwards;text-shadow:0 2px 30px rgba(0,0,0,.3);position:relative;}
+.h-bigen{font-family:Georgia,serif;font-size:clamp(13px,1.6vw,20px);font-weight:400;color:rgba(255,255,255,.4);letter-spacing:7px;margin-bottom:30px;opacity:0;animation:fadeUp .7s .55s forwards;font-style:italic;position:relative;}
+.h-desc{font-size:var(--f-body);line-height:1.9;color:rgba(255,255,255,.75);max-width:400px;margin-left:auto;opacity:0;animation:fadeUp .7s .65s forwards;position:relative;}
+.h-divider{width:48px;height:1px;background:rgba(255,255,255,.25);margin:28px 0 28px auto;opacity:0;animation:fadeUp .7s .75s forwards;position:relative;}
 .h-stats{display:flex;gap:36px;justify-content:flex-end;margin-bottom:36px;opacity:0;animation:fadeUp .7s .85s forwards;position:relative;}
-.hst-item{text-align:right;}
 .hst-num{font-family:Georgia,serif;font-size:28px;font-weight:400;color:#fff;letter-spacing:1px;line-height:1;}
 .hst-num sup{font-size:14px;color:var(--gold);vertical-align:top;line-height:1.4;}
-.hst-lbl{font-size:var(--f-min);color:rgba(255,255,255,.5);letter-spacing:1.5px;margin-top:5px;}
+.hst-lbl{font-size:var(--f-min);color:rgba(255,255,255,.4);letter-spacing:1.5px;margin-top:5px;}
 .h-actions{display:flex;gap:14px;justify-content:flex-end;opacity:0;animation:fadeUp .7s .95s forwards;position:relative;}
-.h-btn{display:flex;align-items:center;gap:8px;font-size:var(--f-min);letter-spacing:2px;text-transform:uppercase;cursor:pointer;padding:11px 22px;transition:all .25s;font-family:inherit;border:none;}
-.h-btn-primary{background:rgba(255,255,255,.9);color:#0d2a6a;}
+.h-btn{display:flex;align-items:center;gap:8px;font-size:var(--f-min);letter-spacing:2px;text-transform:uppercase;cursor:pointer;padding:12px 24px;transition:all .25s;font-family:inherit;border:none;}
+.h-btn-primary{background:rgba(255,255,255,.92);color:#0d2a6a;}
 .h-btn-primary:hover{background:#fff;}
-.h-btn-ghost{background:rgba(255,255,255,.12);color:#fff;border:.5px solid rgba(255,255,255,.4);}
-.h-btn-ghost:hover{background:rgba(255,255,255,.22);}
+.h-btn-ghost{background:rgba(255,255,255,.06);color:#fff;border:.5px solid rgba(255,255,255,.28);}
+.h-btn-ghost:hover{background:rgba(255,255,255,.14);}
 .h-btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5;}
-
-/* scroll hint */
-.h-scroll-hint{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;color:rgba(255,255,255,.35);font-size:var(--f-min);letter-spacing:4px;text-transform:uppercase;z-index:10;}
-.h-scroll-bar{width:1px;height:40px;background:rgba(255,255,255,.18);position:relative;overflow:hidden;}
-.h-scroll-bar::after{content:'';position:absolute;top:-100%;left:0;right:0;height:100%;background:rgba(255,255,255,.5);animation:scbar 2s ease-in-out infinite;}
+.h-scroll-hint{position:absolute;bottom:28px;right:60px;display:flex;flex-direction:column;align-items:center;gap:8px;color:rgba(255,255,255,.22);font-size:var(--f-min);letter-spacing:4px;text-transform:uppercase;}
+.h-scroll-bar{width:1px;height:40px;background:rgba(255,255,255,.15);position:relative;overflow:hidden;}
+.h-scroll-bar::after{content:'';position:absolute;top:-100%;left:0;right:0;height:100%;background:rgba(255,255,255,.4);animation:scbar 2.2s ease-in-out infinite;}
 @keyframes scbar{0%{top:-100%}100%{top:100%}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
-
-/* mosaic hover hint label */
-.mosaic-hint{position:absolute;bottom:28px;left:0;right:0;text-align:center;font-size:var(--f-min);letter-spacing:3px;color:rgba(255,255,255,.4);text-transform:uppercase;pointer-events:none;transition:opacity .3s;}
 
 /* ── SHARED ── */
 .sec{padding:96px 60px;}
@@ -107,8 +84,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Hiragino Sans','No
 .dv{display:flex;align-items:center;gap:14px;margin:20px auto 0;max-width:460px;}
 .dvl{flex:1;height:.5px;background:var(--border);}
 .dvd{width:5px;height:5px;border-radius:50%;background:var(--gold);flex-shrink:0;}
-
-/* ABOUT */
 .about-in{max-width:800px;margin:0 auto;}
 .acn{font-size:var(--f-body);line-height:2.1;color:var(--text);margin-bottom:24px;}
 
@@ -145,24 +120,30 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Hiragino Sans','No
 .wcn{font-family:Georgia,serif;font-size:var(--f-sub);color:#fff;letter-spacing:3px;margin-bottom:5px;}
 .wen{font-size:var(--f-min);color:rgba(255,255,255,.82);letter-spacing:3px;text-transform:uppercase;}
 
-/* OVERSEAS */
+/* OVERSEAS PRODUCTION */
 .ovs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;max-width:1200px;margin:0 auto;}
-.ovs-block{position:relative;aspect-ratio:4/3;overflow:hidden;}
+.ovs-block{position:relative;aspect-ratio:4/3;overflow:hidden;cursor:pointer;}
 .ovs-block img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s;}
 .ovs-block:hover img{transform:scale(1.04);}
-.ovs-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(20,35,48,.82) 0%,rgba(20,35,48,.1) 55%,transparent 100%);display:flex;align-items:flex-end;padding:30px;}
+.ovs-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(20,35,48,.82) 0%,rgba(20,35,48,.1) 55%,transparent 100%);display:flex;align-items:flex-end;padding:30px;transition:background .3s;}
+.ovs-block:hover .ovs-overlay{background:linear-gradient(to top,rgba(20,35,48,.9) 0%,rgba(20,35,48,.2) 55%,transparent 100%);}
 .ovs-cn{font-family:Georgia,serif;font-size:var(--f-title);letter-spacing:4px;color:#fff;margin-bottom:6px;}
 .ovs-en{font-size:var(--f-small);letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.65);margin-bottom:13px;}
 .ovs-tag{display:inline-block;font-size:var(--f-min);letter-spacing:1px;color:rgba(255,255,255,.82);border:.5px solid rgba(255,255,255,.36);padding:6px 16px;}
+.play-badge{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.18);border:.5px solid rgba(255,255,255,.4);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;backdrop-filter:blur(4px);}
+.ovs-block:hover .play-badge{opacity:1;}
+.play-badge svg{width:18px;height:18px;fill:#fff;margin-left:3px;}
 
-/* DESIGN */
+/* DESIGN OFFICES */
 .dgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;max-width:1200px;margin:0 auto;}
-.dcard{position:relative;aspect-ratio:4/3;overflow:hidden;}
+.dcard{position:relative;aspect-ratio:4/3;overflow:hidden;cursor:pointer;}
 .dcard img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s;}
 .dcard:hover img{transform:scale(1.04);}
 .d-overlay{position:absolute;bottom:0;left:0;right:0;padding:24px 28px;background:linear-gradient(to top,rgba(20,35,48,.78) 0%,transparent 100%);}
 .ddcn{font-family:Georgia,serif;font-size:var(--f-title);color:#fff;letter-spacing:3px;margin-bottom:5px;}
 .dden{font-size:var(--f-small);letter-spacing:3px;color:rgba(255,255,255,.7);text-transform:uppercase;}
+.dcard .play-badge{opacity:0;transition:opacity .3s;}
+.dcard:hover .play-badge{opacity:1;}
 
 /* CERTS */
 .cgrid{display:flex;flex-wrap:wrap;justify-content:center;gap:28px;max-width:900px;margin:0 auto;}
@@ -196,6 +177,8 @@ footer{background:#1a4fa8;padding:80px 60px 40px;}
 .fcol ul{list-style:none;}
 .fcol li{font-size:var(--f-body);color:rgba(255,255,255,.4);margin-bottom:6px;cursor:default;transition:color .2s;letter-spacing:.3px;line-height:1.5;}
 .fcol li:hover{color:rgba(255,255,255,.8);}
+.fcol li.flink{cursor:pointer;color:rgba(255,255,255,.55);}
+.fcol li.flink:hover{color:var(--gold);}
 .fhr{height:.5px;background:rgba(255,255,255,.1);margin-bottom:26px;}
 .fbot{display:flex;justify-content:space-between;align-items:center;font-size:var(--f-small);color:rgba(255,255,255,.28);}
 .fgold{color:var(--gold);font-size:var(--f-small);letter-spacing:3px;}
@@ -205,7 +188,7 @@ footer{background:#1a4fa8;padding:80px 60px 40px;}
 .fi.in{opacity:1;transform:translateY(0);}
 .d1{transition-delay:.08s;}.d2{transition-delay:.18s;}.d3{transition-delay:.28s;}.d4{transition-delay:.38s;}
 
-/* GALLERY */
+/* GALLERY PAGE */
 #galleryPage{display:none;position:fixed;inset:0;z-index:1000;background:var(--white);overflow-y:auto;padding-top:66px;}
 #galleryPage.active{display:block;}
 .gal-header{background:var(--navy);padding:72px 60px 56px;text-align:center;position:relative;}
@@ -220,8 +203,6 @@ footer{background:#1a4fa8;padding:80px 60px 40px;}
 .gal-item{overflow:hidden;cursor:pointer;position:relative;background:var(--cream);}
 .gal-item img{width:100%;aspect-ratio:3/4;object-fit:contain;padding:12px;display:block;transition:transform .4s;}
 .gal-item:hover img{transform:scale(1.06);}
-.gal-item::after{content:'';position:absolute;inset:0;background:rgba(28,43,58,0);transition:.3s;}
-.gal-item:hover::after{background:rgba(28,43,58,.06);}
 
 /* LIGHTBOX */
 #lightbox{display:none;position:fixed;inset:0;z-index:2000;background:rgba(7,8,26,.95);align-items:center;justify-content:center;}
@@ -235,18 +216,34 @@ footer{background:#1a4fa8;padding:80px 60px 40px;}
 .lb-prev svg,.lb-next svg{width:28px;height:28px;stroke:currentColor;fill:none;stroke-width:1.5;}
 .lb-count{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);color:rgba(180,200,255,.4);font-size:var(--f-small);letter-spacing:3px;}
 
+/* ── MEDIA MODAL ── */
+#mediaModal{display:none;position:fixed;inset:0;z-index:3000;background:rgba(0,0,0,.9);align-items:center;justify-content:center;padding:40px;}
+#mediaModal.open{display:flex;}
+.mm-inner{position:relative;max-width:900px;width:100%;}
+.mm-close{position:absolute;top:-40px;right:-8px;background:none;border:none;color:rgba(255,255,255,.55);font-size:28px;cursor:pointer;line-height:1;transition:color .2s;font-family:inherit;padding:4px 10px;}
+.mm-close:hover{color:#fff;}
+.mm-title{font-family:Georgia,serif;font-size:var(--f-small);letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,.4);text-align:center;margin-bottom:20px;}
+.mm-video-wrap{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;}
+.mm-video-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:none;}
+.mm-gallery{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;}
+.mm-gallery img{width:100%;aspect-ratio:4/3;object-fit:cover;cursor:pointer;transition:opacity .2s;}
+.mm-gallery img:hover{opacity:.85;}
+@media(max-width:600px){.mm-gallery{grid-template-columns:1fr;}}
+
 /* RESPONSIVE */
 @media(max-width:900px){
   #nav{padding:0 24px;}
   .nlinks{display:none;}
   .ham{display:flex;}
   #hero{flex-direction:column;}
-  .mosaic-wrap{flex:0 0 44vh;}
-  .hero-rp{flex:1;padding:36px 32px;align-items:flex-start;text-align:left;border-left:none;border-top:1px solid rgba(255,255,255,.3);}
+  .mosaic-wrap{flex:0 0 42vh;}
+  .hero-rp{flex:1;padding:32px 28px;align-items:flex-start;text-align:left;border-top:.5px solid rgba(255,255,255,.1);}
+  .hero-rp::before{border-left:none;border-top:.5px solid rgba(255,255,255,.1);}
   .h-desc{margin-left:0;}
   .h-divider{margin-left:0;}
   .h-stats{justify-content:flex-start;}
   .h-actions{justify-content:flex-start;}
+  .h-scroll-hint{right:28px;}
   .sec{padding:72px 32px;}
   .stats-band{padding:44px 32px;}
   .sgrid{grid-template-columns:repeat(2,1fr);}
@@ -255,26 +252,25 @@ footer{background:#1a4fa8;padding:80px 60px 40px;}
   .si:nth-child(4){border-top:.5px solid var(--border);border-right:none;}
   .pgrid{grid-template-columns:repeat(2,1fr);gap:14px;}
   .wgrid{grid-template-columns:repeat(2,1fr);}
-  .ovs-grid{grid-template-columns:1fr;}
-  .ovs-block{aspect-ratio:16/7;}
-  .dgrid{grid-template-columns:repeat(2,1fr);}
-  .dcard{aspect-ratio:4/3;}
-  .pcircle{width:112px;height:112px;}
+  .ovs-grid,.dgrid{grid-template-columns:1fr;}
+  .ovs-block,.dcard{aspect-ratio:16/8;}
   .ftop{grid-template-columns:1fr;gap:36px;}
   .fbot{flex-direction:column;gap:10px;text-align:center;}
   footer{padding:60px 32px 36px;}
   .gal-header{padding:56px 32px 44px;}
   .gal-back{left:20px;top:24px;transform:none;}
   .gal-grid{grid-template-columns:repeat(3,1fr);}
+  #mediaModal{padding:20px;}
 }
 @media(max-width:600px){
   #nav{padding:0 18px;height:58px;}
   .mob-menu{top:58px;}
   #hero{padding-top:58px;}
-  .mosaic-wrap{flex:0 0 38vh;}
-  .hero-rp{padding:24px 20px;}
-  .h-bigcn{font-size:clamp(26px,8vw,42px);}
-  .h-stats{gap:20px;}
+  .mosaic-wrap{flex:0 0 36vh;}
+  .hero-rp{padding:22px 18px;}
+  .h-bigcn{font-size:clamp(24px,8vw,40px);}
+  .h-stats{gap:18px;}
+  .h-scroll-hint{display:none;}
   .sec{padding:56px 20px;}
   .stats-band{padding:36px 20px;}
   .si{padding:28px 12px;}
@@ -291,15 +287,13 @@ footer{background:#1a4fa8;padding:80px 60px 40px;}
   footer{padding:48px 20px 30px;}
   .gal-grid{grid-template-columns:repeat(2,1fr);}
   #galleryPage{padding-top:58px;}
+  .mm-inner{max-width:100%;}
 }
 </style>
 
 <!-- NAV -->
 <nav id="nav">
-  <div class="nl" onclick="backToMain()">
-    <span class="nl-main">DISHANG</span>
-    <span class="nl-sub">Huasheng Fashion</span>
-  </div>
+  <div class="nl" onclick="backToMain()"><span class="nl-main">DISHANG</span><span class="nl-sub">Huasheng Fashion</span></div>
   <ul class="nlinks">
     <li><a href="#about" onclick="backToMain()">公司简介</a></li>
     <li><a href="#products" onclick="backToMain()">产品系列</a></li>
@@ -310,16 +304,13 @@ footer{background:#1a4fa8;padding:80px 60px 40px;}
   </ul>
   <div class="nav-right">
     <div class="lang-sw">
-      <button class="lb active" data-l="cn">中</button>
-      <span class="ls">|</span>
-      <button class="lb" data-l="en">EN</button>
-      <span class="ls">|</span>
+      <button class="lb active" data-l="cn">中</button><span class="ls">|</span>
+      <button class="lb" data-l="en">EN</button><span class="ls">|</span>
       <button class="lb" data-l="ja">日</button>
     </div>
     <button class="ham" id="hamBtn"><span></span><span></span><span></span></button>
   </div>
 </nav>
-
 <div class="mob-menu" id="mobMenu">
   <a href="#about" onclick="backToMain()">公司简介</a>
   <a href="#products" onclick="backToMain()">产品系列</a>
@@ -329,19 +320,13 @@ footer{background:#1a4fa8;padding:80px 60px 40px;}
   <a href="#partners" onclick="backToMain()">合作伙伴</a>
 </div>
 
-<!-- MAIN PAGE -->
 <div id="mainPage">
-
-<!-- ═══ HERO ═══ -->
+<!-- HERO -->
 <section id="hero">
-
-  <!-- LEFT: canvas mosaic (image revealed on hover) -->
   <div class="mosaic-wrap" id="mosaicWrap">
     <canvas id="mosaicCanvas"></canvas>
-    <div class="mosaic-hint" id="mosaicHint">— 悬停探索 —</div>
+    <div class="liquid-hint" id="liquidHint">~ 轻触以激活水波 ~</div>
   </div>
-
-  <!-- RIGHT: brand content -->
   <div class="hero-rp">
     <p class="h-eye" id="hEye">迪尚集团 · 高端时装制造</p>
     <h1 class="h-bigcn" id="hBigCn">大连迪尚<br>華盛時裝</h1>
@@ -355,20 +340,14 @@ footer{background:#1a4fa8;padding:80px 60px 40px;}
     </div>
     <div class="h-actions">
       <button class="h-btn h-btn-primary" onclick="backToMain();setTimeout(()=>{document.getElementById('products').scrollIntoView({behavior:'smooth'})},50)">
-        <span id="hBtn1">查看产品</span>
-        <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        <span id="hBtn1">查看产品</span><svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
       </button>
       <button class="h-btn h-btn-ghost" onclick="backToMain();setTimeout(()=>{document.getElementById('about').scrollIntoView({behavior:'smooth'})},50)">
         <span id="hBtn2">了解更多</span>
       </button>
     </div>
   </div>
-
-  <!-- scroll hint -->
-  <div class="h-scroll-hint">
-    <div class="h-scroll-bar"></div>
-    <span id="hScroll">滚动</span>
-  </div>
+  <div class="h-scroll-hint"><div class="h-scroll-bar"></div><span id="hScroll">滚动</span></div>
 </section>
 
 <!-- ABOUT -->
@@ -401,10 +380,10 @@ footer{background:#1a4fa8;padding:80px 60px 40px;}
 <section id="workshops" class="sec white">
   <div class="sh fi"><p class="slabel" id="wLbl">Manufacturing Excellence</p><h2 class="stcn" id="wTitle">生产车间</h2><div class="dv"><div class="dvl"></div><div class="dvd"></div><div class="dvl"></div></div></div>
   <div class="wgrid">
-    <div class="wi fi d1"><img src="https://i.ibb.co/kgMDsVPQ/image.png" alt="sewing"/><div class="wlbl"><div class="wcn" id="w1n">縫製車間</div><div class="wen" id="w1e">SEWING WORKSHOP</div></div></div>
-    <div class="wi fi d2"><img src="https://i.ibb.co/m1YCN2w/image.png" alt="moulding"/><div class="wlbl"><div class="wcn" id="w2n">模板車間</div><div class="wen" id="w2e">MOULDING WORKSHOP</div></div></div>
-    <div class="wi fi d3"><img src="https://i.ibb.co/KxWV3q8k/image.png" alt="ironing"/><div class="wlbl"><div class="wcn" id="w3n">整熨車間</div><div class="wen" id="w3e">IRONING WORKSHOP</div></div></div>
-    <div class="wi fi d4"><img src="https://i.ibb.co/Y44q49kN/image.png" alt="packaging"/><div class="wlbl"><div class="wcn" id="w4n">包裝車間</div><div class="wen" id="w4e">PACKAGING WORKSHOP</div></div></div>
+    <div class="wi fi d1"><img src="https://i.ibb.co/kgMDsVPQ/image.png" alt=""/><div class="wlbl"><div class="wcn" id="w1n">縫製車間</div><div class="wen" id="w1e">SEWING WORKSHOP</div></div></div>
+    <div class="wi fi d2"><img src="https://i.ibb.co/m1YCN2w/image.png" alt=""/><div class="wlbl"><div class="wcn" id="w2n">模板車間</div><div class="wen" id="w2e">MOULDING WORKSHOP</div></div></div>
+    <div class="wi fi d3"><img src="https://i.ibb.co/KxWV3q8k/image.png" alt=""/><div class="wlbl"><div class="wcn" id="w3n">整熨車間</div><div class="wen" id="w3e">IRONING WORKSHOP</div></div></div>
+    <div class="wi fi d4"><img src="https://i.ibb.co/Y44q49kN/image.png" alt=""/><div class="wlbl"><div class="wcn" id="w4n">包裝車間</div><div class="wen" id="w4e">PACKAGING WORKSHOP</div></div></div>
   </div>
 </section>
 
@@ -412,9 +391,21 @@ footer{background:#1a4fa8;padding:80px 60px 40px;}
 <section id="global" class="sec cream">
   <div class="sh fi"><p class="slabel" id="oLbl">Global Manufacturing</p><h2 class="stcn" id="oTitle">海外生产基地</h2><h3 class="sten" id="oSub">Overseas Factory</h3><div class="dv"><div class="dvl"></div><div class="dvd"></div><div class="dvl"></div></div></div>
   <div class="ovs-grid">
-    <div class="ovs-block fi d1"><img src="https://i.ibb.co/tpsdFSQY/image.png" alt="Myanmar"/><div class="ovs-overlay"><div><div class="ovs-cn" id="o1n">缅甸</div><div class="ovs-en" id="o1e">Myanmar</div><div class="ovs-tag" id="o1t">仰光工业园 · 迪尚凯尼</div></div></div></div>
-    <div class="ovs-block fi d2"><img src="https://i.ibb.co/21dd1rWy/image.png" alt="Bangladesh"/><div class="ovs-overlay"><div><div class="ovs-cn" id="o2n">孟加拉国</div><div class="ovs-en" id="o2e">Bangladesh</div><div class="ovs-tag" id="o2t">ACE APPAREL · 锦鸿</div></div></div></div>
-    <div class="ovs-block fi d3"><img src="https://i.ibb.co/Zz4gwm2p/image.png" alt="Cambodia"/><div class="ovs-overlay"><div><div class="ovs-cn" id="o3n">柬埔寨</div><div class="ovs-en" id="o3e">Cambodia</div><div class="ovs-tag" id="o3t">华宽 · 迪尚瑞华盛</div></div></div></div>
+    <div class="ovs-block fi d1" onclick="openMediaModal('video','https://streamable.com/e/0xocj1','缅甸 · Myanmar')">
+      <img src="https://i.ibb.co/tpsdFSQY/image.png" alt="Myanmar"/>
+      <div class="ovs-overlay"><div><div class="ovs-cn" id="o1n">缅甸</div><div class="ovs-en" id="o1e">Myanmar</div><div class="ovs-tag" id="o1t">仰光工业园 · 迪尚凯尼</div></div></div>
+      <div class="play-badge"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+    </div>
+    <div class="ovs-block fi d2" onclick="openMediaModal('video','https://streamable.com/e/9zztgt','孟加拉国 · Bangladesh')">
+      <img src="https://i.ibb.co/21dd1rWy/image.png" alt="Bangladesh"/>
+      <div class="ovs-overlay"><div><div class="ovs-cn" id="o2n">孟加拉国</div><div class="ovs-en" id="o2e">Bangladesh</div><div class="ovs-tag" id="o2t">ACE APPAREL · 锦鸿</div></div></div>
+      <div class="play-badge"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+    </div>
+    <div class="ovs-block fi d3" onclick="openMediaModal('video','https://streamable.com/e/2wx94h','柬埔寨 · Cambodia')">
+      <img src="https://i.ibb.co/Zz4gwm2p/image.png" alt="Cambodia"/>
+      <div class="ovs-overlay"><div><div class="ovs-cn" id="o3n">柬埔寨</div><div class="ovs-en" id="o3e">Cambodia</div><div class="ovs-tag" id="o3t">华宽 · 迪尚瑞华盛</div></div></div>
+      <div class="play-badge"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+    </div>
   </div>
 </section>
 
@@ -422,9 +413,23 @@ footer{background:#1a4fa8;padding:80px 60px 40px;}
 <section id="design" class="sec white">
   <div class="sh fi"><p class="slabel" id="dLbl">Creative Network</p><h2 class="stcn" id="dTitle">海外设计公司</h2><h3 class="sten" id="dSub">Our Overseas Design Company</h3><div class="dv"><div class="dvl"></div><div class="dvd"></div><div class="dvl"></div></div></div>
   <div class="dgrid">
-    <div class="dcard fi d1"><img src="https://i.ibb.co/RTMhKByW/image.png" alt="UK"/><div class="d-overlay"><div class="ddcn" id="d1n">英国</div><div class="dden" id="d1e">United Kingdom</div></div></div>
-    <div class="dcard fi d2"><img src="https://i.ibb.co/35bRKVNR/image.png" alt="Spain"/><div class="d-overlay"><div class="ddcn" id="d2n">西班牙</div><div class="dden" id="d2e">Spain</div></div></div>
-    <div class="dcard fi d3"><img src="https://i.ibb.co/6K3KVt3/image.png" alt="Canada"/><div class="d-overlay"><div class="ddcn" id="d3n">加拿大</div><div class="dden" id="d3e">Canada</div></div></div>
+    <div class="dcard fi d1" onclick="openMediaModal('video','https://streamable.com/e/39q6dl','英国 · United Kingdom')">
+      <img src="https://i.ibb.co/RTMhKByW/image.png" alt="UK"/>
+      <div class="d-overlay"><div class="ddcn" id="d1n">英国</div><div class="dden" id="d1e">United Kingdom</div></div>
+      <div class="play-badge"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+    </div>
+    <div class="dcard fi d2" onclick="openMediaModal('video','https://streamable.com/e/g3q5ry','西班牙 · Spain')">
+      <img src="https://i.ibb.co/35bRKVNR/image.png" alt="Spain"/>
+      <div class="d-overlay"><div class="ddcn" id="d2n">西班牙</div><div class="dden" id="d2e">Spain</div></div>
+      <div class="play-badge"><svg viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+    </div>
+    <div class="dcard fi d3" onclick="openMediaModal('gallery',['https://i.ibb.co/RT4MDJ97/Screenshot-2025-02-27-103703.png','https://i.ibb.co/x8gsYgym/Screenshot-2025-02-27-103748.png','https://i.ibb.co/5t82XNn/Screenshot-2025-02-27-103905.png','https://i.ibb.co/nqngn2V4/Screenshot-2025-02-27-104249.png'],'加拿大 · Canada')">
+      <img src="https://i.ibb.co/6K3KVt3/image.png" alt="Canada"/>
+      <div class="d-overlay"><div class="ddcn" id="d3n">加拿大</div><div class="dden" id="d3e">Canada</div></div>
+      <div class="play-badge" style="background:rgba(255,255,255,.15);">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#fff" stroke-width="1.5"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -471,10 +476,8 @@ footer{background:#1a4fa8;padding:80px 60px 40px;}
 <div id="galleryPage">
   <div class="gal-header">
     <button class="gal-back" onclick="backToMain()"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg><span id="galBackTxt">返回</span></button>
-    <p class="gal-label" id="galLabel">产品系列</p>
-    <h2 class="gal-title" id="galTitle">西服</h2>
-    <p class="gal-sub" id="galSub">Suit / Blazer</p>
-    <p class="gal-count" id="galCount"></p>
+    <p class="gal-label" id="galLabel"></p><h2 class="gal-title" id="galTitle"></h2>
+    <p class="gal-sub" id="galSub"></p><p class="gal-count" id="galCount"></p>
   </div>
   <div class="gal-grid" id="galGrid"></div>
 </div>
@@ -488,37 +491,38 @@ footer{background:#1a4fa8;padding:80px 60px 40px;}
   <div class="lb-count" id="lbCount"></div>
 </div>
 
+<!-- MEDIA MODAL -->
+<div id="mediaModal">
+  <div class="mm-inner">
+    <button class="mm-close" onclick="closeMediaModal()">×</button>
+    <div class="mm-title" id="mmTitle"></div>
+    <div id="mmContent"></div>
+  </div>
+</div>
+
 <script>
-/* ═══ IMAGE DATA ═══ */
+/* ═══ GALLERY DATA ═══ */
 const IMGS={
   suit:['https://i.ibb.co/zhNZgb2T/307.png','https://i.ibb.co/Pv1xXydY/AI-2026-05-13.jpg','https://i.ibb.co/XfrfzbgF/AI-2026-05-13-2.jpg','https://i.ibb.co/wFbbgNLc/94ccfb90-4e67-11f1-8e84-4e4c8cfc4b0c.jpg','https://i.ibb.co/YTKBSf9c/273.png','https://i.ibb.co/cStcp8SP/c3627192-4e6c-11f1-8e84-4e4c8cfc4b0c.jpg','https://i.ibb.co/Z6RVt2ZW/AI-2026-05-13-5.jpg','https://i.ibb.co/qMqRwRTk/AI-2026-05-13-6.jpg','https://i.ibb.co/5hdcM5vV/AI-2026-05-13-7.jpg','https://i.ibb.co/V0sYRwhF/AI-2026-05-13-8.jpg','https://i.ibb.co/3Prdyb5/AI-2026-05-13-9.jpg','https://i.ibb.co/0pp4bJTY/AI-2026-05-13-10.jpg','https://i.ibb.co/vvRPYQL5/AI-2026-05-13-11.jpg','https://i.ibb.co/hx31Dfn7/AI-2026-05-13-17.jpg','https://i.ibb.co/gLCRVrX0/AI-2026-05-13-16.jpg','https://i.ibb.co/5XfPtDRS/AI-2026-05-13-15.jpg','https://i.ibb.co/840RK0jf/AI-2026-05-13-14.jpg','https://i.ibb.co/4ggVNdGw/AI-2026-05-13-13.jpg','https://i.ibb.co/qLKQYcYP/AI-2026-05-13-12.jpg','https://i.ibb.co/TD0JTnFV/AI-2026-05-13-23.jpg','https://i.ibb.co/Nd8MmVR9/AI-2026-05-13-22.jpg','https://i.ibb.co/CKcs5NNy/AI-2026-05-13-21.jpg','https://i.ibb.co/FLC4p30P/AI-2026-05-13-20.jpg','https://i.ibb.co/TDfQg1Pb/AI-2026-05-13-19.jpg','https://i.ibb.co/S45CHV1r/AI-2026-05-13-18.jpg','https://i.ibb.co/7xT5YnPM/AI-2026-05-13-29.jpg','https://i.ibb.co/7JMfwnGS/AI-2026-05-13-28.jpg','https://i.ibb.co/fd36B3hx/AI-2026-05-13-27.jpg','https://i.ibb.co/y73Kpcn/AI-2026-05-13-26.jpg','https://i.ibb.co/GQFt4ydy/AI-2026-05-13-25.jpg','https://i.ibb.co/rKXvR25z/AI-2026-05-13-24.jpg','https://i.ibb.co/ymtS9tLv/AI-2026-05-13-35.jpg','https://i.ibb.co/NgYzWhyt/AI-2026-05-13-34.jpg','https://i.ibb.co/6RTHkDN9/AI-2026-05-13-33.jpg','https://i.ibb.co/fdbdYnV3/AI-2026-05-13-32.jpg','https://i.ibb.co/DPhxhT6v/AI-2026-05-13-31.jpg','https://i.ibb.co/WWcZvC4p/AI-2026-05-13-30.jpg','https://i.ibb.co/LD6qtjq9/AI-2026-05-13-38.jpg','https://i.ibb.co/N25z3D2D/AI-2026-05-13-37.jpg','https://i.ibb.co/zWQ7HjkH/AI-2026-05-13-36.jpg'],
   wool:['https://i.ibb.co/TBMT1vvr/AI-2026-05-13-50.jpg','https://i.ibb.co/pBYsLxqJ/AI-2026-05-13-49.jpg','https://i.ibb.co/z0GNtJJ/AI-2026-05-13-48.jpg','https://i.ibb.co/dScxXPS/AI-2026-05-13-56.jpg','https://i.ibb.co/R4NcnSfM/AI-2026-05-13-55.jpg','https://i.ibb.co/sDQs2Tg/AI-2026-05-13-54.jpg','https://i.ibb.co/Gv33CFH5/AI-2026-05-14.jpg','https://i.ibb.co/yB8XgzgS/AI-2026-05-13-64.jpg','https://i.ibb.co/LdwzzCyV/AI-2026-05-13-74.jpg','https://i.ibb.co/kVk4PRTm/AI-2026-05-13-73.jpg','https://i.ibb.co/27h4cnSz/AI-2026-05-13-72.jpg','https://i.ibb.co/gcWQhKd/AI-2026-05-13-71.jpg','https://i.ibb.co/0p2dhMnF/AI-2026-05-13-70.jpg','https://i.ibb.co/p61bGHMW/AI-2026-05-13-69.jpg','https://i.ibb.co/R4gSmdDL/AI-2026-05-13-80.jpg','https://i.ibb.co/SDGchzhc/AI-2026-05-13-79.jpg','https://i.ibb.co/6RcWpT0y/AI-2026-05-13-78.jpg','https://i.ibb.co/8LWyQ2nj/AI-2026-05-13-77.jpg','https://i.ibb.co/Zzfv1myQ/AI-2026-05-13-76.jpg','https://i.ibb.co/Swbs9mft/AI-2026-05-13-75.jpg','https://i.ibb.co/jP1WVLT6/AI-2026-05-13-86.jpg','https://i.ibb.co/jkXf3PyJ/AI-2026-05-13-85.jpg','https://i.ibb.co/7dVtf6rw/AI-2026-05-13-84.jpg','https://i.ibb.co/TMLG2qnV/AI-2026-05-13-83.jpg','https://i.ibb.co/21RcqcCp/AI-2026-05-13-82.jpg','https://i.ibb.co/qFmH1FFk/AI-2026-05-13-81.jpg','https://i.ibb.co/3YNq6tw6/AI-2026-05-13-92.jpg','https://i.ibb.co/q2WNytx/AI-2026-05-13-91.jpg','https://i.ibb.co/XfBkBJBh/AI-2026-05-13-90.jpg','https://i.ibb.co/gFtcpfgG/AI-2026-05-13-89.jpg','https://i.ibb.co/Tq1Nr8Xz/AI-2026-05-13-88.jpg','https://i.ibb.co/VYZTvCS4/AI-2026-05-13-87.jpg','https://i.ibb.co/sv7NsXr2/AI-2026-05-13-100.jpg','https://i.ibb.co/zW1G2PcL/AI-2026-05-13-99.jpg','https://i.ibb.co/60grm0ks/AI-2026-05-13-98.jpg','https://i.ibb.co/RkFHQSP9/AI-2026-05-13-97.jpg','https://i.ibb.co/jc0KgNX/AI-2026-05-13-96.jpg','https://i.ibb.co/8DdrgYJT/AI-2026-05-13-95.jpg','https://i.ibb.co/sJvCnSXX/AI-2026-05-13-94.jpg','https://i.ibb.co/7tjV8GP8/AI-2026-05-13-93.jpg'],
   trench:['https://i.ibb.co/4gwtKWHM/AI-2026-05-13-47.jpg','https://i.ibb.co/BppTpp4/AI-2026-05-13-52.jpg','https://i.ibb.co/DX01WpR/AI-2026-05-13-51.jpg','https://i.ibb.co/nvWzjX6/AI-2026-05-13-63.jpg','https://i.ibb.co/wrwx1TTt/AI-2026-05-13-68.jpg','https://i.ibb.co/zh0bvRtF/AI-2026-05-13-67.jpg','https://i.ibb.co/zh43NV4x/AI-2026-05-13-66.jpg','https://i.ibb.co/5XBtftWk/AI-2026-05-13-65.jpg','https://i.ibb.co/C38ck71v/IMG-0591.jpg','https://i.ibb.co/DNyF3qL/AI-2026-05-13-128.jpg','https://i.ibb.co/ds0QZY3p/AI-2026-05-13-127.jpg','https://i.ibb.co/Hf7SJhzy/AI-2026-05-13-126.jpg','https://i.ibb.co/1tKZTzgv/AI-2026-05-13-125.jpg','https://i.ibb.co/4RCNswgH/AI-2026-05-13-124.jpg','https://i.ibb.co/BVC0hXVN/AI-2026-05-13-123.jpg','https://i.ibb.co/8LwGxMf7/AI-2026-05-13-122.jpg','https://i.ibb.co/0ydSq9qK/AI-2026-05-14-19.jpg','https://i.ibb.co/nsBvwJhR/AI-2026-05-13-133.jpg','https://i.ibb.co/Xxr32BTR/AI-2026-05-13-132.jpg','https://i.ibb.co/mFdvFKwt/AI-2026-05-13-131.jpg','https://i.ibb.co/60GDjv00/AI-2026-05-13-130.jpg','https://i.ibb.co/bR6vkdT8/AI-2026-05-13-129.jpg','https://i.ibb.co/nqskYscL/AI-2026-05-14-7.jpg','https://i.ibb.co/tp75JzYS/AI-2026-05-14-6.jpg','https://i.ibb.co/DDkLddwr/AI-2026-05-14-5.jpg','https://i.ibb.co/27wwnWhB/AI-2026-05-14-4.jpg','https://i.ibb.co/9mYpHV1m/AI-2026-05-14-3.jpg','https://i.ibb.co/vCKsn5qs/AI-2026-05-14-2.jpg','https://i.ibb.co/C5VBQ3Gz/AI-2026-05-14-13.jpg','https://i.ibb.co/399R7TY4/AI-2026-05-14-12.jpg','https://i.ibb.co/C5SrqqMy/AI-2026-05-14-11.jpg','https://i.ibb.co/PZXKfg2s/AI-2026-05-14-10.jpg','https://i.ibb.co/1Gpnd9WK/AI-2026-05-14-9.jpg','https://i.ibb.co/vCTCW2jw/AI-2026-05-14-8.jpg','https://i.ibb.co/pjBpFtPX/AI-2026-05-14-18.jpg','https://i.ibb.co/tT17tFPb/AI-2026-05-14-17.jpg','https://i.ibb.co/zVTzxjxk/AI-2026-05-14-16.jpg','https://i.ibb.co/JwVB49qK/AI-2026-05-14-15.jpg','https://i.ibb.co/hJb8hh4q/AI-2026-05-14-14.jpg','https://i.ibb.co/bMRjmbNg/AI-2026-05-14-20.jpg'],
   down:['https://i.ibb.co/4wPn2wrn/AI-2026-05-13-3.jpg','https://i.ibb.co/k2kWqLm1/AI-2026-05-13-4.jpg','https://i.ibb.co/nMn9YyCx/a34c96e6-4e6a-11f1-b180-32122d3eb903.jpg','https://i.ibb.co/mrDMd303/275.png','https://i.ibb.co/S7QRqJzQ/AI-2026-05-13-44.jpg','https://i.ibb.co/V0XqQmdD/AI-2026-05-13-43.jpg','https://i.ibb.co/Y4Kzb2z1/AI-2026-05-13-42.jpg','https://i.ibb.co/zT6bbxjv/AI-2026-05-13-41.jpg','https://i.ibb.co/nsNwZqs6/AI-2026-05-13-40.jpg','https://i.ibb.co/prRBFd96/AI-2026-05-13-39.jpg','https://i.ibb.co/tMx2jH3x/AI-2026-05-13-46.jpg','https://i.ibb.co/RTGvZZqF/AI-2026-05-13-45.jpg','https://i.ibb.co/ks5w9HxL/AI-2026-05-13-62.jpg','https://i.ibb.co/6JRS8N0j/AI-2026-05-13-61.jpg','https://i.ibb.co/d0wnCb2m/AI-2026-05-13-60.jpg','https://i.ibb.co/VY6SSXKZ/AI-2026-05-13-59.jpg','https://i.ibb.co/cX7kv6Nv/AI-2026-05-13-58.jpg','https://i.ibb.co/Gfh9tLRB/AI-2026-05-13-57.jpg','https://i.ibb.co/1GJF8CGr/AI-2026-05-13-108.jpg','https://i.ibb.co/99tm4XDS/AI-2026-05-13-107.jpg','https://i.ibb.co/kg0KtwjM/AI-2026-05-13-106.jpg','https://i.ibb.co/G3bC7gF3/AI-2026-05-13-105.jpg','https://i.ibb.co/b5nQwMsv/AI-2026-05-13-104.jpg','https://i.ibb.co/gb2k7Whm/AI-2026-05-13-103.jpg','https://i.ibb.co/HpXncjKc/AI-2026-05-13-102.jpg','https://i.ibb.co/YFVszR2G/AI-2026-05-13-101.jpg','https://i.ibb.co/zTyBMVM9/AI-2026-05-13-116.jpg','https://i.ibb.co/TBWMtYkQ/AI-2026-05-13-115.jpg','https://i.ibb.co/KcZsLydW/AI-2026-05-13-114.jpg','https://i.ibb.co/KcPHG1th/AI-2026-05-13-113.jpg','https://i.ibb.co/Sw47WHrr/AI-2026-05-13-112.jpg','https://i.ibb.co/TDQgQhHm/AI-2026-05-13-111.jpg','https://i.ibb.co/zWNW4mTf/AI-2026-05-13-110.jpg','https://i.ibb.co/vWKMtsh/AI-2026-05-13-109.jpg','https://i.ibb.co/ch29zmBr/AI-2026-05-13-120.jpg','https://i.ibb.co/PzJRkkXD/AI-2026-05-13-121.jpg','https://i.ibb.co/ZzJnS3z1/AI-2026-05-13-119.jpg','https://i.ibb.co/wrjxLq5H/AI-2026-05-13-118.jpg','https://i.ibb.co/k2Z5nJj6/AI-2026-05-13-117.jpg']
 };
-
 const GAL_META={
   suit:{cn:{label:'产品系列',title:'西服',sub:'Suit / Blazer',back:'返回主页',count:'件'},en:{label:'Product Range',title:'Suit',sub:'Suit / Blazer',back:'Back',count:'pieces'},ja:{label:'製品シリーズ',title:'スーツ',sub:'Suit / Blazer',back:'戻る',count:'点'}},
   wool:{cn:{label:'产品系列',title:'双面呢大衣',sub:'Double-Faced Wool Coat',back:'返回主页',count:'件'},en:{label:'Product Range',title:'Wool Coat',sub:'Double-Faced Wool Coat',back:'Back',count:'pieces'},ja:{label:'製品シリーズ',title:'ウールコート',sub:'Double-Faced Wool Coat',back:'戻る',count:'点'}},
   trench:{cn:{label:'产品系列',title:'风衣',sub:'Trench Coat',back:'返回主页',count:'件'},en:{label:'Product Range',title:'Trench Coat',sub:'Trench Coat',back:'Back',count:'pieces'},ja:{label:'製品シリーズ',title:'トレンチコート',sub:'Trench Coat',back:'戻る',count:'点'}},
   down:{cn:{label:'产品系列',title:'羽绒服',sub:'Down Jacket',back:'返回主页',count:'件'},en:{label:'Product Range',title:'Down Jacket',sub:'Down Jacket',back:'Back',count:'pieces'},ja:{label:'製品シリーズ',title:'ダウンジャケット',sub:'Down Jacket',back:'戻る',count:'点'}}
 };
-
 let curLang='cn',curCat='suit',curLbIdx=0;
 
+/* ── Gallery ── */
 function openGallery(cat){
   curCat=cat;const m=GAL_META[cat][curLang],imgs=IMGS[cat];
-  document.getElementById('galLabel').textContent=m.label;
-  document.getElementById('galTitle').textContent=m.title;
-  document.getElementById('galSub').textContent=m.sub;
-  document.getElementById('galBackTxt').textContent=m.back;
+  ['galLabel','galTitle','galSub','galBackTxt'].forEach((id,i)=>document.getElementById(id).textContent=[m.label,m.title,m.sub,m.back][i]);
   document.getElementById('galCount').textContent=imgs.length+' '+m.count;
   const g=document.getElementById('galGrid');g.innerHTML='';
-  imgs.forEach((src,i)=>{
-    const d=document.createElement('div');d.className='gal-item';d.onclick=()=>openLb(i);
-    const im=document.createElement('img');im.src=src;im.loading='lazy';
-    d.appendChild(im);g.appendChild(d);
-  });
+  imgs.forEach((src,i)=>{const d=document.createElement('div');d.className='gal-item';d.onclick=()=>openLb(i);const im=document.createElement('img');im.src=src;im.loading='lazy';d.appendChild(im);g.appendChild(d);});
   document.getElementById('mainPage').style.display='none';
   const gp=document.getElementById('galleryPage');gp.classList.add('active');gp.scrollTop=0;
 }
@@ -527,26 +531,37 @@ function backToMain(){
   document.getElementById('mainPage').style.display='';
   closeMobMenu();
 }
-function openLb(i){
-  curLbIdx=i;const imgs=IMGS[curCat];
-  document.getElementById('lbImg').src=imgs[i];
-  document.getElementById('lbCount').textContent=(i+1)+' / '+imgs.length;
-  document.getElementById('lightbox').classList.add('open');
-}
+function openLb(i){curLbIdx=i;const imgs=IMGS[curCat];document.getElementById('lbImg').src=imgs[i];document.getElementById('lbCount').textContent=(i+1)+' / '+imgs.length;document.getElementById('lightbox').classList.add('open');}
 function closeLb(){document.getElementById('lightbox').classList.remove('open');}
 function lbNav(dir){const imgs=IMGS[curCat];curLbIdx=(curLbIdx+dir+imgs.length)%imgs.length;openLb(curLbIdx);}
-document.addEventListener('keydown',e=>{
-  if(!document.getElementById('lightbox').classList.contains('open'))return;
-  if(e.key==='ArrowLeft')lbNav(-1);if(e.key==='ArrowRight')lbNav(1);if(e.key==='Escape')closeLb();
-});
+document.addEventListener('keydown',e=>{if(!document.getElementById('lightbox').classList.contains('open'))return;if(e.key==='ArrowLeft')lbNav(-1);if(e.key==='ArrowRight')lbNav(1);if(e.key==='Escape')closeLb();});
 document.getElementById('lightbox').addEventListener('click',function(e){if(e.target===this)closeLb();});
 
-/* ═══ TRANSLATIONS ═══ */
+/* ── Media Modal ── */
+function openMediaModal(type,src,title){
+  const modal=document.getElementById('mediaModal');
+  document.getElementById('mmTitle').textContent=title;
+  const content=document.getElementById('mmContent');
+  if(type==='video'){
+    content.innerHTML=`<div class="mm-video-wrap"><iframe src="${src}" allowfullscreen allow="autoplay; fullscreen"></iframe></div>`;
+  } else {
+    content.innerHTML=`<div class="mm-gallery">${src.map(u=>`<img src="${u}" onclick="window.open('${u}','_blank')" alt=""/>`).join('')}</div>`;
+  }
+  modal.classList.add('open');
+}
+function closeMediaModal(){
+  document.getElementById('mediaModal').classList.remove('open');
+  document.getElementById('mmContent').innerHTML='';
+}
+document.getElementById('mediaModal').addEventListener('click',function(e){if(e.target===this)closeMediaModal();});
+
+/* ── Translations ── */
 const TR={
-  cn:{nav:['公司简介','产品系列','生产车间','全球布局','国际认证','合作伙伴'],hEye:'迪尚集团 · 高端时装制造',hBigCn:'大连迪尚<br>華盛時裝',hBigEn:'DISHANG HUASHENG',hDesc:'作为迪尚集团旗下高端时装制造板块的核心企业，聚焦双面呢大衣、风衣、西服及羽绒服等品类的精细化生产，为全球客户提供高品质服装解决方案。',hSt1:'注册资本',hSt2:'员工',hSt3:'年产能',hBtn1:'查看产品',hBtn2:'了解更多',hScroll:'滚动',mHint:'— 悬停探索 —',aLbl:'Company Profile',aTitle:'公司简介',aP1:'作为迪尚集团旗下高端时装制造板块的核心企业，大连迪尚华盛时装有限公司注册资本1.2亿元人民币，厂区占地约15000平方米，拥有12000平方米现代化生产车间，核心团队与一线员工共600余人，年产能40万件。',aP2:'公司聚焦高端时装，尤其是双面呢大衣、风衣、西服及羽绒服等品类的精细化生产，以服装加工制造为核心，联动进出口贸易业务，构建了集研发、生产、贸易于一体的全流程服务体系，为全球客户提供高品质服装解决方案。',s1l:'注册资本（元）',s2l:'厂区占地面积',s3l:'核心团队与员工',s4l:'年产能',pLbl:'Our Products',pTitle:'产品系列',p1n:'西服',p1e:'Suit / Blazer',p2n:'双面呢大衣',p2e:'Double-Faced Wool Coat',p3n:'风衣',p3e:'Trench Coat',p4n:'羽绒服',p4e:'Down Jacket',vm:'查看更多',wLbl:'Manufacturing Excellence',wTitle:'生产车间',w1n:'縫製車間',w1e:'SEWING WORKSHOP',w2n:'模板車間',w2e:'MOULDING WORKSHOP',w3n:'整熨車間',w3e:'IRONING WORKSHOP',w4n:'包裝車間',w4e:'PACKAGING WORKSHOP',oLbl:'Global Manufacturing',oTitle:'海外生产基地',oSub:'Overseas Factory',o1n:'缅甸',o1e:'Myanmar',o1t:'仰光工业园 · 迪尚凯尼',o2n:'孟加拉国',o2e:'Bangladesh',o2t:'ACE APPAREL · 锦鸿',o3n:'柬埔寨',o3e:'Cambodia',o3t:'华宽 · 迪尚瑞华盛',dLbl:'Creative Network',dTitle:'海外设计公司',dSub:'Our Overseas Design Company',d1n:'英国',d1e:'United Kingdom',d2n:'西班牙',d2e:'Spain',d3n:'加拿大',d3e:'Canada',cLbl:'Quality Assurance',cTitle:'国际认证',cSub:'International Certification',c1:'Responsible Down Standard',c2:'Responsible Wool Standard',c3:'Organic 100 Content Standard',c4:'ISO International Standard',c5:'ISO 9001 Quality Management',c6:'ISO 14001 Environmental',c7:'Business Social Compliance Initiative',c8:'SMETA Sedex Audit',c9:'Global Recycled Standard',ptLbl:'Collaborations',ptTitle:'合作伙伴',ptSub:'Business Partners',ftDesc:'以高端时装制造为核心，集研发、生产、贸易于一体，为全球客户提供高品质服装解决方案。',ftC1T:'Company',ftC1:['公司简介','产品系列','生产车间','全球布局','国际认证','合作伙伴'],ftC2T:'Global Network',ftC2:['UK — Design Office','Spain — Design Office','Canada — Design Office','Myanmar — Production','Bangladesh — Production','Cambodia — Production'],ftCopy:'© 2024 大连迪尚华盛时装有限公司 · Dalian Dishang Huasheng Fashion Co., Ltd. All rights reserved.'},
-  en:{nav:['About','Products','Workshops','Global','Certifications','Partners'],hEye:'Dishang Group · Premium Fashion',hBigCn:'Dalian Dishang<br>Huasheng',hBigEn:'DISHANG HUASHENG',hDesc:'A core high-end fashion manufacturer under Dishang Group, specializing in wool coats, trench coats, suits and down jackets — delivering premium garment solutions to global clients.',hSt1:'Registered Capital',hSt2:'Employees',hSt3:'Annual Capacity',hBtn1:'View Products',hBtn2:'Learn More',hScroll:'Scroll',mHint:'— Hover to Reveal —',aLbl:'Company Profile',aTitle:'About Us',aP1:'A core high-end fashion manufacturer under Dishang Group, Dalian Dishang Huasheng Fashion Co., Ltd. has RMB 120 million in registered capital. Our plant spans ~15,000 sqm, with 12,000 sqm of modern workshops, a team of over 600 employees, and an annual capacity of 400,000 pieces.',aP2:'Specializing in high-end fashion — double-faced wool coats, trenchcoats, suits and down jackets — we integrate garment manufacturing with import/export trade. With a full R&D-production-trade service system, we deliver premium garment solutions to global clients.',s1l:'Registered Capital',s2l:'Plant Area',s3l:'Employees',s4l:'Annual Capacity',pLbl:'Our Products',pTitle:'Product Range',p1n:'Suit',p1e:'Suit / Blazer',p2n:'Wool Coat',p2e:'Double-Faced Wool Coat',p3n:'Trench Coat',p3e:'Trench Coat',p4n:'Down Jacket',p4e:'Down Jacket',vm:'View More',wLbl:'Manufacturing Excellence',wTitle:'Workshops',w1n:'Sewing',w1e:'SEWING WORKSHOP',w2n:'Moulding',w2e:'MOULDING WORKSHOP',w3n:'Ironing',w3e:'IRONING WORKSHOP',w4n:'Packaging',w4e:'PACKAGING WORKSHOP',oLbl:'Global Manufacturing',oTitle:'Overseas Factories',oSub:'Global Production Network',o1n:'Myanmar',o1e:'Myanmar',o1t:'Yangon Industrial Park · Dishang Kenny',o2n:'Bangladesh',o2e:'Bangladesh',o2t:'ACE Apparel · Jinhong',o3n:'Cambodia',o3e:'Cambodia',o3t:'Huakuan · Dishang Ruihuasheng',dLbl:'Creative Network',dTitle:'Design Offices',dSub:'Our Overseas Design Network',d1n:'United Kingdom',d1e:'United Kingdom',d2n:'Spain',d2e:'Spain',d3n:'Canada',d3e:'Canada',cLbl:'Quality Assurance',cTitle:'Certifications',cSub:'International Certification',c1:'Responsible Down Standard',c2:'Responsible Wool Standard',c3:'Organic 100 Content Standard',c4:'ISO International Standard',c5:'ISO 9001 Quality Management',c6:'ISO 14001 Environmental',c7:'Business Social Compliance Initiative',c8:'SMETA Sedex Audit',c9:'Global Recycled Standard',ptLbl:'Collaborations',ptTitle:'Partners',ptSub:'Business Partners',ftDesc:'A premium fashion manufacturer integrating R&D, production and trade to deliver high-quality garment solutions to global clients.',ftC1T:'Company',ftC1:['About','Products','Workshops','Global','Certifications','Partners'],ftC2T:'Global Network',ftC2:['UK — Design Office','Spain — Design Office','Canada — Design Office','Myanmar — Production','Bangladesh — Production','Cambodia — Production'],ftCopy:'© 2024 Dalian Dishang Huasheng Fashion Co., Ltd. All rights reserved.'},
-  ja:{nav:['会社概要','製品ライン','生産工場','グローバル','国際認証','パートナー'],hEye:'迪尚グループ · 高級ファッション',hBigCn:'大連迪尚<br>華盛時裝',hBigEn:'DISHANG HUASHENG',hDesc:'迪尚グループ傘下の高級ファッション製造の中核企業。ダブルフェイスウールコート、トレンチコート、スーツ、ダウンジャケットを専門に製造し、グローバルクライアントへ高品質なソリューションを提供します。',hSt1:'登録資本金',hSt2:'従業員数',hSt3:'年間生産能力',hBtn1:'製品を見る',hBtn2:'詳細へ',hScroll:'スクロール',mHint:'— ホバーで表示 —',aLbl:'会社概要',aTitle:'会社について',aP1:'迪尚グループ傘下の高級ファッション製造の中核企業として、大連迪尚華盛時装有限公司は登録資本金1億2,000万元を有します。工場総面積は約15,000㎡、600名超のスタッフが年間40万点の生産能力を支えています。',aP2:'ダブルフェイスウールコート、トレンチコート、スーツ、ダウンジャケットなどの高級ファッションに特化し、製造と輸出入貿易を統合。フルサービス体制でグローバルクライアントに高品質なソリューションを提供します。',s1l:'登録資本金',s2l:'工場総面積',s3l:'従業員数',s4l:'年間生産能力',pLbl:'製品ライン',pTitle:'製品シリーズ',p1n:'スーツ',p1e:'Suit / Blazer',p2n:'ウールコート',p2e:'Double-Faced Wool Coat',p3n:'トレンチコート',p3e:'Trench Coat',p4n:'ダウンジャケット',p4e:'Down Jacket',vm:'もっと見る',wLbl:'製造の卓越性',wTitle:'生産工場',w1n:'縫製工場',w1e:'SEWING WORKSHOP',w2n:'型板工場',w2e:'MOULDING WORKSHOP',w3n:'プレス工場',w3e:'IRONING WORKSHOP',w4n:'包装工場',w4e:'PACKAGING WORKSHOP',oLbl:'グローバル製造',oTitle:'海外生産拠点',oSub:'Overseas Factory',o1n:'ミャンマー',o1e:'Myanmar',o1t:'ヤンゴン工業団地 · 迪尚凱尼',o2n:'バングラデシュ',o2e:'Bangladesh',o2t:'ACE APPAREL · 錦鴻',o3n:'カンボジア',o3e:'Cambodia',o3t:'華寛 · 迪尚瑞華盛',dLbl:'クリエイティブネットワーク',dTitle:'海外デザイン拠点',dSub:'Overseas Design Offices',d1n:'イギリス',d1e:'United Kingdom',d2n:'スペイン',d2e:'Spain',d3n:'カナダ',d3e:'Canada',cLbl:'品質保証',cTitle:'国際認証',cSub:'International Certification',c1:'責任あるダウン基準',c2:'責任あるウール基準',c3:'オーガニック100含有基準',c4:'ISO国際基準',c5:'ISO 9001 品質管理',c6:'ISO 14001 環境管理',c7:'ビジネス社会的コンプライアンス',c8:'SMETAセデックス審査',c9:'グローバルリサイクル基準',ptLbl:'コラボレーション',ptTitle:'ビジネスパートナー',ptSub:'Business Partners',ftDesc:'高級ファッション製造を核心に、研究開発・生産・貿易を統合し、グローバルクライアントに高品質なソリューションを提供します。',ftC1T:'会社',ftC1:['会社概要','製品ライン','生産工場','グローバル','国際認証','パートナー'],ftC2T:'グローバルネットワーク',ftC2:['イギリス — デザイン拠点','スペイン — デザイン拠点','カナダ — デザイン拠点','ミャンマー — 生産拠点','バングラデシュ — 生産拠点','カンボジア — 生産拠点'],ftCopy:'© 2024 大連迪尚華盛時装有限公司 · All rights reserved.'}
+  cn:{nav:['公司简介','产品系列','生产车间','全球布局','国际认证','合作伙伴'],hEye:'迪尚集团 · 高端时装制造',hBigCn:'大连迪尚<br>華盛時裝',hBigEn:'DISHANG HUASHENG',hDesc:'作为迪尚集团旗下高端时装制造板块的核心企业，聚焦双面呢大衣、风衣、西服及羽绒服等品类的精细化生产，为全球客户提供高品质服装解决方案。',hSt1:'注册资本',hSt2:'员工',hSt3:'年产能',hBtn1:'查看产品',hBtn2:'了解更多',hScroll:'滚动',lhint:'~ 轻触以激活水波 ~',aLbl:'Company Profile',aTitle:'公司简介',aP1:'作为迪尚集团旗下高端时装制造板块的核心企业，大连迪尚华盛时装有限公司注册资本1.2亿元人民币，厂区占地约15000平方米，拥有12000平方米现代化生产车间，核心团队与一线员工共600余人，年产能40万件。',aP2:'公司聚焦高端时装，尤其是双面呢大衣、风衣、西服及羽绒服等品类的精细化生产，以服装加工制造为核心，联动进出口贸易业务，构建了集研发、生产、贸易于一体的全流程服务体系，为全球客户提供高品质服装解决方案。',s1l:'注册资本（元）',s2l:'厂区占地面积',s3l:'核心团队与员工',s4l:'年产能',pLbl:'Our Products',pTitle:'产品系列',p1n:'西服',p1e:'Suit / Blazer',p2n:'双面呢大衣',p2e:'Double-Faced Wool Coat',p3n:'风衣',p3e:'Trench Coat',p4n:'羽绒服',p4e:'Down Jacket',vm:'查看更多',wLbl:'Manufacturing Excellence',wTitle:'生产车间',w1n:'縫製車間',w1e:'SEWING WORKSHOP',w2n:'模板車間',w2e:'MOULDING WORKSHOP',w3n:'整熨車間',w3e:'IRONING WORKSHOP',w4n:'包裝車間',w4e:'PACKAGING WORKSHOP',oLbl:'Global Manufacturing',oTitle:'海外生产基地',oSub:'Overseas Factory',o1n:'缅甸',o1e:'Myanmar',o1t:'仰光工业园 · 迪尚凯尼',o2n:'孟加拉国',o2e:'Bangladesh',o2t:'ACE APPAREL · 锦鸿',o3n:'柬埔寨',o3e:'Cambodia',o3t:'华宽 · 迪尚瑞华盛',dLbl:'Creative Network',dTitle:'海外设计公司',dSub:'Our Overseas Design Company',d1n:'英国',d1e:'United Kingdom',d2n:'西班牙',d2e:'Spain',d3n:'加拿大',d3e:'Canada',cLbl:'Quality Assurance',cTitle:'国际认证',cSub:'International Certification',c1:'Responsible Down Standard',c2:'Responsible Wool Standard',c3:'Organic 100 Content Standard',c4:'ISO International Standard',c5:'ISO 9001 Quality Management',c6:'ISO 14001 Environmental',c7:'Business Social Compliance Initiative',c8:'SMETA Sedex Audit',c9:'Global Recycled Standard',ptLbl:'Collaborations',ptTitle:'合作伙伴',ptSub:'Business Partners',ftDesc:'以高端时装制造为核心，集研发、生产、贸易于一体，为全球客户提供高品质服装解决方案。',ftC1T:'Company',ftC1:['公司简介','产品系列','生产车间','全球布局','国际认证','合作伙伴'],ftC2T:'Global Network',ftC2links:[{t:'英国 · 设计公司',v:'https://streamable.com/e/39q6dl',l:'英国'},{t:'西班牙 · 设计公司',v:'https://streamable.com/e/g3q5ry',l:'西班牙'},{t:'加拿大 · 设计公司',g:true,l:'加拿大'}],ftC2plain:['缅甸 · 生产基地','孟加拉国 · 生产基地','柬埔寨 · 生产基地'],ftCopy:'© 2024 大连迪尚华盛时装有限公司 · Dalian Dishang Huasheng Fashion Co., Ltd. All rights reserved.'},
+  en:{nav:['About','Products','Workshops','Global','Certifications','Partners'],hEye:'Dishang Group · Premium Fashion',hBigCn:'Dalian Dishang<br>Huasheng',hBigEn:'DISHANG HUASHENG',hDesc:'A core high-end fashion manufacturer under Dishang Group, specializing in wool coats, trench coats, suits and down jackets — delivering premium garment solutions to global clients.',hSt1:'Capital',hSt2:'Employees',hSt3:'Capacity/Yr',hBtn1:'View Products',hBtn2:'Learn More',hScroll:'Scroll',lhint:'~ Touch to Activate Ripples ~',aLbl:'Company Profile',aTitle:'About Us',aP1:'A core high-end fashion manufacturer under Dishang Group, Dalian Dishang Huasheng Fashion Co., Ltd. has RMB 120 million in registered capital. Our plant spans ~15,000 sqm, with 12,000 sqm of modern workshops, a team of over 600 employees, and an annual capacity of 400,000 pieces.',aP2:'Specializing in high-end fashion — double-faced wool coats, trenchcoats, suits and down jackets — we integrate garment manufacturing with import/export trade. With a full R&D-production-trade service system, we deliver premium garment solutions to global clients.',s1l:'Registered Capital',s2l:'Plant Area',s3l:'Employees',s4l:'Annual Capacity',pLbl:'Our Products',pTitle:'Product Range',p1n:'Suit',p1e:'Suit / Blazer',p2n:'Wool Coat',p2e:'Double-Faced Wool Coat',p3n:'Trench Coat',p3e:'Trench Coat',p4n:'Down Jacket',p4e:'Down Jacket',vm:'View More',wLbl:'Manufacturing Excellence',wTitle:'Workshops',w1n:'Sewing',w1e:'SEWING WORKSHOP',w2n:'Moulding',w2e:'MOULDING WORKSHOP',w3n:'Ironing',w3e:'IRONING WORKSHOP',w4n:'Packaging',w4e:'PACKAGING WORKSHOP',oLbl:'Global Manufacturing',oTitle:'Overseas Factories',oSub:'Global Production Network',o1n:'Myanmar',o1e:'Myanmar',o1t:'Yangon Industrial Park · Dishang Kenny',o2n:'Bangladesh',o2e:'Bangladesh',o2t:'ACE Apparel · Jinhong',o3n:'Cambodia',o3e:'Cambodia',o3t:'Huakuan · Dishang Ruihuasheng',dLbl:'Creative Network',dTitle:'Design Offices',dSub:'Our Overseas Design Network',d1n:'United Kingdom',d1e:'United Kingdom',d2n:'Spain',d2e:'Spain',d3n:'Canada',d3e:'Canada',cLbl:'Quality Assurance',cTitle:'Certifications',cSub:'International Certification',c1:'Responsible Down Standard',c2:'Responsible Wool Standard',c3:'Organic 100 Content Standard',c4:'ISO International Standard',c5:'ISO 9001 Quality Management',c6:'ISO 14001 Environmental',c7:'Business Social Compliance Initiative',c8:'SMETA Sedex Audit',c9:'Global Recycled Standard',ptLbl:'Collaborations',ptTitle:'Partners',ptSub:'Business Partners',ftDesc:'A premium fashion manufacturer integrating R&D, production and trade to deliver high-quality garment solutions to global clients.',ftC1T:'Company',ftC1:['About','Products','Workshops','Global','Certifications','Partners'],ftC2links:[{t:'UK · Design Office',v:'https://streamable.com/e/39q6dl',l:'UK'},{t:'Spain · Design Office',v:'https://streamable.com/e/g3q5ry',l:'Spain'},{t:'Canada · Design Office',g:true,l:'Canada'}],ftC2plain:['Myanmar · Production','Bangladesh · Production','Cambodia · Production'],ftCopy:'© 2024 Dalian Dishang Huasheng Fashion Co., Ltd. All rights reserved.'},
+  ja:{nav:['会社概要','製品ライン','生産工場','グローバル','国際認証','パートナー'],hEye:'迪尚グループ · 高級ファッション',hBigCn:'大連迪尚<br>華盛時裝',hBigEn:'DISHANG HUASHENG',hDesc:'迪尚グループ傘下の高級ファッション製造の中核企業。高品質なソリューションをグローバルクライアントへ提供します。',hSt1:'登録資本',hSt2:'従業員',hSt3:'年間生産',hBtn1:'製品を見る',hBtn2:'詳細へ',hScroll:'スクロール',lhint:'~ タッチで水波を起動 ~',aLbl:'会社概要',aTitle:'会社について',aP1:'迪尚グループ傘下の高級ファッション製造の中核企業として、大連迪尚華盛時装有限公司は登録資本金1億2,000万元を有します。工場総面積は約15,000㎡、600名超のスタッフが年間40万点の生産能力を支えています。',aP2:'ダブルフェイスウールコート、トレンチコート、スーツ、ダウンジャケットなどの高級ファッションに特化し、研究開発から生産・貿易まで一体化したフルサービス体制で提供します。',s1l:'登録資本金',s2l:'工場総面積',s3l:'従業員数',s4l:'年間生産能力',pLbl:'製品ライン',pTitle:'製品シリーズ',p1n:'スーツ',p1e:'Suit / Blazer',p2n:'ウールコート',p2e:'Double-Faced Wool Coat',p3n:'トレンチコート',p3e:'Trench Coat',p4n:'ダウンジャケット',p4e:'Down Jacket',vm:'もっと見る',wLbl:'製造の卓越性',wTitle:'生産工場',w1n:'縫製工場',w1e:'SEWING WORKSHOP',w2n:'型板工場',w2e:'MOULDING WORKSHOP',w3n:'プレス工場',w3e:'IRONING WORKSHOP',w4n:'包装工場',w4e:'PACKAGING WORKSHOP',oLbl:'グローバル製造',oTitle:'海外生産拠点',oSub:'Overseas Factory',o1n:'ミャンマー',o1e:'Myanmar',o1t:'ヤンゴン工業団地',o2n:'バングラデシュ',o2e:'Bangladesh',o2t:'ACE APPAREL · 錦鴻',o3n:'カンボジア',o3e:'Cambodia',o3t:'華寛 · 迪尚瑞華盛',dLbl:'クリエイティブネットワーク',dTitle:'海外デザイン拠点',dSub:'Overseas Design Offices',d1n:'イギリス',d1e:'United Kingdom',d2n:'スペイン',d2e:'Spain',d3n:'カナダ',d3e:'Canada',cLbl:'品質保証',cTitle:'国際認証',cSub:'International Certification',c1:'責任あるダウン基準',c2:'責任あるウール基準',c3:'オーガニック100含有基準',c4:'ISO国際基準',c5:'ISO 9001 品質管理',c6:'ISO 14001 環境管理',c7:'ビジネス社会的コンプライアンス',c8:'SMETAセデックス審査',c9:'グローバルリサイクル基準',ptLbl:'コラボレーション',ptTitle:'ビジネスパートナー',ptSub:'Business Partners',ftDesc:'高級ファッション製造を核心に、研究開発・生産・貿易を統合し、グローバルクライアントに高品質なソリューションを提供します。',ftC1T:'会社',ftC1:['会社概要','製品ライン','生産工場','グローバル','国際認証','パートナー'],ftC2links:[{t:'イギリス · デザイン',v:'https://streamable.com/e/39q6dl',l:'英国'},{t:'スペイン · デザイン',v:'https://streamable.com/e/g3q5ry',l:'西班牙'},{t:'カナダ · デザイン',g:true,l:'加拿大'}],ftC2plain:['ミャンマー · 生産','バングラデシュ · 生産','カンボジア · 生産'],ftCopy:'© 2024 大連迪尚華盛時装有限公司 · All rights reserved.'}
 };
+const CANADA_IMGS=['https://i.ibb.co/RT4MDJ97/Screenshot-2025-02-27-103703.png','https://i.ibb.co/x8gsYgym/Screenshot-2025-02-27-103748.png','https://i.ibb.co/5t82XNn/Screenshot-2025-02-27-103905.png','https://i.ibb.co/nqngn2V4/Screenshot-2025-02-27-104249.png'];
 
 function $i(id){return document.getElementById(id);}
 function st(id,v){const e=$i(id);if(e)e.textContent=v;}
@@ -559,39 +574,41 @@ function setLang(l){
   sh('hEye',t.hEye);sh('hBigCn',t.hBigCn);st('hBigEn',t.hBigEn);st('hDesc',t.hDesc);
   st('hSt1',t.hSt1);st('hSt2',t.hSt2);st('hSt3',t.hSt3);
   st('hBtn1',t.hBtn1);st('hBtn2',t.hBtn2);st('hScroll',t.hScroll);
-  st('mosaicHint',t.mHint);
+  st('liquidHint',t.lhint);
   st('aLbl',t.aLbl);st('aTitle',t.aTitle);st('aP1',t.aP1);st('aP2',t.aP2);
   st('s1l',t.s1l);st('s2l',t.s2l);st('s3l',t.s3l);st('s4l',t.s4l);
   st('pLbl',t.pLbl);st('pTitle',t.pTitle);
-  st('p1n',t.p1n);st('p1e',t.p1e);st('p2n',t.p2n);st('p2e',t.p2e);
-  st('p3n',t.p3n);st('p3e',t.p3e);st('p4n',t.p4n);st('p4e',t.p4e);
+  ['p1n','p1e','p2n','p2e','p3n','p3e','p4n','p4e'].forEach(k=>st(k,t[k]));
   document.querySelectorAll('.view-more').forEach(el=>el.textContent=t.vm);
   st('wLbl',t.wLbl);st('wTitle',t.wTitle);
-  st('w1n',t.w1n);st('w1e',t.w1e);st('w2n',t.w2n);st('w2e',t.w2e);
-  st('w3n',t.w3n);st('w3e',t.w3e);st('w4n',t.w4n);st('w4e',t.w4e);
+  ['w1n','w1e','w2n','w2e','w3n','w3e','w4n','w4e'].forEach(k=>st(k,t[k]));
   st('oLbl',t.oLbl);st('oTitle',t.oTitle);st('oSub',t.oSub);
-  st('o1n',t.o1n);st('o1e',t.o1e);st('o1t',t.o1t);
-  st('o2n',t.o2n);st('o2e',t.o2e);st('o2t',t.o2t);
-  st('o3n',t.o3n);st('o3e',t.o3e);st('o3t',t.o3t);
+  ['o1n','o1e','o1t','o2n','o2e','o2t','o3n','o3e','o3t'].forEach(k=>st(k,t[k]));
   st('dLbl',t.dLbl);st('dTitle',t.dTitle);st('dSub',t.dSub);
-  st('d1n',t.d1n);st('d1e',t.d1e);st('d2n',t.d2n);st('d2e',t.d2e);st('d3n',t.d3n);st('d3e',t.d3e);
+  ['d1n','d1e','d2n','d2e','d3n','d3e'].forEach(k=>st(k,t[k]));
   st('cLbl',t.cLbl);st('cTitle',t.cTitle);st('cSub',t.cSub);
   for(let i=1;i<=9;i++) st('c'+i,t['c'+i]);
   st('ptLbl',t.ptLbl);st('ptTitle',t.ptTitle);st('ptSub',t.ptSub);
-  st('ftDesc',t.ftDesc);st('ftCopy',t.ftCopy);st('ftC1T',t.ftC1T);st('ftC2T',t.ftC2T);
-  ['ftC1','ftC2'].forEach(id=>{
-    const ul=$i(id);if(!ul)return;ul.innerHTML='';
-    t[id].forEach(txt=>{const li=document.createElement('li');li.textContent=txt;ul.appendChild(li);});
-  });
+  st('ftDesc',t.ftDesc);st('ftCopy',t.ftCopy);st('ftC1T',t.ftC1T);
+  const c1ul=$i('ftC1');if(c1ul){c1ul.innerHTML='';t.ftC1.forEach(txt=>{const li=document.createElement('li');li.textContent=txt;c1ul.appendChild(li);});}
+  st('ftC2T',t.ftC2T);
+  const c2ul=$i('ftC2');
+  if(c2ul){
+    c2ul.innerHTML='';
+    t.ftC2links.forEach(item=>{
+      const li=document.createElement('li');li.textContent=item.t;li.className='flink';
+      if(item.g){li.onclick=()=>openMediaModal('gallery',CANADA_IMGS,item.l);}
+      else{li.onclick=()=>openMediaModal('video',item.v,item.l);}
+      c2ul.appendChild(li);
+    });
+    t.ftC2plain.forEach(txt=>{const li=document.createElement('li');li.textContent=txt;c2ul.appendChild(li);});
+  }
   document.querySelectorAll('.lb').forEach(b=>b.classList.toggle('active',b.dataset.l===l));
 }
 
 document.querySelectorAll('.lb').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.l)));
 
-function closeMobMenu(){
-  $i('mobMenu').classList.remove('open');
-  $i('hamBtn').querySelectorAll('span').forEach(s=>{s.style.transform='';s.style.opacity='1';});
-}
+function closeMobMenu(){$i('mobMenu').classList.remove('open');$i('hamBtn').querySelectorAll('span').forEach(s=>{s.style.transform='';s.style.opacity='1';});}
 $i('hamBtn').addEventListener('click',()=>{
   const mm=$i('mobMenu');mm.classList.toggle('open');
   const bars=$i('hamBtn').querySelectorAll('span'),open=mm.classList.contains('open');
@@ -601,186 +618,146 @@ $i('hamBtn').addEventListener('click',()=>{
 });
 $i('mobMenu').querySelectorAll('a').forEach(a=>a.addEventListener('click',closeMobMenu));
 
-window.addEventListener('scroll',()=>{
-  $i('nav').classList.toggle('scrolled',window.scrollY>80);
-});
+window.addEventListener('scroll',()=>$i('nav').classList.toggle('scrolled',window.scrollY>80));
 const obs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('in');});},{threshold:.08});
 document.querySelectorAll('.fi').forEach(el=>obs.observe(el));
-document.querySelectorAll('a[href^="#"]').forEach(a=>{
-  a.addEventListener('click',e=>{
-    e.preventDefault();
-    const t=document.querySelector(a.getAttribute('href'));
-    if(t) t.scrollIntoView({behavior:'smooth'});
-  });
-});
+document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click',e=>{e.preventDefault();const t=document.querySelector(a.getAttribute('href'));if(t)t.scrollIntoView({behavior:'smooth'});});});
 
-/* ═══ MOSAIC CANVAS — Grid Circles with Gaps + Subdivision ═══ */
+/* ═══ LIQUID GLASS — Three.js WebGL Shader ═══ */
 (function(){
-  const SRC='https://i.ibb.co/4R6QMjzw/1fc166ee-5414-11f1-b180-32122d3eb903.jpg';
-  const mc=document.getElementById('mosaicCanvas');
-  const ctx=mc.getContext('2d');
-  const wrap=document.getElementById('mosaicWrap');
-  const hint=document.getElementById('mosaicHint');
-
-  /* Off-screen image buffer */
-  let offC=null,offCtx=null,offW=1,offH=1,imgOK=false;
-  let W=0,H=0,roots=[],mx=-1,my=-1,hintGone=false;
-
-  /* Grid gap as fraction of cell size — creates the white diagonal gaps */
-  const GAP_F=0.13;
-  /* Initial layout: COLS × ROWS = ~8 circles */
-  const INIT_C=2,INIT_R=4;
-  const MAX_DEPTH=3;
-  /* Each level subdivides 1 parent → 4 children (2×2) for a clean square grid */
-  const SUB=2; // SUB × SUB children per node
-
-  const FB=['#dbeafe','#93c5fd','#60a5fa','#3b82f6','#2563eb','#1d4ed8','#1e3a8a','#bfdbfe','#7dd3fc','#e0f2fe'];
-
-  /* ── sample average colour from off-screen image region ── */
-  function avgCol(ix,iy,iw,ih){
-    ix=Math.max(0,ix|0); iy=Math.max(0,iy|0);
-    iw=Math.max(1,Math.min(iw|0,offW-ix));
-    ih=Math.max(1,Math.min(ih|0,offH-iy));
-    try{
-      const d=offCtx.getImageData(ix,iy,iw,ih).data;
-      let r=0,g=0,b=0,n=0;
-      /* sample stride keeps it fast */
-      const stride=Math.max(4,((iw*ih)|0)*4/800|0)*4;
-      for(let i=0;i<d.length;i+=stride){r+=d[i];g+=d[i+1];b+=d[i+2];n++;}
-      return n?`rgb(${r/n|0},${g/n|0},${b/n|0})`:FB[0];
-    }catch(e){ return FB[(ix+iy)%FB.length]; }
-  }
-
-  /* ── create a node ──
-     (x,y,w,h)  = canvas cell bounds
-     (ix,iy,iw,ih) = corresponding image region
-     radius = half of shortest side, minus gap padding → full circle always fits */
-  function mkNode(x,y,w,h,ix,iy,iw,ih,depth,animate){
-    const gap=Math.min(w,h)*GAP_F;
-    const r=(Math.min(w,h)-gap)/2;
-    const color=imgOK?avgCol(ix,iy,iw,ih):FB[Math.floor(Math.random()*FB.length)];
-    return{x,y,w,h,cx:x+w/2,cy:y+h/2,
-           tr:r,cr:animate?0:r,
-           ix,iy,iw,ih,depth,color,children:null};
-  }
-
-  /* ── build root grid ── */
-  function build(){
-    const cw=W/INIT_C,ch=H/INIT_R;
-    const icw=offW/INIT_C,ich=offH/INIT_R;
-    roots=[];
-    for(let row=0;row<INIT_R;row++)
-      for(let col=0;col<INIT_C;col++)
-        roots.push(mkNode(col*cw,row*ch,cw,ch,col*icw,row*ich,icw,ich,0,false));
-  }
-
-  /* ── subdivide leaf → SUB×SUB children ── */
-  function subdivide(node){
-    if(node.children||node.depth>=MAX_DEPTH)return;
-    const cw=node.w/SUB,ch=node.h/SUB;
-    const icw=node.iw/SUB,ich=node.ih/SUB;
-    node.children=[];
-    for(let row=0;row<SUB;row++)
-      for(let col=0;col<SUB;col++)
-        node.children.push(mkNode(
-          node.x+col*cw, node.y+row*ch, cw, ch,
-          node.ix+col*icw, node.iy+row*ich, icw, ich,
-          node.depth+1, true
-        ));
-  }
-
-  /* ── find leaf node at canvas (px,py) ── */
-  function findLeaf(arr,px,py){
-    for(const n of arr){
-      if(px<n.x||px>n.x+n.w||py<n.y||py>n.y+n.h)continue;
-      if(n.children){const f=findLeaf(n.children,px,py);if(f)return f;}
-      else return n;
-    }
-    return null;
-  }
-
-  /* ── animate radii ── */
-  function animate(arr){
-    for(const n of arr){
-      n.cr+=(n.tr-n.cr)*0.16;
-      if(n.children)animate(n.children);
-    }
-  }
-
-  /* ── draw ── */
-  function drawNodes(arr){
-    for(const n of arr){
-      if(n.children){drawNodes(n.children);continue;}
-      const r=Math.max(0,n.cr);
-      if(r<0.3)continue;
-      if(n.depth>=MAX_DEPTH&&imgOK){
-        /* deepest level: show actual image cropped to circle */
-        ctx.save();
-        ctx.beginPath();ctx.arc(n.cx,n.cy,r,0,Math.PI*2);ctx.clip();
-        ctx.drawImage(offC,n.ix,n.iy,n.iw,n.ih,n.x,n.y,n.w,n.h);
-        ctx.restore();
-      } else {
-        ctx.beginPath();ctx.arc(n.cx,n.cy,r,0,Math.PI*2);
-        ctx.fillStyle=n.color;ctx.fill();
+  const VERTEX=`
+    varying vec2 vUv;
+    void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}
+  `;
+  const FRAGMENT=`
+    precision highp float;
+    uniform sampler2D uTex;
+    uniform float uTime;
+    uniform float uAspect;
+    uniform vec3 uRipples[16];
+    varying vec2 vUv;
+    void main(){
+      vec2 uv=vUv;
+      vec2 disp=vec2(0.);
+      float energy=0.;
+      for(int i=0;i<16;i++){
+        vec2 c=uRipples[i].xy;
+        float bt=uRipples[i].z;
+        float elapsed=uTime-bt;
+        if(elapsed<0.||elapsed>2.8)continue;
+        vec2 delta=(uv-c)*vec2(uAspect,1.);
+        float dist=length(delta)+.0001;
+        float radius=elapsed*.52;
+        float ring=exp(-pow((dist-radius)*22.,2.));
+        float decay=exp(-elapsed*1.6)*exp(-dist*2.2);
+        float w=ring*decay;
+        energy+=w;
+        vec2 n=delta/(dist*vec2(uAspect,1.));
+        disp+=n*w*.022;
       }
+      /* ambient breath */
+      disp+=vec2(sin(uTime*.28+vUv.y*3.8)*.0018,cos(uTime*.22+vUv.x*3.1)*.0018);
+      /* chromatic aberration */
+      float ca=energy*.007;
+      float r=texture2D(uTex,clamp(uv+disp*(1.+ca),0.,1.)).r;
+      float g=texture2D(uTex,clamp(uv+disp,0.,1.)).g;
+      float b=texture2D(uTex,clamp(uv+disp*(1.-ca*.5),0.,1.)).b;
+      vec3 col=vec3(r,g,b);
+      /* drifting specular sheen */
+      vec2 sp=vec2(.28+sin(uTime*.16)*.11,.42+cos(uTime*.13)*.09);
+      float sd=length((uv-sp)*vec2(uAspect,1.));
+      col+=exp(-sd*sd*11.)*.08*vec3(.88,.94,1.);
+      /* ripple highlight */
+      col+=energy*.05*vec3(.82,.9,1.);
+      gl_FragColor=vec4(clamp(col,0.,1.),1.);
     }
-  }
+  `;
 
-  /* ── main loop ── */
-  function loop(){
-    /* white canvas background → creates white diagonal gaps between circles */
-    ctx.clearRect(0,0,W,H);
-    if(mx>=0&&my>=0){
-      const leaf=findLeaf(roots,mx,my);
-      if(leaf&&!leaf.children){
-        subdivide(leaf);
-        if(!hintGone){hint.style.opacity='0';hintGone=true;}
-      }
+  function init(THREE){
+    const wrap=document.getElementById('mosaicWrap');
+    const mc=document.getElementById('mosaicCanvas');
+    const hint=document.getElementById('liquidHint');
+
+    let W=wrap.clientWidth,H=wrap.clientHeight;
+    const renderer=new THREE.WebGLRenderer({canvas:mc,antialias:true,alpha:false});
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+    renderer.setSize(W,H,false);
+
+    const scene=new THREE.Scene();
+    const camera=new THREE.OrthographicCamera(-1,1,1,-1,0,1);
+    const geo=new THREE.PlaneGeometry(2,2);
+
+    /* Ripple buffer — 16 slots, z=-100 = inactive */
+    const ripples=[];
+    for(let i=0;i<16;i++) ripples.push(new THREE.Vector3(.5,.5,-100));
+    let rIdx=0;
+
+    const uniforms={
+      uTex:{value:null},
+      uTime:{value:0},
+      uAspect:{value:W/H},
+      uRipples:{value:ripples}
+    };
+
+    const mat=new THREE.ShaderMaterial({vertexShader:VERTEX,fragmentShader:FRAGMENT,uniforms});
+    scene.add(new THREE.Mesh(geo,mat));
+
+    /* Load image */
+    const loader=new THREE.TextureLoader();
+    loader.crossOrigin='anonymous';
+    loader.load('https://i.ibb.co/4R6QMjzw/1fc166ee-5414-11f1-b180-32122d3eb903.jpg',tex=>{
+      tex.minFilter=THREE.LinearFilter;
+      uniforms.uTex.value=tex;
+      hint.style.opacity='1';
+    });
+
+    /* Ripple management */
+    let lastRx=-1,lastRy=-1,lastRippleT=0,hintFaded=false;
+    const MIN_DIST=0.025,MIN_INT=0.055;
+
+    function addRipple(uvx,uvy,t){
+      if(t-lastRippleT<MIN_INT)return;
+      const dx=uvx-lastRx,dy=uvy-lastRy;
+      if(lastRx>=0&&Math.sqrt(dx*dx+dy*dy)<MIN_DIST)return;
+      lastRippleT=t;lastRx=uvx;lastRy=uvy;
+      ripples[rIdx%16].set(uvx,uvy,t);
+      rIdx++;
+      if(!hintFaded){hint.style.opacity='0';hintFaded=true;}
     }
-    animate(roots);
-    drawNodes(roots);
-    requestAnimationFrame(loop);
+
+    function onMove(cx,cy){
+      const rc=mc.getBoundingClientRect();
+      const uvx=(cx-rc.left)/rc.width;
+      const uvy=1-(cy-rc.top)/rc.height;
+      addRipple(uvx,uvy,uniforms.uTime.value);
+    }
+
+    mc.addEventListener('mousemove',e=>onMove(e.clientX,e.clientY));
+    mc.addEventListener('touchmove',e=>{e.preventDefault();const t=e.touches[0];onMove(t.clientX,t.clientY);},{passive:false});
+
+    /* Resize */
+    function resize(){
+      W=wrap.clientWidth;H=wrap.clientHeight;
+      renderer.setSize(W,H,false);
+      uniforms.uAspect.value=W/H;
+    }
+    window.addEventListener('resize',resize);
+
+    /* Render loop */
+    const clock=new THREE.Clock();
+    function loop(){
+      uniforms.uTime.value=clock.getElapsedTime();
+      renderer.render(scene,camera);
+      requestAnimationFrame(loop);
+    }
+    loop();
   }
 
-  /* ── resize ── */
-  function resize(){
-    const rc=wrap.getBoundingClientRect();
-    W=mc.width=rc.width; H=mc.height=rc.height;
-    build();
-  }
-
-  /* ── pointer events ── */
-  mc.addEventListener('mousemove',e=>{
-    const rc=mc.getBoundingClientRect();mx=e.clientX-rc.left;my=e.clientY-rc.top;
-  });
-  mc.addEventListener('mouseleave',()=>{mx=-1;my=-1;});
-  mc.addEventListener('touchmove',e=>{
-    e.preventDefault();
-    const rc=mc.getBoundingClientRect(),t=e.touches[0];
-    mx=t.clientX-rc.left;my=t.clientY-rc.top;
-  },{passive:false});
-  mc.addEventListener('touchend',()=>{mx=-1;my=-1;});
-  window.addEventListener('resize',resize);
-
-  /* ── boot: run immediately with fallback colours, upgrade when image loads ── */
-  resize();
-  loop();
-
-  /* Set canvas background white so gaps show white */
-  mc.style.background='rgba(255,255,255,0.92)';
-
-  const img=new Image();
-  img.crossOrigin='anonymous';
-  img.onload=()=>{
-    offC=document.createElement('canvas');
-    offW=offC.width=img.naturalWidth;
-    offH=offC.height=img.naturalHeight;
-    offCtx=offC.getContext('2d');
-    offCtx.drawImage(img,0,0);
-    imgOK=true;
-    build(); // repaint with real colours
-  };
-  img.src=SRC;
+  /* Load Three.js */
+  const s=document.createElement('script');
+  s.src='https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+  s.onload=()=>init(THREE);
+  document.head.appendChild(s);
 })();
 
 setLang('cn');
