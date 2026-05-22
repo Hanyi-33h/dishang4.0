@@ -688,8 +688,32 @@ body.force-mobile .h-scroll-hint{display:none!important;}
       <div class="flogocn">大连迪尚华盛时装有限公司</div>
       <p id="ftDesc">以高端时装制造为核心，集研发、生产、贸易于一体，为全球客户提供高品质服装解决方案。</p>
     </div>
-    <div class="fcol"><h4 id="ftC1T">Company</h4><ul id="ftC1"></ul></div>
-    <div class="fcol"><h4 id="ftC2T">Global Network</h4><ul id="ftC2"></ul></div>
+    <div class="fcol">
+      <h4 id="ftC1T">导航</h4>
+      <ul id="ftC1">
+        <li>公司简介</li>
+        <li>产品系列 — 西服</li>
+        <li>产品系列 — 双面呢大衣</li>
+        <li>产品系列 — 风衣</li>
+        <li>产品系列 — 羽绒服</li>
+        <li>生产车间</li>
+        <li>海外生产基地</li>
+        <li>海外设计公司</li>
+        <li>国际认证</li>
+        <li>合作伙伴</li>
+      </ul>
+    </div>
+    <div class="fcol">
+      <h4 id="ftC2T">全球网络</h4>
+      <ul id="ftC2">
+        <li class="flink" onclick="openMediaModal('video','https://streamable.com/e/39q6dl','英国')">英国 · 海外设计公司</li>
+        <li class="flink" onclick="openMediaModal('video','https://streamable.com/e/g3q5ry','西班牙')">西班牙 · 海外设计公司</li>
+        <li class="flink" onclick="openMediaModal('gallery',['https://i.ibb.co/RT4MDJ97/Screenshot-2025-02-27-103703.png','https://i.ibb.co/x8gsYgym/Screenshot-2025-02-27-103748.png','https://i.ibb.co/5t82XNn/Screenshot-2025-02-27-103905.png','https://i.ibb.co/nqngn2V4/Screenshot-2025-02-27-104249.png'],'加拿大')">加拿大 · 海外设计公司</li>
+        <li class="flink" onclick="openMediaModal('video','https://streamable.com/e/0xocj1','缅甸')">缅甸 · 海外生产基地</li>
+        <li class="flink" onclick="openMediaModal('video','https://streamable.com/e/9zztgt','孟加拉国')">孟加拉国 · 海外生产基地</li>
+        <li class="flink" onclick="openMediaModal('video','https://streamable.com/e/2wx94h','柬埔寨')">柬埔寨 · 海外生产基地</li>
+      </ul>
+    </div>
   </div>
   <div class="fhr"></div>
   <div class="fbot"><span id="ftCopy"></span><span class="fgold">DISHANG HUASHENG</span></div>
@@ -853,164 +877,49 @@ const obs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting)x.targe
 document.querySelectorAll('.fi').forEach(el=>obs.observe(el));
 document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click',e=>{e.preventDefault();const t=document.querySelector(a.getAttribute('href'));if(t)t.scrollIntoView({behavior:'smooth'});});});
 
-/* ═══ LIQUID GLASS — Three.js WebGL Shader ═══ */
+/* ═══ LIQUID GLASS — threejs-components LiquidBackground ═══ */
 (function(){
-  const VERTEX=`
-    varying vec2 vUv;
-    void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}
+  const wrap = document.getElementById('mosaicWrap');
+  const hint = document.getElementById('liquidHint');
+
+  /* Dynamically load as ES module */
+  const script = document.createElement('script');
+  script.type = 'module';
+  script.textContent = `
+    import LiquidBackground from 'https://cdn.jsdelivr.net/npm/threejs-components@0.0.30/build/backgrounds/liquid1.min.js';
+
+    const canvas = document.getElementById('mosaicCanvas');
+    if (!canvas) return;
+
+    const app = LiquidBackground(canvas);
+
+    /* Load the product / brand image */
+    app.loadImage('https://i.ibb.co/4R6QMjzw/1fc166ee-5414-11f1-b180-32122d3eb903.jpg');
+
+    /* Tune liquid surface feel:
+       metalness  → reflectivity (0=matte, 1=mirror)
+       roughness  → sharpness of reflections
+       displacementScale → ripple amplitude              */
+    app.liquidPlane.material.metalness  = 0.22;
+    app.liquidPlane.material.roughness  = 0.52;
+    app.liquidPlane.uniforms.displacementScale.value = 1.6;
+
+    /* No auto-rain — interaction only */
+    app.setRain(false);
+
+    /* Fade hint once user first touches */
+    const hint = document.getElementById('liquidHint');
+    let hintFaded = false;
+    canvas.addEventListener('mousemove', () => {
+      if (!hintFaded) { hint.style.opacity = '0'; hintFaded = true; }
+    }, { once: true });
+    canvas.addEventListener('touchstart', () => {
+      if (!hintFaded) { hint.style.opacity = '0'; hintFaded = true; }
+    }, { once: true });
+
+    window.__liquidApp = app;
   `;
-  const FRAGMENT=`
-    precision highp float;
-    uniform sampler2D uTex;
-    uniform float uTime;
-    uniform float uAspect;
-    uniform vec3 uRipples[16];
-    varying vec2 vUv;
-
-    void main(){
-      vec2 uv=vUv;
-      vec2 disp=vec2(0.);
-      float specular=0.;
-
-      for(int i=0;i<16;i++){
-        vec2 c=uRipples[i].xy;
-        float bt=uRipples[i].z;
-        float elapsed=uTime-bt;
-        if(elapsed<0.||elapsed>2.6)continue;
-
-        /* aspect-corrected distance */
-        vec2 delta=(uv-c)*vec2(uAspect,1.);
-        float dist=length(delta)+.0001;
-
-        /* expanding ring radius */
-        float radius=elapsed*.44;
-
-        /* NARROW, SHARP ring — tight gaussian */
-        float ring=exp(-pow((dist-radius)*55.,2.));
-
-        /* fast distance falloff + time decay */
-        float decay=exp(-elapsed*2.1)*exp(-dist*3.5);
-        float w=ring*decay;
-
-        /* displacement along surface normal */
-        vec2 n=delta/dist;
-        disp+=n*(w*.013)/vec2(uAspect,1.);
-
-        /* specular glint on ring crest */
-        specular+=ring*decay*.9;
-      }
-
-      /* ultra-subtle ambient breath — nearly imperceptible */
-      disp+=vec2(
-        sin(uTime*.22+vUv.y*5.1)*.0007,
-        cos(uTime*.18+vUv.x*4.3)*.0007
-      );
-
-      /* Chromatic aberration proportional to displacement magnitude */
-      float ca=length(disp)*1.2;
-      vec2 nr=normalize(disp+vec2(.0001));
-      vec3 col;
-      col.r=texture2D(uTex,clamp(uv+disp+nr*ca*.003,0.,1.)).r;
-      col.g=texture2D(uTex,clamp(uv+disp,0.,1.)).g;
-      col.b=texture2D(uTex,clamp(uv+disp-nr*ca*.002,0.,1.)).b;
-
-      /* thin bright specular line on ring */
-      col+=specular*.032*vec3(.92,.96,1.);
-
-      /* single soft drifting sheen — very gentle */
-      vec2 sp=vec2(.3+sin(uTime*.14)*.08,.45+cos(uTime*.11)*.07);
-      float sd=length((uv-sp)*vec2(uAspect,1.));
-      col+=exp(-sd*sd*18.)*.04*vec3(.9,.95,1.);
-
-      gl_FragColor=vec4(clamp(col,0.,1.),1.);
-    }
-  `;
-
-  function init(THREE){
-    const wrap=document.getElementById('mosaicWrap');
-    const mc=document.getElementById('mosaicCanvas');
-    const hint=document.getElementById('liquidHint');
-
-    let W=wrap.clientWidth,H=wrap.clientHeight;
-    const renderer=new THREE.WebGLRenderer({canvas:mc,antialias:true,alpha:false});
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
-    renderer.setSize(W,H,false);
-
-    const scene=new THREE.Scene();
-    const camera=new THREE.OrthographicCamera(-1,1,1,-1,0,1);
-    const geo=new THREE.PlaneGeometry(2,2);
-
-    /* Ripple buffer — 16 slots, z=-100 = inactive */
-    const ripples=[];
-    for(let i=0;i<16;i++) ripples.push(new THREE.Vector3(.5,.5,-100));
-    let rIdx=0;
-
-    const uniforms={
-      uTex:{value:null},
-      uTime:{value:0},
-      uAspect:{value:W/H},
-      uRipples:{value:ripples}
-    };
-
-    const mat=new THREE.ShaderMaterial({vertexShader:VERTEX,fragmentShader:FRAGMENT,uniforms});
-    scene.add(new THREE.Mesh(geo,mat));
-
-    /* Load image */
-    const loader=new THREE.TextureLoader();
-    loader.crossOrigin='anonymous';
-    loader.load('https://i.ibb.co/4R6QMjzw/1fc166ee-5414-11f1-b180-32122d3eb903.jpg',tex=>{
-      tex.minFilter=THREE.LinearFilter;
-      uniforms.uTex.value=tex;
-      hint.style.opacity='1';
-    });
-
-    /* Ripple management */
-    let lastRx=-1,lastRy=-1,lastRippleT=0,hintFaded=false;
-    const MIN_DIST=0.025,MIN_INT=0.055;
-
-    function addRipple(uvx,uvy,t){
-      if(t-lastRippleT<MIN_INT)return;
-      const dx=uvx-lastRx,dy=uvy-lastRy;
-      if(lastRx>=0&&Math.sqrt(dx*dx+dy*dy)<MIN_DIST)return;
-      lastRippleT=t;lastRx=uvx;lastRy=uvy;
-      ripples[rIdx%16].set(uvx,uvy,t);
-      rIdx++;
-      if(!hintFaded){hint.style.opacity='0';hintFaded=true;}
-    }
-
-    function onMove(cx,cy){
-      const rc=mc.getBoundingClientRect();
-      const uvx=(cx-rc.left)/rc.width;
-      const uvy=1-(cy-rc.top)/rc.height;
-      addRipple(uvx,uvy,uniforms.uTime.value);
-    }
-
-    mc.addEventListener('mousemove',e=>onMove(e.clientX,e.clientY));
-    mc.addEventListener('touchmove',e=>{e.preventDefault();const t=e.touches[0];onMove(t.clientX,t.clientY);},{passive:false});
-
-    /* Resize */
-    function resize(){
-      W=wrap.clientWidth;H=wrap.clientHeight;
-      renderer.setSize(W,H,false);
-      uniforms.uAspect.value=W/H;
-    }
-    window.addEventListener('resize',resize);
-
-    /* Render loop */
-    const clock=new THREE.Clock();
-    function loop(){
-      uniforms.uTime.value=clock.getElapsedTime();
-      renderer.render(scene,camera);
-      requestAnimationFrame(loop);
-    }
-    loop();
-  }
-
-  /* Load Three.js */
-  const s=document.createElement('script');
-  s.src='https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
-  s.onload=()=>init(THREE);
-  document.head.appendChild(s);
+  document.body.appendChild(script);
 })();
 
 /* ── View Toggle Logic ── */
