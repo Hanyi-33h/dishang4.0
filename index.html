@@ -214,6 +214,87 @@ footer{background:#1a4fa8;padding:80px 60px 40px;}
 .fbot{display:flex;justify-content:space-between;align-items:center;font-size:var(--f-small);color:rgba(255,255,255,.28);}
 .fgold{color:var(--gold);font-size:var(--f-small);letter-spacing:3px;}
 
+/* ── VIEW TOGGLE BUTTON ── */
+#viewToggle{
+  position:fixed;bottom:28px;right:28px;z-index:9999;
+  display:flex;align-items:center;gap:7px;
+  padding:9px 16px;
+  background:rgba(255,255,255,.14);
+  backdrop-filter:blur(20px) saturate(1.6);
+  -webkit-backdrop-filter:blur(20px) saturate(1.6);
+  border:.5px solid rgba(255,255,255,.32);
+  border-radius:40px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 4px 20px rgba(0,0,0,.18);
+  cursor:pointer;font-family:inherit;
+  font-size:11px;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(255,255,255,.82);
+  transition:all .3s ease;
+  user-select:none;
+}
+#viewToggle:hover{
+  background:rgba(255,255,255,.22);
+  color:#fff;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.4),0 6px 28px rgba(0,0,0,.22);
+}
+#viewToggle svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.6;flex-shrink:0;}
+/* When page is scrolled past hero, button adapts */
+#viewToggle.dark{
+  background:rgba(28,43,58,.82);
+  border-color:rgba(255,255,255,.1);
+  color:rgba(255,255,255,.7);
+  box-shadow:0 4px 20px rgba(0,0,0,.22);
+}
+#viewToggle.dark:hover{background:rgba(28,43,58,.95);color:#fff;}
+
+/* ── FORCE DESKTOP on mobile ── */
+body.force-desktop #hero{flex-direction:row!important;height:100vh!important;min-height:640px!important;}
+body.force-desktop .mosaic-wrap{flex:0 0 52%!important;width:auto!important;height:auto!important;max-height:none!important;}
+body.force-desktop .hero-rp{
+  flex:1!important;align-items:flex-end!important;text-align:right!important;
+  padding:80px 60px 80px 40px!important;border-left:.5px solid rgba(255,255,255,.1)!important;border-top:none!important;
+}
+body.force-desktop .h-desc{margin-left:auto!important;}
+body.force-desktop .h-divider{margin-left:auto!important;}
+body.force-desktop .h-stats{justify-content:flex-end!important;}
+body.force-desktop .h-actions{justify-content:flex-end!important;}
+body.force-desktop #nav{height:66px!important;padding:0 52px!important;}
+body.force-desktop #nav .nlinks{display:flex!important;}
+body.force-desktop #nav .ham{display:none!important;}
+body.force-desktop .mob-menu{display:none!important;}
+body.force-desktop .h-scroll-hint{display:flex!important;}
+body.force-desktop .h-bigcn{font-size:clamp(32px,4.2vw,62px)!important;letter-spacing:3px!important;}
+body.force-desktop .h-bigen{font-size:clamp(13px,1.6vw,20px)!important;}
+body.force-desktop .sec{padding:96px 60px!important;}
+body.force-desktop .stats-band{padding:56px 60px!important;}
+body.force-desktop .sgrid{grid-template-columns:repeat(4,1fr)!important;}
+body.force-desktop .si{border-top:none!important;}
+body.force-desktop .si:nth-child(2){border-right:.5px solid var(--border)!important;}
+body.force-desktop .pgrid{grid-template-columns:repeat(4,1fr)!important;gap:18px!important;}
+body.force-desktop .wgrid{grid-template-columns:repeat(2,1fr)!important;}
+body.force-desktop .ovs-grid{grid-template-columns:repeat(3,1fr)!important;}
+body.force-desktop .ovs-block{aspect-ratio:4/3!important;}
+body.force-desktop .dgrid{grid-template-columns:repeat(3,1fr)!important;}
+body.force-desktop .dcard{aspect-ratio:4/3!important;}
+body.force-desktop .ftop{grid-template-columns:1.4fr 1fr 1fr!important;}
+body.force-desktop .fbot{flex-direction:row!important;}
+body.force-desktop footer{padding:80px 60px 40px!important;}
+body.force-desktop .gal-grid{grid-template-columns:repeat(4,1fr)!important;}
+body.force-desktop .pcircle{width:136px!important;height:136px!important;}
+
+/* ── FORCE MOBILE on desktop ── */
+body.force-mobile #hero{flex-direction:column!important;height:auto!important;min-height:100svh!important;}
+body.force-mobile .mosaic-wrap{flex:0 0 auto!important;width:100%!important;height:50vw!important;max-height:56vw!important;}
+body.force-mobile .hero-rp{flex:1!important;align-items:flex-start!important;text-align:left!important;padding:32px 24px 52px!important;border-left:none!important;border-top:.5px solid rgba(255,255,255,.14)!important;}
+body.force-mobile .h-desc{margin-left:0!important;}
+body.force-mobile .h-divider{margin-left:0!important;}
+body.force-mobile .h-stats{justify-content:flex-start!important;gap:20px!important;}
+body.force-mobile .h-actions{justify-content:flex-start!important;}
+body.force-mobile .h-bigcn{font-size:clamp(28px,8vw,42px)!important;letter-spacing:1.5px!important;}
+body.force-mobile #nav{height:60px!important;padding:0 20px!important;}
+body.force-mobile #nav .nlinks{display:none!important;}
+body.force-mobile #nav .ham{display:flex!important;}
+body.force-mobile .h-scroll-hint{display:none!important;}
+
 /* ANIMATIONS */
 .fi{opacity:0;transform:translateY(20px);transition:opacity .65s ease,transform .65s ease;}
 .fi.in{opacity:1;transform:translateY(0);}
@@ -612,6 +693,12 @@ footer{background:#1a4fa8;padding:80px 60px 40px;}
 </footer>
 </div>
 
+<!-- VIEW TOGGLE BUTTON -->
+<button id="viewToggle" aria-label="切换视图">
+  <svg id="vtIcon" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="14" rx="2"/><line x1="8" y1="20" x2="16" y2="20"/><line x1="12" y1="18" x2="12" y2="20"/></svg>
+  <span id="vtLabel">PC版</span>
+</button>
+
 <!-- GALLERY PAGE -->
 <div id="galleryPage">
   <div class="gal-header">
@@ -923,5 +1010,76 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click'
   document.head.appendChild(s);
 })();
 
-setLang('cn');
+/* ── View Toggle Logic ── */
+(function(){
+  const btn=document.getElementById('viewToggle');
+  const label=document.getElementById('vtLabel');
+  const icon=document.getElementById('vtIcon');
+  const body=document.body;
+
+  const MOBILE_ICON=`<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="7" y="2" width="10" height="18" rx="2"/><line x1="11" y1="19" x2="13" y2="19"/></svg>`;
+  const PC_ICON=`<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="4" width="20" height="14" rx="2"/><line x1="8" y1="20" x2="16" y2="20"/><line x1="12" y1="18" x2="12" y2="20"/></svg>`;
+
+  /* Detect if viewport is mobile (<= 900px) */
+  function isMobileViewport(){ return window.innerWidth<=900; }
+
+  /* Current forced mode: null = auto, 'desktop', 'mobile' */
+  let forced=null;
+
+  function updateBtn(){
+    const onMobile=isMobileViewport();
+    /* What would the next action be? */
+    if(forced===null){
+      /* Auto mode: show option to switch to opposite */
+      if(onMobile){
+        label.textContent='PC 版';
+        icon.innerHTML=PC_ICON.replace('<svg ','<svg ');
+        btn.title='切换到桌面版布局';
+      } else {
+        label.textContent='移动版';
+        icon.innerHTML=MOBILE_ICON.replace('<svg ','<svg ');
+        btn.title='切换到移动端布局';
+      }
+    } else if(forced==='desktop'){
+      label.textContent='移动版';
+      icon.innerHTML=MOBILE_ICON;
+      btn.title='切换到移动端布局';
+    } else {
+      label.textContent='PC 版';
+      icon.innerHTML=PC_ICON;
+      btn.title='切换到桌面版布局';
+    }
+  }
+
+  function applyForced(){
+    body.classList.remove('force-desktop','force-mobile');
+    if(forced==='desktop') body.classList.add('force-desktop');
+    if(forced==='mobile') body.classList.add('force-mobile');
+  }
+
+  btn.addEventListener('click',()=>{
+    const onMobile=isMobileViewport();
+    if(forced===null){
+      forced=onMobile?'desktop':'mobile';
+    } else if(forced==='desktop'){
+      forced=onMobile?null:'mobile';
+    } else {
+      forced=onMobile?'desktop':null;
+    }
+    applyForced();
+    updateBtn();
+  });
+
+  /* Adapt button colour based on scroll position */
+  window.addEventListener('scroll',()=>{
+    btn.classList.toggle('dark',window.scrollY>window.innerHeight*.7);
+  });
+
+  /* Re-evaluate when viewport resizes */
+  window.addEventListener('resize',()=>{
+    if(forced===null) updateBtn();
+  });
+
+  updateBtn();
+})();
 </script>
