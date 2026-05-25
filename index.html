@@ -877,49 +877,143 @@ const obs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting)x.targe
 document.querySelectorAll('.fi').forEach(el=>obs.observe(el));
 document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click',e=>{e.preventDefault();const t=document.querySelector(a.getAttribute('href'));if(t)t.scrollIntoView({behavior:'smooth'});});});
 
-/* ═══ LIQUID GLASS — threejs-components LiquidBackground ═══ */
+/* ═══ LIQUID GLASS — Three.js WebGL Shader (restored) ═══ */
 (function(){
-  const wrap = document.getElementById('mosaicWrap');
-  const hint = document.getElementById('liquidHint');
-
-  /* Dynamically load as ES module */
-  const script = document.createElement('script');
-  script.type = 'module';
-  script.textContent = `
-    import LiquidBackground from 'https://cdn.jsdelivr.net/npm/threejs-components@0.0.30/build/backgrounds/liquid1.min.js';
-
-    const canvas = document.getElementById('mosaicCanvas');
-    if (!canvas) return;
-
-    const app = LiquidBackground(canvas);
-
-    /* Load the product / brand image */
-    app.loadImage('https://i.ibb.co/4R6QMjzw/1fc166ee-5414-11f1-b180-32122d3eb903.jpg');
-
-    /* Tune liquid surface feel:
-       metalness  → reflectivity (0=matte, 1=mirror)
-       roughness  → sharpness of reflections
-       displacementScale → ripple amplitude              */
-    app.liquidPlane.material.metalness  = 0.22;
-    app.liquidPlane.material.roughness  = 0.52;
-    app.liquidPlane.uniforms.displacementScale.value = 1.6;
-
-    /* No auto-rain — interaction only */
-    app.setRain(false);
-
-    /* Fade hint once user first touches */
-    const hint = document.getElementById('liquidHint');
-    let hintFaded = false;
-    canvas.addEventListener('mousemove', () => {
-      if (!hintFaded) { hint.style.opacity = '0'; hintFaded = true; }
-    }, { once: true });
-    canvas.addEventListener('touchstart', () => {
-      if (!hintFaded) { hint.style.opacity = '0'; hintFaded = true; }
-    }, { once: true });
-
-    window.__liquidApp = app;
+  const VERT=`
+    varying vec2 vUv;
+    void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}
   `;
-  document.body.appendChild(script);
+  const FRAG=`
+    precision highp float;
+    uniform sampler2D uTex;
+    uniform float     uTime;
+    uniform float     uAspect;
+    uniform vec3      uRipples[16];
+    varying vec2 vUv;
+    void main(){
+      vec2 uv=vUv, disp=vec2(0.);
+      float spec=0.;
+      for(int i=0;i<16;i++){
+        vec2  c  =uRipples[i].xy;
+        float bt =uRipples[i].z;
+        float el =uTime-bt;
+        if(el<0.||el>2.8)continue;
+        vec2  dv =(uv-c)*vec2(uAspect,1.);
+        float d  =length(dv)+.0001;
+        float r  =el*.46;
+        float ring=exp(-pow((d-r)*48.,2.));
+        float dec =exp(-el*2.0)*exp(-d*3.0);
+        float w  =ring*dec;
+        disp+=normalize(dv)*(w*.016)/vec2(uAspect,1.);
+        spec+=ring*dec*.85;
+      }
+      disp+=vec2(sin(uTime*.2+vUv.y*4.8)*.0008,
+                 cos(uTime*.17+vUv.x*4.2)*.0008);
+      float ca=length(disp)*1.1;
+      vec2 nr=normalize(disp+vec2(.00001));
+      vec3 col;
+      col.r=texture2D(uTex,clamp(uv+disp+nr*ca*.0025,0.,1.)).r;
+      col.g=texture2D(uTex,clamp(uv+disp           ,0.,1.)).g;
+      col.b=texture2D(uTex,clamp(uv+disp-nr*ca*.002 ,0.,1.)).b;
+      col+=spec*.03*vec3(.92,.96,1.);
+      vec2 sp=vec2(.32+sin(uTime*.13)*.07,.44+cos(uTime*.10)*.06);
+      col+=exp(-dot((uv-sp)*vec2(uAspect,1.),(uv-sp)*vec2(uAspect,1.))*16.)*.035*vec3(.9,.95,1.);
+      gl_FragColor=vec4(clamp(col,0.,1.),1.);
+    }
+  `;
+
+  function boot(THREE){
+    const wrap = document.getElementById('mosaicWrap');
+    const mc   = document.getElementById('mosaicCanvas');
+    const hint = document.getElementById('liquidHint');
+    if(!wrap||!mc) return;
+
+    /* ── Size canvas to wrapper ── */
+    function getSize(){ return {w:wrap.clientWidth, h:wrap.clientHeight}; }
+    let {w,h} = getSize();
+
+    const renderer = new THREE.WebGLRenderer({canvas:mc, antialias:true, alpha:false});
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+    renderer.setSize(w, h, false);
+
+    const scene  = new THREE.Scene();
+    const camera = new THREE.OrthographicCamera(-1,1,1,-1,0,1);
+    const geo    = new THREE.PlaneGeometry(2,2);
+
+    /* Ripple store */
+    const ripples=[];
+    for(let i=0;i<16;i++) ripples.push(new THREE.Vector3(.5,.5,-999));
+    let rIdx=0;
+
+    const uniforms={
+      uTex    :{value:null},
+      uTime   :{value:0},
+      uAspect :{value:w/h},
+      uRipples:{value:ripples}
+    };
+    const mat = new THREE.ShaderMaterial({vertexShader:VERT,fragmentShader:FRAG,uniforms});
+    scene.add(new THREE.Mesh(geo,mat));
+
+    /* ── Load image ── */
+    const loader = new THREE.TextureLoader();
+    loader.crossOrigin='anonymous';
+    loader.load(
+      'https://i.ibb.co/4R6QMjzw/1fc166ee-5414-11f1-b180-32122d3eb903.jpg',
+      tex=>{ tex.minFilter=THREE.LinearFilter; uniforms.uTex.value=tex; },
+      undefined,
+      err=>console.warn('Texture load failed',err)
+    );
+
+    /* ── Ripple helpers ── */
+    let lastT=0, lastX=-1, lastY=-1, hinted=false;
+    const MIN_GAP=0.05, MIN_DT=0.05;
+
+    function addRipple(ux,uy,t){
+      if(t-lastT<MIN_DT) return;
+      const dx=ux-lastX, dy=uy-lastY;
+      if(lastX>=0 && Math.sqrt(dx*dx+dy*dy)<MIN_GAP) return;
+      lastT=t; lastX=ux; lastY=uy;
+      ripples[rIdx%16].set(ux,uy,t); rIdx++;
+      if(!hinted){ hint.style.opacity='0'; hinted=true; }
+    }
+    function toUV(cx,cy){
+      const rc=mc.getBoundingClientRect();
+      return {ux:(cx-rc.left)/rc.width, uy:1-(cy-rc.top)/rc.height};
+    }
+    mc.addEventListener('mousemove',e=>{
+      const {ux,uy}=toUV(e.clientX,e.clientY);
+      addRipple(ux,uy,uniforms.uTime.value);
+    });
+    mc.addEventListener('touchmove',e=>{
+      e.preventDefault();
+      const t=e.touches[0];
+      const {ux,uy}=toUV(t.clientX,t.clientY);
+      addRipple(ux,uy,uniforms.uTime.value);
+    },{passive:false});
+
+    /* ── Resize ── */
+    const ro=new ResizeObserver(()=>{
+      const s=getSize();
+      renderer.setSize(s.w,s.h,false);
+      uniforms.uAspect.value=s.w/s.h;
+    });
+    ro.observe(wrap);
+
+    /* ── Render loop ── */
+    const clock=new THREE.Clock();
+    (function loop(){
+      uniforms.uTime.value=clock.getElapsedTime();
+      renderer.render(scene,camera);
+      requestAnimationFrame(loop);
+    })();
+  }
+
+  /* Load Three.js r128 then boot */
+  const s=document.createElement('script');
+  s.src='https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+  s.onload=()=>boot(window.THREE);
+  s.onerror=()=>console.warn('Three.js CDN failed');
+  document.head.appendChild(s);
 })();
 
 /* ── View Toggle Logic ── */
