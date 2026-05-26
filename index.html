@@ -74,55 +74,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Hiragino Sans','No
 #hero{position:relative;height:100vh;min-height:640px;overflow:hidden;padding-top:66px;display:flex;
   background:linear-gradient(160deg,#0c1a3a 0%,#112255 25%,#1a3a6e 50%,#1e4d8c 70%,#1565c0 90%,#1976d2 100%);}
 
-/* ── MOSAIC GRID ── */
-.mosaic-grid{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  width:100%;height:100%;
-  overflow:hidden;
-  gap:3px;
-  background:#e8ecf0;
-  position:relative;z-index:0;
-}
-.mosaic-tile{
-  aspect-ratio:1/1;position:relative;
-  perspective:1000px;cursor:pointer;overflow:hidden;
-}
-.mosaic-tile-inner{
-  width:100%;height:100%;
-  position:relative;
-  transform-style:preserve-3d;
-  transition:transform .78s cubic-bezier(.4,0,.15,1);
-}
-.mosaic-tile:hover .mosaic-tile-inner{transform:rotateY(180deg);}
-.mosaic-face{
-  position:absolute;inset:0;
-  backface-visibility:hidden;
-  -webkit-backface-visibility:hidden;
-  overflow:hidden;
-}
-.mosaic-back{transform:rotateY(180deg);}
-.mosaic-face img{
-  width:100%;height:100%;
-  object-fit:cover;display:block;
-}
-.mosaic-face.solid{
-  display:flex;align-items:center;justify-content:center;
-}
-.mosaic-face.solid span{
-  font-family:Georgia,serif;
-  font-size:clamp(10px,1.1vw,14px);
-  letter-spacing:4px;color:rgba(255,255,255,.32);
-  text-transform:uppercase;writing-mode:vertical-rl;
-  user-select:none;
-}
-/* ── CANVAS overlay (ripple only, transparent) ── */
-#mosaicCanvas{
-  position:absolute;inset:0;
-  width:100%!important;height:100%!important;
-  pointer-events:none;
-  z-index:3;
-}
+/* LEFT: canvas panel */
+.mosaic-wrap{flex:0 0 52%;position:relative;overflow:hidden;}
+#mosaicCanvas{position:absolute;inset:0;width:100%;height:100%;}
 .liquid-hint{position:absolute;bottom:32px;left:0;right:0;text-align:center;font-size:var(--f-min);letter-spacing:5px;color:rgba(255,255,255,.28);text-transform:uppercase;pointer-events:none;transition:opacity .8s;}
 
 /* RIGHT: content panel */
@@ -591,94 +545,8 @@ body.force-mobile .h-scroll-hint{display:none!important;}
 <!-- HERO -->
 <section id="hero">
   <div class="mosaic-wrap" id="mosaicWrap">
-
-    <div class="mosaic-grid">
-
-      <!-- Row 1 -->
-      <div class="mosaic-tile">
-        <div class="mosaic-tile-inner">
-          <div class="mosaic-face solid" style="background:#1C2B3A;"><span>DISHANG</span></div>
-          <div class="mosaic-face mosaic-back solid" style="background:#B8976A;"></div>
-        </div>
-      </div>
-      <div class="mosaic-tile">
-        <div class="mosaic-tile-inner">
-          <div class="mosaic-face"><img src="https://i.ibb.co/m56qtcRY/result-1-61.png" alt=""/></div>
-          <div class="mosaic-face mosaic-back solid" style="background:#6B8FA8;"></div>
-        </div>
-      </div>
-      <div class="mosaic-tile">
-        <div class="mosaic-tile-inner">
-          <div class="mosaic-face solid" style="background:#dbeafe;"><span>2025</span></div>
-          <div class="mosaic-face mosaic-back solid" style="background:#1C2B3A;"></div>
-        </div>
-      </div>
-
-      <!-- Row 2 -->
-      <div class="mosaic-tile">
-        <div class="mosaic-tile-inner">
-          <div class="mosaic-face"><img src="https://i.ibb.co/4R6QMjzw/1fc166ee-5414-11f1-b180-32122d3eb903.jpg" alt=""/></div>
-          <div class="mosaic-face mosaic-back solid" style="background:#1e3a8a;"></div>
-        </div>
-      </div>
-      <div class="mosaic-tile">
-        <div class="mosaic-tile-inner">
-          <div class="mosaic-face solid" style="background:#B8976A;"><span>华盛</span></div>
-          <div class="mosaic-face mosaic-back solid" style="background:#F8F6F3;"></div>
-        </div>
-      </div>
-      <div class="mosaic-tile">
-        <div class="mosaic-tile-inner">
-          <div class="mosaic-face"><img src="https://i.ibb.co/8DGQjkvZ/AI-2026-05-25-2.jpg" alt=""/></div>
-          <div class="mosaic-face mosaic-back solid" style="background:#1C2B3A;"></div>
-        </div>
-      </div>
-
-      <!-- Row 3 -->
-      <div class="mosaic-tile">
-        <div class="mosaic-tile-inner">
-          <div class="mosaic-face"><img src="https://i.ibb.co/sv76V0NY/result-1-62.jpg" alt=""/></div>
-          <div class="mosaic-face mosaic-back solid" style="background:#B8976A;"></div>
-        </div>
-      </div>
-      <div class="mosaic-tile">
-        <div class="mosaic-tile-inner">
-          <div class="mosaic-face solid" style="background:#6B8FA8;"><span>DALIAN</span></div>
-          <div class="mosaic-face mosaic-back solid" style="background:#dbeafe;"></div>
-        </div>
-      </div>
-      <div class="mosaic-tile">
-        <div class="mosaic-tile-inner">
-          <div class="mosaic-face"><img src="https://i.ibb.co/5hvS4zRR/result-1-63.png" alt=""/></div>
-          <div class="mosaic-face mosaic-back solid" style="background:#1e3a8a;"></div>
-        </div>
-      </div>
-
-      <!-- Row 4 -->
-      <div class="mosaic-tile">
-        <div class="mosaic-tile-inner">
-          <div class="mosaic-face solid" style="background:#1e3a8a;"><span>时装</span></div>
-          <div class="mosaic-face mosaic-back solid" style="background:#F8F6F3;"></div>
-        </div>
-      </div>
-      <div class="mosaic-tile">
-        <div class="mosaic-tile-inner">
-          <div class="mosaic-face"><img src="https://i.ibb.co/XxY6rDdp/result-1-65.png" alt=""/></div>
-          <div class="mosaic-face mosaic-back solid" style="background:#6B8FA8;"></div>
-        </div>
-      </div>
-      <div class="mosaic-tile">
-        <div class="mosaic-tile-inner">
-          <div class="mosaic-face solid" style="background:#F8F6F3;"><span style="color:rgba(28,43,58,.28);">FASHION</span></div>
-          <div class="mosaic-face mosaic-back solid" style="background:#1C2B3A;"></div>
-        </div>
-      </div>
-
-    </div><!-- /mosaic-grid -->
-
     <canvas id="mosaicCanvas"></canvas>
     <div class="liquid-hint" id="liquidHint">~ 轻触以激活水波 ~</div>
-
   </div>
   <div class="hero-rp">
     <p class="h-eye" id="hEye">迪尚集团 · 高端时装制造</p>
