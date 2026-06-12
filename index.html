@@ -902,10 +902,17 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click'
     uniform sampler2D uTex;
     uniform float     uTime;
     uniform float     uAspect;
+    uniform float     uTexAspect;
     uniform vec3      uRipples[16];
     varying vec2 vUv;
     void main(){
-      vec2 uv=vUv, disp=vec2(0.);
+      // Cover scaling: fit image to canvas preserving aspect ratio
+      vec2 canvasAR = vec2(uAspect, 1.0);
+      vec2 texAR    = vec2(uTexAspect, 1.0);
+      vec2 scale    = canvasAR / texAR;
+      float s       = max(scale.x, scale.y);
+      vec2 uv0      = (vUv - 0.5) * (canvasAR / (texAR * s)) + 0.5;
+      vec2 uv=uv0, disp=vec2(0.);
       float spec=0.;
       for(int i=0;i<16;i++){
         vec2  c  =uRipples[i].xy;
@@ -926,9 +933,9 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click'
       float ca=length(disp)*1.1;
       vec2 nr=normalize(disp+vec2(.00001));
       vec3 col;
-      col.r=texture2D(uTex,clamp(uv+disp+nr*ca*.0025,0.,1.)).r;
-      col.g=texture2D(uTex,clamp(uv+disp           ,0.,1.)).g;
-      col.b=texture2D(uTex,clamp(uv+disp-nr*ca*.002 ,0.,1.)).b;
+      col.r=texture2D(uTex,clamp(uv+disp+nr*ca*.0025,vec2(0.),vec2(1.))).r;
+      col.g=texture2D(uTex,clamp(uv+disp           ,vec2(0.),vec2(1.))).g;
+      col.b=texture2D(uTex,clamp(uv+disp-nr*ca*.002 ,vec2(0.),vec2(1.))).b;
       col+=spec*.03*vec3(.92,.96,1.);
       vec2 sp=vec2(.32+sin(uTime*.13)*.07,.44+cos(uTime*.10)*.06);
       col+=exp(-dot((uv-sp)*vec2(uAspect,1.),(uv-sp)*vec2(uAspect,1.))*16.)*.035*vec3(.9,.95,1.);
@@ -944,6 +951,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click'
 
     /* ── Size canvas to wrapper ── */
     function getSize(){ return {w:wrap.clientWidth, h:wrap.clientHeight}; }
+    function updateAspect(nw,nh){ uniforms.uAspect.value=nw/nh; }
     let {w,h} = getSize();
 
     const renderer = new THREE.WebGLRenderer({canvas:mc, antialias:true, alpha:false});
@@ -960,10 +968,11 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click'
     let rIdx=0;
 
     const uniforms={
-      uTex    :{value:null},
-      uTime   :{value:0},
-      uAspect :{value:w/h},
-      uRipples:{value:ripples}
+      uTex      :{value:null},
+      uTime     :{value:0},
+      uAspect   :{value:w/h},
+      uTexAspect:{value:1.0},
+      uRipples  :{value:ripples}
     };
     const mat = new THREE.ShaderMaterial({vertexShader:VERT,fragmentShader:FRAG,uniforms});
     scene.add(new THREE.Mesh(geo,mat));
@@ -973,7 +982,11 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click'
     loader.crossOrigin='anonymous';
     loader.load(
       'https://i.ibb.co/4RLX40jh/result-1-66.png',
-      tex=>{ tex.minFilter=THREE.LinearFilter; uniforms.uTex.value=tex; },
+      tex=>{
+        tex.minFilter=THREE.LinearFilter;
+        uniforms.uTex.value=tex;
+        uniforms.uTexAspect.value=tex.image.width/tex.image.height;
+      },
       undefined,
       err=>console.warn('Texture load failed',err)
     );
@@ -1130,7 +1143,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click'
 
 /* ── 聊天面板 ── */
 #aiPanel{
-  position:fixed;bottom:155px;right:28px;z-index:9997;
+  position:fixed!important;bottom:90px!important;right:28px!important;z-index:2147483646!important;
   width:380px;max-width:calc(100vw - 32px);
   background:#fff;
   border:.5px solid rgba(28,43,58,.12);
@@ -1308,96 +1321,6 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click'
 }
 </style>
 
-<!-- FAB 展开菜单（包含 AI助手 + 视图切换） -->
-<div id="fabWrap">
-  <div id="fabChildren">
-    <div class="fab-row">
-      <span class="fab-label">AI 提示词助手</span>
-      <button id="aiAssistBtn" onclick="toggleAiPanel()" title="AI 提示词助手">
-        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" stroke-width="1.2"/><path d="M8 12h.01M12 12h.01M16 12h.01" stroke-width="2.5" stroke-linecap="round"/></svg>
-        <div class="ai-badge">AI</div>
-      </button>
-    </div>
-    <div class="fab-row" id="fabVtRow"></div>
-  </div>
-  <button id="fabMain" onclick="toggleFab()" title="工具菜单">
-    <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-  </button>
-</div>
-
-<!-- 聊天面板 -->
-<div id="aiPanel">
-  <!-- 头部 -->
-  <div class="ai-head">
-    <div class="ai-head-icon">
-      <svg viewBox="0 0 24 24"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
-    </div>
-    <div class="ai-head-text">
-      <div class="ai-head-title">AI 提示词助手</div>
-      <div class="ai-head-sub">选款式 · 选需求 · 一键生成提示词</div>
-    </div>
-    <button class="ai-head-close" onclick="toggleAiPanel()">×</button>
-  </div>
-
-  <!-- API Key 配置 -->
-  <div class="ai-key-area" id="aiKeyArea">
-    <div class="ai-key-label">
-      <svg viewBox="0 0 24 24"><path d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
-      Claude API Key（仅存本地，不上传）
-    </div>
-    <div class="ai-key-row">
-      <input class="ai-key-input" id="aiKeyInput" type="password" placeholder="sk-ant-api03-..." />
-      <button class="ai-key-save" onclick="saveApiKey()">保存</button>
-    </div>
-    <div class="ai-key-hint">Key 保存在浏览器本地，关闭页面后不丢失。申请地址：console.anthropic.com</div>
-  </div>
-
-  <!-- 选款式图 -->
-  <div class="ai-picker">
-    <div class="ai-picker-label">① 选择款式</div>
-    <div class="ai-img-scroll" id="aiImgScroll">
-      <!-- 由 JS 填充 -->
-    </div>
-    <div class="ai-selected-preview" id="aiSelectedPreview">
-      <img class="ai-preview-img" id="aiPreviewImg" src="" alt=""/>
-      <span class="ai-preview-name" id="aiPreviewName"></span>
-      <button class="ai-preview-clear" onclick="clearSelectedImg()" title="取消选择">×</button>
-    </div>
-  </div>
-
-  <!-- 快捷需求标签 -->
-  <div class="ai-shortcuts">
-    <div class="ai-shortcuts-label">② 选择需求</div>
-    <div class="ai-tags" id="aiTags">
-      <span class="ai-tag" onclick="toggleTag(this)">背面展示</span>
-      <span class="ai-tag" onclick="toggleTag(this)">侧面视角</span>
-      <span class="ai-tag" onclick="toggleTag(this)">细节特写</span>
-      <span class="ai-tag" onclick="toggleTag(this)">平铺展示</span>
-      <span class="ai-tag" onclick="toggleTag(this)">上身效果</span>
-      <span class="ai-tag" onclick="toggleTag(this)">换颜色</span>
-      <span class="ai-tag" onclick="toggleTag(this)">换面料</span>
-      <span class="ai-tag" onclick="toggleTag(this)">秀场风格</span>
-    </div>
-  </div>
-
-  <!-- 消息区 -->
-  <div class="ai-messages" id="aiMessages">
-    <div class="ai-msg bot">
-      <div class="ai-avatar">华</div>
-      <div class="ai-bubble">你好！我是迪尚华盛的 AI 助手。<br><br>请先选择上方的<b>款式图</b>和<b>需求标签</b>，或直接在输入框描述想要的效果，我会生成适合<b>即梦/可灵</b>等平台的中文提示词。</div>
-    </div>
-  </div>
-
-  <!-- 输入区 -->
-  <div class="ai-input-area">
-    <textarea class="ai-input" id="aiTextInput" placeholder="补充说明，如：希望模特是亚洲女性，背景是干净白色..." rows="1"
-      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAiMsg();}"
-      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,90)+'px'"></textarea>
-    <button class="ai-send" id="aiSendBtn" onclick="sendAiMsg()">
-      <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-    </button>
-  </div>
-</div>
 
 <script>
 /* ══════════════════════════════════════════
@@ -1681,11 +1604,112 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click'
     }
   });
 
+  /* ── 把 FAB 和面板直接挂到 body，避免被父容器 overflow 裁切 ── */
+  function mountUI(){
+    if(!document.getElementById('fabWrap')){
+      const fabDiv = document.createElement('div');
+      fabDiv.innerHTML = `<!-- FAB 展开菜单（包含 AI助手 + 视图切换） -->
+<div id="fabWrap">
+  <div id="fabChildren">
+    <div class="fab-row">
+      <span class="fab-label">AI 提示词助手</span>
+      <button id="aiAssistBtn" onclick="toggleAiPanel()" title="AI 提示词助手">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" stroke-width="1.2"/><path d="M8 12h.01M12 12h.01M16 12h.01" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <div class="ai-badge">AI</div>
+      </button>
+    </div>
+    <div class="fab-row" id="fabVtRow"></div>
+  </div>
+  <button id="fabMain" onclick="toggleFab()" title="工具菜单">
+    <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
+</div>`;
+      document.body.appendChild(fabDiv.firstElementChild);
+    }
+    if(!document.getElementById('aiPanel')){
+      const panelDiv = document.createElement('div');
+      panelDiv.innerHTML = `<!-- 聊天面板 -->
+<div id="aiPanel">
+  <!-- 头部 -->
+  <div class="ai-head">
+    <div class="ai-head-icon">
+      <svg viewBox="0 0 24 24"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+    </div>
+    <div class="ai-head-text">
+      <div class="ai-head-title">AI 提示词助手</div>
+      <div class="ai-head-sub">选款式 · 选需求 · 一键生成提示词</div>
+    </div>
+    <button class="ai-head-close" onclick="toggleAiPanel()">×</button>
+  </div>
+
+  <!-- API Key 配置 -->
+  <div class="ai-key-area" id="aiKeyArea">
+    <div class="ai-key-label">
+      <svg viewBox="0 0 24 24"><path d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+      Claude API Key（仅存本地，不上传）
+    </div>
+    <div class="ai-key-row">
+      <input class="ai-key-input" id="aiKeyInput" type="password" placeholder="sk-ant-api03-..." />
+      <button class="ai-key-save" onclick="saveApiKey()">保存</button>
+    </div>
+    <div class="ai-key-hint">Key 保存在浏览器本地，关闭页面后不丢失。申请地址：console.anthropic.com</div>
+  </div>
+
+  <!-- 选款式图 -->
+  <div class="ai-picker">
+    <div class="ai-picker-label">① 选择款式</div>
+    <div class="ai-img-scroll" id="aiImgScroll">
+      <!-- 由 JS 填充 -->
+    </div>
+    <div class="ai-selected-preview" id="aiSelectedPreview">
+      <img class="ai-preview-img" id="aiPreviewImg" src="" alt=""/>
+      <span class="ai-preview-name" id="aiPreviewName"></span>
+      <button class="ai-preview-clear" onclick="clearSelectedImg()" title="取消选择">×</button>
+    </div>
+  </div>
+
+  <!-- 快捷需求标签 -->
+  <div class="ai-shortcuts">
+    <div class="ai-shortcuts-label">② 选择需求</div>
+    <div class="ai-tags" id="aiTags">
+      <span class="ai-tag" onclick="toggleTag(this)">背面展示</span>
+      <span class="ai-tag" onclick="toggleTag(this)">侧面视角</span>
+      <span class="ai-tag" onclick="toggleTag(this)">细节特写</span>
+      <span class="ai-tag" onclick="toggleTag(this)">平铺展示</span>
+      <span class="ai-tag" onclick="toggleTag(this)">上身效果</span>
+      <span class="ai-tag" onclick="toggleTag(this)">换颜色</span>
+      <span class="ai-tag" onclick="toggleTag(this)">换面料</span>
+      <span class="ai-tag" onclick="toggleTag(this)">秀场风格</span>
+    </div>
+  </div>
+
+  <!-- 消息区 -->
+  <div class="ai-messages" id="aiMessages">
+    <div class="ai-msg bot">
+      <div class="ai-avatar">华</div>
+      <div class="ai-bubble">你好！我是迪尚华盛的 AI 助手。<br><br>请先选择上方的<b>款式图</b>和<b>需求标签</b>，或直接在输入框描述想要的效果，我会生成适合<b>即梦/可灵</b>等平台的中文提示词。</div>
+    </div>
+  </div>
+
+  <!-- 输入区 -->
+  <div class="ai-input-area">
+    <textarea class="ai-input" id="aiTextInput" placeholder="补充说明，如：希望模特是亚洲女性，背景是干净白色..." rows="1"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAiMsg();}"
+      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,90)+'px'"></textarea>
+    <button class="ai-send" id="aiSendBtn" onclick="sendAiMsg()">
+      <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </div>
+</div>`;
+      document.body.appendChild(panelDiv.firstElementChild);
+    }
+  }
+
   /* ── 初始化 ── */
   if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded', init);
+    document.addEventListener('DOMContentLoaded', function(){ mountUI(); init(); });
   } else {
-    init();
+    mountUI(); init();
   }
 })();
 </script>
