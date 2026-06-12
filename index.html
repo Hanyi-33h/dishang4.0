@@ -216,7 +216,7 @@ footer{background:#1a4fa8;padding:80px 60px 40px;}
 
 /* ── VIEW TOGGLE BUTTON ── */
 #viewToggle{
-  position:static;z-index:9999;
+  position:fixed;bottom:28px;right:28px;z-index:9999;
   display:flex;align-items:center;gap:7px;
   padding:9px 16px;
   background:rgba(255,255,255,.14);
@@ -734,8 +734,8 @@ body.force-mobile .h-scroll-hint{display:none!important;}
 </footer>
 </div>
 
-<!-- VIEW TOGGLE BUTTON (moved into FAB by JS) -->
-<button id="viewToggle" aria-label="切换视图" style="display:none">
+<!-- VIEW TOGGLE BUTTON -->
+<button id="viewToggle" aria-label="切换视图">
   <svg id="vtIcon" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="14" rx="2"/><line x1="8" y1="20" x2="16" y2="20"/><line x1="12" y1="18" x2="12" y2="20"/></svg>
   <span id="vtLabel">PC版</span>
 </button>
@@ -906,12 +906,11 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click'
     uniform vec3      uRipples[16];
     varying vec2 vUv;
     void main(){
-      // Cover scaling: fit image to canvas preserving aspect ratio
-      vec2 canvasAR = vec2(uAspect, 1.0);
-      vec2 texAR    = vec2(uTexAspect, 1.0);
-      vec2 scale    = canvasAR / texAR;
-      float s       = max(scale.x, scale.y);
-      vec2 uv0      = (vUv - 0.5) * (canvasAR / (texAR * s)) + 0.5;
+      // Cover: fit image preserving aspect ratio
+      float s = max(uAspect/uTexAspect, 1.0/max(1.0/uAspect*uTexAspect,0.0001));
+      vec2 scale = vec2(uAspect,1.0) / vec2(uTexAspect,1.0);
+      float sc = max(scale.x, scale.y);
+      vec2 uv0 = (vUv - 0.5) * (vec2(uAspect,1.0) / (vec2(uTexAspect,1.0) * sc)) + 0.5;
       vec2 uv=uv0, disp=vec2(0.);
       float spec=0.;
       for(int i=0;i<16;i++){
@@ -933,9 +932,9 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click'
       float ca=length(disp)*1.1;
       vec2 nr=normalize(disp+vec2(.00001));
       vec3 col;
-      col.r=texture2D(uTex,clamp(uv+disp+nr*ca*.0025,vec2(0.),vec2(1.))).r;
-      col.g=texture2D(uTex,clamp(uv+disp           ,vec2(0.),vec2(1.))).g;
-      col.b=texture2D(uTex,clamp(uv+disp-nr*ca*.002 ,vec2(0.),vec2(1.))).b;
+      col.r=texture2D(uTex,clamp(uv+disp+nr*ca*.0025,0.,1.)).r;
+      col.g=texture2D(uTex,clamp(uv+disp           ,0.,1.)).g;
+      col.b=texture2D(uTex,clamp(uv+disp-nr*ca*.002 ,0.,1.)).b;
       col+=spec*.03*vec3(.92,.96,1.);
       vec2 sp=vec2(.32+sin(uTime*.13)*.07,.44+cos(uTime*.10)*.06);
       col+=exp(-dot((uv-sp)*vec2(uAspect,1.),(uv-sp)*vec2(uAspect,1.))*16.)*.035*vec3(.9,.95,1.);
@@ -951,7 +950,6 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click'
 
     /* ── Size canvas to wrapper ── */
     function getSize(){ return {w:wrap.clientWidth, h:wrap.clientHeight}; }
-    function updateAspect(nw,nh){ uniforms.uAspect.value=nw/nh; }
     let {w,h} = getSize();
 
     const renderer = new THREE.WebGLRenderer({canvas:mc, antialias:true, alpha:false});
@@ -971,7 +969,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click'
       uTex      :{value:null},
       uTime     :{value:0},
       uAspect   :{value:w/h},
-      uTexAspect:{value:1.0},
+      uTexAspect:{value:1.5},
       uRipples  :{value:ripples}
     };
     const mat = new THREE.ShaderMaterial({vertexShader:VERT,fragmentShader:FRAG,uniforms});
@@ -985,7 +983,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click'
       tex=>{
         tex.minFilter=THREE.LinearFilter;
         uniforms.uTex.value=tex;
-        uniforms.uTexAspect.value=tex.image.width/tex.image.height;
+        uniforms.uTexAspect.value=tex.image.naturalWidth/tex.image.naturalHeight;
       },
       undefined,
       err=>console.warn('Texture load failed',err)
@@ -1117,524 +1115,135 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click'
 })();
 </script>
 
-<!-- ═══════════════════════════════════════════
-     AI 助手 · 服装提示词生成器
-════════════════════════════════════════════ -->
+<!-- ══════════════════════════════════════════
+     AI 助手 + FAB 悬浮按钮
+══════════════════════════════════════════ -->
 <style>
-/* ── 悬浮按钮 ── */
+/* ── FAB 主按钮 ── */
 #aiAssistBtn{
-  position:static;z-index:9998;
+  position:fixed;bottom:90px;right:28px;z-index:9998;
   width:52px;height:52px;border-radius:50%;border:none;cursor:pointer;
   background:linear-gradient(135deg,#1C2B3A 0%,#B8976A 100%);
   box-shadow:0 4px 20px rgba(28,43,58,.35);
   display:flex;align-items:center;justify-content:center;
   transition:transform .25s,box-shadow .25s;
-  flex-direction:column;gap:1px;
 }
 #aiAssistBtn:hover{transform:scale(1.08);box-shadow:0 6px 28px rgba(28,43,58,.45);}
 #aiAssistBtn svg{width:22px;height:22px;stroke:#fff;fill:none;stroke-width:1.5;}
-#aiAssistBtn .ai-badge{
+.ai-badge{
   position:absolute;top:-3px;right:-3px;
   width:16px;height:16px;border-radius:50%;
   background:#B8976A;border:2px solid #fff;
   font-size:9px;color:#fff;display:flex;align-items:center;justify-content:center;
-  font-weight:700;letter-spacing:0;
+  font-weight:700;
 }
 
 /* ── 聊天面板 ── */
 #aiPanel{
-  position:fixed!important;bottom:90px!important;right:28px!important;z-index:2147483646!important;
+  position:fixed;bottom:155px;right:28px;z-index:9997;
   width:380px;max-width:calc(100vw - 32px);
   background:#fff;
   border:.5px solid rgba(28,43,58,.12);
   border-radius:16px;
-  box-shadow:0 16px 60px rgba(0,0,0,.16),0 2px 8px rgba(0,0,0,.06);
+  box-shadow:0 16px 60px rgba(0,0,0,.16);
   display:none;flex-direction:column;overflow:hidden;
   max-height:calc(100vh - 200px);
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Hiragino Sans',Arial,sans-serif;
 }
 #aiPanel.open{display:flex;animation:panelIn .28s cubic-bezier(.34,1.3,.64,1) forwards;}
-@keyframes panelIn{
-  from{opacity:0;transform:translateY(18px) scale(.97);}
-  to{opacity:1;transform:translateY(0) scale(1);}
-}
+@keyframes panelIn{from{opacity:0;transform:translateY(16px) scale(.97);}to{opacity:1;transform:translateY(0) scale(1);}}
 
-/* 面板头部 */
-.ai-head{
-  background:linear-gradient(135deg,#1C2B3A 0%,#2a4060 100%);
-  padding:16px 18px;display:flex;align-items:center;gap:12px;flex-shrink:0;
-}
-.ai-head-icon{
-  width:36px;height:36px;border-radius:50%;
-  background:rgba(184,151,106,.25);border:.5px solid rgba(184,151,106,.4);
-  display:flex;align-items:center;justify-content:center;flex-shrink:0;
-}
-.ai-head-icon svg{width:18px;height:18px;stroke:#B8976A;fill:none;stroke-width:1.5;}
+.ai-head{background:linear-gradient(135deg,#1C2B3A 0%,#2a4060 100%);padding:14px 16px;display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.ai-head-icon{width:34px;height:34px;border-radius:50%;background:rgba(184,151,106,.2);border:.5px solid rgba(184,151,106,.4);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ai-head-icon svg{width:16px;height:16px;stroke:#B8976A;fill:none;stroke-width:1.5;}
 .ai-head-text{flex:1;}
-.ai-head-title{font-size:13px;font-weight:600;color:#fff;letter-spacing:.5px;margin-bottom:2px;}
-.ai-head-sub{font-size:11px;color:rgba(255,255,255,.45);letter-spacing:.3px;}
-.ai-head-close{background:none;border:none;cursor:pointer;padding:4px;color:rgba(255,255,255,.4);transition:color .2s;line-height:1;font-size:18px;}
+.ai-head-title{font-size:13px;font-weight:600;color:#fff;letter-spacing:.5px;margin-bottom:1px;}
+.ai-head-sub{font-size:10px;color:rgba(255,255,255,.4);letter-spacing:.3px;}
+.ai-head-close{background:none;border:none;cursor:pointer;color:rgba(255,255,255,.4);font-size:20px;line-height:1;padding:2px;transition:color .2s;}
 .ai-head-close:hover{color:#fff;}
 
 /* 选图区 */
-.ai-picker{
-  padding:14px 16px 10px;border-bottom:.5px solid #f0ede9;flex-shrink:0;
-}
-.ai-picker-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#B8976A;font-weight:500;margin-bottom:10px;}
-.ai-img-scroll{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;}
+.ai-picker{padding:12px 14px 8px;border-bottom:.5px solid #f0ede9;flex-shrink:0;}
+.ai-picker-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#B8976A;font-weight:500;margin-bottom:8px;}
+.ai-cat-tabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
+.ai-cat-tab{font-size:11px;padding:4px 11px;border-radius:20px;border:.5px solid #ddd;background:#fafafa;color:#666;cursor:pointer;transition:all .18s;letter-spacing:.3px;}
+.ai-cat-tab.active{background:#1C2B3A;color:#fff;border-color:#1C2B3A;}
+.ai-img-scroll{display:flex;gap:7px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;}
 .ai-img-scroll::-webkit-scrollbar{display:none;}
-.ai-img-thumb{
-  width:62px;height:78px;flex-shrink:0;border-radius:6px;overflow:hidden;
-  border:2px solid transparent;cursor:pointer;transition:border-color .2s,transform .2s;
-  background:#f5f3f0;position:relative;
-}
+.ai-img-thumb{width:58px;height:74px;flex-shrink:0;border-radius:6px;overflow:hidden;border:2px solid transparent;cursor:pointer;transition:border-color .18s,transform .18s;background:#f5f3f0;position:relative;}
 .ai-img-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
-.ai-img-thumb.selected{border-color:#B8976A;transform:scale(1.04);}
-.ai-img-thumb.selected::after{
-  content:'✓';position:absolute;top:2px;right:3px;
-  font-size:10px;color:#B8976A;font-weight:700;line-height:1;
-}
-.ai-selected-preview{
-  display:none;margin-top:10px;align-items:center;gap:10px;
-  padding:8px 10px;background:#f8f6f3;border-radius:8px;
-}
+.ai-img-thumb.selected{border-color:#B8976A;transform:scale(1.05);}
+.ai-img-thumb.selected::after{content:'✓';position:absolute;top:2px;right:3px;font-size:10px;color:#B8976A;font-weight:700;}
+.ai-selected-preview{display:none;margin-top:8px;align-items:center;gap:9px;padding:7px 10px;background:#f8f6f3;border-radius:8px;}
 .ai-selected-preview.show{display:flex;}
-.ai-preview-img{width:40px;height:50px;border-radius:4px;object-fit:cover;flex-shrink:0;}
-.ai-preview-name{font-size:12px;color:#1C2B3A;font-weight:500;letter-spacing:.3px;flex:1;}
-.ai-preview-clear{background:none;border:none;cursor:pointer;color:#bbb;font-size:14px;padding:2px;transition:color .2s;}
+.ai-preview-img{width:38px;height:48px;border-radius:4px;object-fit:cover;flex-shrink:0;}
+.ai-preview-name{font-size:12px;color:#1C2B3A;font-weight:500;flex:1;}
+.ai-preview-clear{background:none;border:none;cursor:pointer;color:#bbb;font-size:16px;padding:0;transition:color .2s;}
 .ai-preview-clear:hover{color:#666;}
 
-/* 快捷选项 */
-.ai-shortcuts{
-  padding:10px 16px;border-bottom:.5px solid #f0ede9;flex-shrink:0;
-}
-.ai-shortcuts-label{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:#6B8FA8;font-weight:500;margin-bottom:8px;}
-.ai-tags{display:flex;flex-wrap:wrap;gap:6px;}
-.ai-tag{
-  font-size:11px;letter-spacing:.5px;padding:5px 11px;border-radius:20px;
-  border:.5px solid #ddd;background:#fafafa;color:#444;cursor:pointer;
-  transition:all .18s;white-space:nowrap;
-}
-.ai-tag:hover{border-color:#B8976A;color:#B8976A;background:#fdf9f4;}
+/* 快捷标签 */
+.ai-shortcuts{padding:9px 14px;border-bottom:.5px solid #f0ede9;flex-shrink:0;}
+.ai-shortcuts-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:#6B8FA8;font-weight:500;margin-bottom:7px;}
+.ai-tags{display:flex;flex-wrap:wrap;gap:5px;}
+.ai-tag{font-size:11px;padding:4px 10px;border-radius:20px;border:.5px solid #ddd;background:#fafafa;color:#555;cursor:pointer;transition:all .18s;white-space:nowrap;}
+.ai-tag:hover{border-color:#B8976A;color:#B8976A;}
 .ai-tag.active{border-color:#1C2B3A;background:#1C2B3A;color:#fff;}
 
 /* 消息区 */
-.ai-messages{
-  flex:1;overflow-y:auto;padding:14px 16px;
-  display:flex;flex-direction:column;gap:12px;min-height:120px;
-  scrollbar-width:thin;scrollbar-color:#e0ddd9 transparent;
-}
+.ai-messages{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px;min-height:100px;scrollbar-width:thin;scrollbar-color:#e0ddd9 transparent;}
 .ai-messages::-webkit-scrollbar{width:4px;}
 .ai-messages::-webkit-scrollbar-thumb{background:#e0ddd9;border-radius:2px;}
-
-.ai-msg{display:flex;gap:8px;align-items:flex-start;}
-.ai-msg.bot .ai-bubble{
-  background:#f8f6f3;color:#1E1E1E;border-radius:4px 12px 12px 12px;
-  font-size:13px;line-height:1.7;padding:10px 13px;max-width:88%;
-}
+.ai-msg{display:flex;gap:7px;align-items:flex-start;}
+.ai-msg.bot .ai-bubble{background:#f8f6f3;color:#1E1E1E;border-radius:4px 12px 12px 12px;font-size:13px;line-height:1.7;padding:9px 12px;max-width:88%;}
 .ai-msg.user{flex-direction:row-reverse;}
-.ai-msg.user .ai-bubble{
-  background:#1C2B3A;color:#fff;border-radius:12px 4px 12px 12px;
-  font-size:13px;line-height:1.7;padding:10px 13px;max-width:88%;
-}
-.ai-avatar{
-  width:26px;height:26px;border-radius:50%;flex-shrink:0;margin-top:2px;
-  background:linear-gradient(135deg,#1C2B3A,#B8976A);
-  display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;font-weight:600;
-}
-
-/* 提示词结果卡 */
-.ai-result-card{
-  background:#fff;border:.5px solid #e0ddd9;border-radius:10px;overflow:hidden;
-  margin-top:4px;
-}
-.ai-result-head{
-  background:#f8f6f3;padding:9px 12px;font-size:11px;letter-spacing:1.5px;
-  text-transform:uppercase;color:#B8976A;font-weight:600;
-  border-bottom:.5px solid #e0ddd9;display:flex;align-items:center;gap:6px;
-}
-.ai-result-body{padding:11px 12px;font-size:12.5px;line-height:1.8;color:#333;}
-.ai-copy-btn{
-  display:flex;align-items:center;gap:6px;margin:8px 12px 10px;
-  padding:8px 14px;background:#1C2B3A;color:#fff;border:none;border-radius:6px;
-  font-size:11px;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;
-  transition:background .2s;width:fit-content;font-family:inherit;
-}
+.ai-msg.user .ai-bubble{background:#1C2B3A;color:#fff;border-radius:12px 4px 12px 12px;font-size:13px;line-height:1.7;padding:9px 12px;max-width:88%;}
+.ai-avatar{width:24px;height:24px;border-radius:50%;flex-shrink:0;margin-top:2px;background:linear-gradient(135deg,#1C2B3A,#B8976A);display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:600;}
+.ai-result-card{background:#fff;border:.5px solid #e0ddd9;border-radius:10px;overflow:hidden;margin-top:4px;}
+.ai-result-head{background:#f8f6f3;padding:8px 12px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:#B8976A;font-weight:600;border-bottom:.5px solid #e0ddd9;}
+.ai-result-body{padding:10px 12px;font-size:12.5px;line-height:1.8;color:#333;}
+.ai-copy-btn{display:flex;align-items:center;gap:5px;margin:6px 12px 10px;padding:7px 13px;background:#1C2B3A;color:#fff;border:none;border-radius:6px;font-size:11px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:background .2s;font-family:inherit;}
 .ai-copy-btn:hover{background:#2a4060;}
 .ai-copy-btn.copied{background:#4a7c59;}
-.ai-copy-btn svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;}
-
-/* 加载动画 */
-.ai-typing{display:flex;gap:4px;padding:4px 2px;align-items:center;}
-.ai-dot{width:6px;height:6px;border-radius:50%;background:#B8976A;animation:dotPulse 1.2s infinite;}
-.ai-dot:nth-child(2){animation-delay:.2s;}
-.ai-dot:nth-child(3){animation-delay:.4s;}
-@keyframes dotPulse{0%,80%,100%{opacity:.3;transform:scale(.8);}40%{opacity:1;transform:scale(1);}}
+.ai-typing{display:flex;gap:4px;padding:4px 0;align-items:center;}
+.ai-dot{width:6px;height:6px;border-radius:50%;background:#B8976A;animation:dotP 1.2s infinite;}
+.ai-dot:nth-child(2){animation-delay:.2s;}.ai-dot:nth-child(3){animation-delay:.4s;}
+@keyframes dotP{0%,80%,100%{opacity:.3;transform:scale(.8);}40%{opacity:1;transform:scale(1);}}
 
 /* 输入区 */
-.ai-input-area{
-  padding:12px 14px;border-top:.5px solid #f0ede9;display:flex;gap:8px;align-items:flex-end;flex-shrink:0;
-}
-.ai-input{
-  flex:1;resize:none;border:.5px solid #ddd;border-radius:10px;
-  padding:9px 12px;font-size:13px;font-family:inherit;color:#1E1E1E;
-  outline:none;max-height:90px;min-height:38px;line-height:1.5;
-  transition:border-color .2s;
-}
+.ai-input-area{padding:10px 12px;border-top:.5px solid #f0ede9;display:flex;gap:7px;align-items:flex-end;flex-shrink:0;}
+.ai-input{flex:1;resize:none;border:.5px solid #ddd;border-radius:10px;padding:8px 11px;font-size:13px;font-family:inherit;color:#1E1E1E;outline:none;max-height:80px;min-height:36px;line-height:1.5;transition:border-color .2s;}
 .ai-input:focus{border-color:#6B8FA8;}
-.ai-send{
-  width:36px;height:36px;border-radius:50%;border:none;
-  background:#1C2B3A;color:#fff;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;transition:background .2s,transform .15s;
-}
+.ai-send{width:34px;height:34px;border-radius:50%;border:none;background:#1C2B3A;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s,transform .15s;}
 .ai-send:hover{background:#B8976A;transform:scale(1.06);}
-.ai-send:disabled{background:#ccc;transform:none;cursor:not-allowed;}
-.ai-send svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2;margin-left:1px;}
+.ai-send:disabled{background:#ccc;cursor:not-allowed;transform:none;}
+.ai-send svg{width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2;margin-left:1px;}
 
-/* API Key 输入 */
-.ai-key-area{
-  padding:14px 16px;background:#fdf9f4;border-bottom:.5px solid #f0ede9;
-  flex-shrink:0;
-}
-.ai-key-label{font-size:11px;color:#B8976A;letter-spacing:1px;font-weight:500;margin-bottom:7px;display:flex;align-items:center;gap:5px;}
-.ai-key-label svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:2;}
-.ai-key-row{display:flex;gap:7px;}
-.ai-key-input{
-  flex:1;border:.5px solid #ddd;border-radius:7px;padding:7px 10px;
-  font-size:12px;font-family:inherit;outline:none;transition:border-color .2s;
-  color:#333;background:#fff;
-}
+/* Key 区 */
+.ai-key-area{padding:12px 14px;background:#fdf9f4;border-bottom:.5px solid #f0ede9;flex-shrink:0;}
+.ai-key-label{font-size:10px;color:#B8976A;letter-spacing:1px;font-weight:500;margin-bottom:6px;}
+.ai-key-row{display:flex;gap:6px;}
+.ai-key-input{flex:1;border:.5px solid #ddd;border-radius:7px;padding:7px 10px;font-size:12px;font-family:inherit;outline:none;transition:border-color .2s;color:#333;}
 .ai-key-input:focus{border-color:#6B8FA8;}
-.ai-key-save{
-  padding:7px 14px;background:#1C2B3A;color:#fff;border:none;border-radius:7px;
-  font-size:11px;cursor:pointer;letter-spacing:.5px;font-family:inherit;
-  transition:background .2s;white-space:nowrap;
-}
+.ai-key-save{padding:7px 13px;background:#1C2B3A;color:#fff;border:none;border-radius:7px;font-size:11px;cursor:pointer;font-family:inherit;transition:background .2s;white-space:nowrap;}
 .ai-key-save:hover{background:#B8976A;}
-.ai-key-hint{font-size:10.5px;color:#aaa;margin-top:5px;line-height:1.6;}
+.ai-key-hint{font-size:10px;color:#bbb;margin-top:5px;line-height:1.6;}
 
-/* 响应式 */
 @media(max-width:600px){
-  #aiPanel{right:12px;width:calc(100vw - 24px);bottom:140px;}
-  #aiAssistBtn{}
+  #aiPanel{right:12px;width:calc(100vw - 24px);bottom:145px;}
+  #aiAssistBtn{right:16px;bottom:82px;}
 }
 </style>
 
+<!-- AI 助手悬浮按钮 -->
+<button id="aiAssistBtn" onclick="toggleAiPanel()" title="AI 提示词助手">
+  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="1.2"/><path d="M8 12h.01M12 12h.01M16 12h.01" stroke-width="2.5" stroke-linecap="round"/></svg>
+  <div class="ai-badge">AI</div>
+</button>
 
-<script>
-/* ══════════════════════════════════════════
-   AI 助手脚本
-══════════════════════════════════════════ */
-(function(){
-  /* ── 款式图数据（取产品封面图） ── */
-  const PRODUCT_IMGS = [
-    { name:'西服',     src:'https://i.ibb.co/Z1R9WVBm/image.jpg',    cat:'suit'   },
-    { name:'双面呢大衣', src:'https://i.ibb.co/spy5Xnq1/image.jpg',  cat:'wool'   },
-    { name:'风衣',     src:'https://i.ibb.co/2Yqr1sHS/image.jpg',    cat:'trench' },
-    { name:'羽绒服',   src:'https://i.ibb.co/yc23866v/1.jpg',        cat:'down'   }
-  ];
-
-  let selectedImg  = null; // { name, src }
-  let activeTags   = [];
-  let isLoading    = false;
-  let apiKey       = localStorage.getItem('dsh_ai_key') || '';
-  let panelOpen    = false;
-
-  /* ── 初始化 ── */
-  function init(){
-    buildThumbStrip();
-    if(apiKey) hideKeyArea();
-    restoreKeyInput();
-    mountViewToggle();
-  }
-
-  function buildThumbStrip(){
-    const scroll = document.getElementById('aiImgScroll');
-    PRODUCT_IMGS.forEach((p,i)=>{
-      const div = document.createElement('div');
-      div.className='ai-img-thumb';
-      div.dataset.idx = i;
-      div.innerHTML=`<img src="${p.src}" alt="${p.name}" loading="lazy"/>`;
-      div.onclick=()=>selectImg(i, div);
-      scroll.appendChild(div);
-    });
-  }
-
-  function selectImg(idx, el){
-    document.querySelectorAll('.ai-img-thumb').forEach(t=>t.classList.remove('selected'));
-    el.classList.add('selected');
-    selectedImg = PRODUCT_IMGS[idx];
-    const preview = document.getElementById('aiSelectedPreview');
-    document.getElementById('aiPreviewImg').src = selectedImg.src;
-    document.getElementById('aiPreviewName').textContent = selectedImg.name;
-    preview.classList.add('show');
-  }
-
-  window.clearSelectedImg = function(){
-    selectedImg = null;
-    document.querySelectorAll('.ai-img-thumb').forEach(t=>t.classList.remove('selected'));
-    document.getElementById('aiSelectedPreview').classList.remove('show');
-  };
-
-  window.toggleTag = function(el){
-    el.classList.toggle('active');
-    const tag = el.textContent;
-    if(activeTags.includes(tag)){
-      activeTags = activeTags.filter(t=>t!==tag);
-    } else {
-      activeTags.push(tag);
-    }
-  };
-
-  /* ── API Key ── */
-  function restoreKeyInput(){
-    if(apiKey) document.getElementById('aiKeyInput').value = apiKey;
-  }
-  function hideKeyArea(){
-    const area = document.getElementById('aiKeyArea');
-    area.style.display='none';
-  }
-  window.saveApiKey = function(){
-    const v = document.getElementById('aiKeyInput').value.trim();
-    if(!v){ alert('请输入有效的 API Key'); return; }
-    apiKey = v;
-    localStorage.setItem('dsh_ai_key', v);
-    hideKeyArea();
-    addBotMsg('✅ API Key 已保存！现在可以开始使用了。');
-  };
-
-  /* ── 面板开关 ── */
-  window.toggleAiPanel = function(){
-    const panel = document.getElementById('aiPanel');
-    panelOpen = !panelOpen;
-    if(panelOpen){
-      panel.classList.add('open');
-      if(!apiKey) document.getElementById('aiKeyArea').style.display='';
-    } else {
-      panel.classList.remove('open');
-    }
-  };
-
-  /* ── 消息渲染 ── */
-  function addBotMsg(html){
-    const msgs = document.getElementById('aiMessages');
-    const div = document.createElement('div');
-    div.className='ai-msg bot';
-    div.innerHTML=`<div class="ai-avatar">华</div><div class="ai-bubble">${html}</div>`;
-    msgs.appendChild(div);
-    msgs.scrollTop = msgs.scrollHeight;
-    return div;
-  }
-  function addUserMsg(text){
-    const msgs = document.getElementById('aiMessages');
-    const div = document.createElement('div');
-    div.className='ai-msg user';
-    div.innerHTML=`<div class="ai-bubble">${text}</div>`;
-    msgs.appendChild(div);
-    msgs.scrollTop = msgs.scrollHeight;
-  }
-  function addTyping(){
-    const msgs = document.getElementById('aiMessages');
-    const div = document.createElement('div');
-    div.className='ai-msg bot';
-    div.id='aiTyping';
-    div.innerHTML=`<div class="ai-avatar">华</div><div class="ai-bubble"><div class="ai-typing"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div></div></div>`;
-    msgs.appendChild(div);
-    msgs.scrollTop = msgs.scrollHeight;
-  }
-  function removeTyping(){
-    const t = document.getElementById('aiTyping');
-    if(t) t.remove();
-  }
-  function addResultCard(promptText){
-    const msgs = document.getElementById('aiMessages');
-    const div = document.createElement('div');
-    div.className='ai-msg bot';
-    const id = 'cp_' + Date.now();
-    div.innerHTML=`
-      <div class="ai-avatar">华</div>
-      <div style="flex:1;max-width:88%;">
-        <div class="ai-result-card">
-          <div class="ai-result-head">
-            <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" fill="none" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-            生成的提示词（可直接复制到即梦/可灵）
-          </div>
-          <div class="ai-result-body" id="${id}">${promptText.replace(/\n/g,'<br>')}</div>
-          <button class="ai-copy-btn" onclick="copyPrompt('${id}',this)">
-            <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-            复制提示词
-          </button>
-        </div>
-      </div>`;
-    msgs.appendChild(div);
-    msgs.scrollTop = msgs.scrollHeight;
-  }
-
-  window.copyPrompt = function(id, btn){
-    const text = document.getElementById(id).innerText;
-    navigator.clipboard.writeText(text).then(()=>{
-      btn.classList.add('copied');
-      btn.textContent = '✓ 已复制！';
-      setTimeout(()=>{
-        btn.classList.remove('copied');
-        btn.innerHTML=`<svg viewBox="0 0 24 24" style="width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> 复制提示词`;
-      }, 2000);
-    });
-  };
-
-  /* ── 发送消息 ── */
-  window.sendAiMsg = async function(){
-    if(isLoading) return;
-    if(!apiKey){
-      addBotMsg('请先填写并保存 Claude API Key，才能使用 AI 功能。');
-      document.getElementById('aiKeyArea').style.display='';
-      return;
-    }
-
-    const input = document.getElementById('aiTextInput');
-    const userText = input.value.trim();
-
-    if(!selectedImg && activeTags.length===0 && !userText){
-      addBotMsg('请先选择一件款式，或在下方描述你想要的效果 😊');
-      return;
-    }
-
-    /* 组合用户描述 */
-    let desc = '';
-    if(selectedImg) desc += `款式：${selectedImg.name}`;
-    if(activeTags.length) desc += (desc?'，':'') + `需求：${activeTags.join('、')}`;
-    if(userText) desc += (desc?'。\n补充说明：':'') + userText;
-
-    addUserMsg(desc.replace(/\n/g,'<br>'));
-    input.value='';
-    input.style.height='auto';
-
-    isLoading = true;
-    document.getElementById('aiSendBtn').disabled = true;
-    addTyping();
-
-    /* 构建发送给 Claude 的 prompt */
-    const imgNote = selectedImg
-      ? `用户选择的服装图片URL：${selectedImg.src}\n服装类别：${selectedImg.name}\n`
-      : '';
-
-    const systemPrompt = `你是一位专业的服装产品摄影师兼AI生图提示词专家，专为即梦AI、可灵AI、海螺AI等国内平台优化提示词。
-
-任务：根据用户提供的服装信息和需求，生成一段高质量的中文生图提示词。
-
-提示词要求：
-1. 必须是中文，流畅自然
-2. 包含：服装类型/款式描述、颜色/面料、拍摄角度/视角、光线/背景、风格定义
-3. 适合商业服装展示，专业、精准
-4. 长度控制在120-200字之间
-5. 直接输出提示词内容，不要加解释或前言
-
-服装品牌背景：大连迪尚华盛时装，专注高端时装，包含双面呢大衣、风衣、西服、羽绒服等品类。`;
-
-    const userPrompt = `${imgNote}用户需求：${desc}\n\n请生成适合即梦/可灵AI平台的服装图生图提示词。`;
-
-    try {
-      const res = await fetch('https://api.anthropic.com/v1/messages',{
-        method:'POST',
-        headers:{
-          'Content-Type':'application/json',
-          'x-api-key': apiKey,
-          'anthropic-version':'2023-06-01',
-          'anthropic-dangerous-direct-browser-access':'true'
-        },
-        body: JSON.stringify({
-          model:'claude-sonnet-4-20250514',
-          max_tokens:600,
-          system: systemPrompt,
-          messages:[{role:'user', content: userPrompt}]
-        })
-      });
-
-      const data = await res.json();
-      removeTyping();
-
-      if(data.error){
-        addBotMsg(`❌ 请求失败：${data.error.message}<br><small>请检查 API Key 是否正确。</small>`);
-      } else {
-        const promptText = data.content[0].text.trim();
-        addResultCard(promptText);
-        /* 重置标签 */
-        document.querySelectorAll('.ai-tag').forEach(t=>t.classList.remove('active'));
-        activeTags=[];
-      }
-    } catch(e){
-      removeTyping();
-      addBotMsg(`❌ 网络错误，请检查网络连接后重试。<br><small>${e.message}</small>`);
-    }
-
-    isLoading = false;
-    document.getElementById('aiSendBtn').disabled = false;
-  };
-
-  /* ── FAB 菜单逻辑 ── */
-  window.toggleFab = function(){
-    const children = document.getElementById('fabChildren');
-    const main = document.getElementById('fabMain');
-    const isOpen = children.classList.toggle('open');
-    main.classList.toggle('open', isOpen);
-  };
-  // 把 viewToggle 移入 FAB 的视图切换行
-  function mountViewToggle(){
-    const vt = document.getElementById('viewToggle');
-    const row = document.getElementById('fabVtRow');
-    if(!vt||!row) return;
-    vt.style.display='';
-    const label = document.createElement('span');
-    label.className='fab-label';
-    label.id='fabVtLabel';
-    label.textContent='切换视图';
-    row.appendChild(label);
-    row.appendChild(vt);
-  }
-  // 点击面板外关闭 FAB
-  document.addEventListener('click', function(e){
-    const wrap = document.getElementById('fabWrap');
-    const panel = document.getElementById('aiPanel');
-    if(wrap && !wrap.contains(e.target) && panel && !panel.contains(e.target)){
-      const children = document.getElementById('fabChildren');
-      const main = document.getElementById('fabMain');
-      if(children) children.classList.remove('open');
-      if(main) main.classList.remove('open');
-    }
-  });
-
-  /* ── 把 FAB 和面板直接挂到 body，避免被父容器 overflow 裁切 ── */
-  function mountUI(){
-    if(!document.getElementById('fabWrap')){
-      const fabDiv = document.createElement('div');
-      fabDiv.innerHTML = `<!-- FAB 展开菜单（包含 AI助手 + 视图切换） -->
-<div id="fabWrap">
-  <div id="fabChildren">
-    <div class="fab-row">
-      <span class="fab-label">AI 提示词助手</span>
-      <button id="aiAssistBtn" onclick="toggleAiPanel()" title="AI 提示词助手">
-        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" stroke-width="1.2"/><path d="M8 12h.01M12 12h.01M16 12h.01" stroke-width="2.5" stroke-linecap="round"/></svg>
-        <div class="ai-badge">AI</div>
-      </button>
-    </div>
-    <div class="fab-row" id="fabVtRow"></div>
-  </div>
-  <button id="fabMain" onclick="toggleFab()" title="工具菜单">
-    <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-  </button>
-</div>`;
-      document.body.appendChild(fabDiv.firstElementChild);
-    }
-    if(!document.getElementById('aiPanel')){
-      const panelDiv = document.createElement('div');
-      panelDiv.innerHTML = `<!-- 聊天面板 -->
+<!-- 聊天面板 -->
 <div id="aiPanel">
-  <!-- 头部 -->
   <div class="ai-head">
-    <div class="ai-head-icon">
-      <svg viewBox="0 0 24 24"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
-    </div>
+    <div class="ai-head-icon"><svg viewBox="0 0 24 24"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg></div>
     <div class="ai-head-text">
       <div class="ai-head-title">AI 提示词助手</div>
       <div class="ai-head-sub">选款式 · 选需求 · 一键生成提示词</div>
@@ -1642,33 +1251,32 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click'
     <button class="ai-head-close" onclick="toggleAiPanel()">×</button>
   </div>
 
-  <!-- API Key 配置 -->
   <div class="ai-key-area" id="aiKeyArea">
-    <div class="ai-key-label">
-      <svg viewBox="0 0 24 24"><path d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
-      Claude API Key（仅存本地，不上传）
-    </div>
+    <div class="ai-key-label">🔑 Claude API Key（仅存本地）</div>
     <div class="ai-key-row">
-      <input class="ai-key-input" id="aiKeyInput" type="password" placeholder="sk-ant-api03-..." />
+      <input class="ai-key-input" id="aiKeyInput" type="password" placeholder="sk-ant-api03-..."/>
       <button class="ai-key-save" onclick="saveApiKey()">保存</button>
     </div>
-    <div class="ai-key-hint">Key 保存在浏览器本地，关闭页面后不丢失。申请地址：console.anthropic.com</div>
+    <div class="ai-key-hint">Key 存在浏览器本地，不上传。申请：console.anthropic.com</div>
   </div>
 
-  <!-- 选款式图 -->
   <div class="ai-picker">
     <div class="ai-picker-label">① 选择款式</div>
-    <div class="ai-img-scroll" id="aiImgScroll">
-      <!-- 由 JS 填充 -->
+    <div class="ai-cat-tabs" id="aiCatTabs">
+      <span class="ai-cat-tab active" onclick="switchCat('all',this)">全部</span>
+      <span class="ai-cat-tab" onclick="switchCat('suit',this)">西服</span>
+      <span class="ai-cat-tab" onclick="switchCat('wool',this)">双面呢大衣</span>
+      <span class="ai-cat-tab" onclick="switchCat('trench',this)">风衣</span>
+      <span class="ai-cat-tab" onclick="switchCat('down',this)">羽绒服</span>
     </div>
+    <div class="ai-img-scroll" id="aiImgScroll"></div>
     <div class="ai-selected-preview" id="aiSelectedPreview">
       <img class="ai-preview-img" id="aiPreviewImg" src="" alt=""/>
       <span class="ai-preview-name" id="aiPreviewName"></span>
-      <button class="ai-preview-clear" onclick="clearSelectedImg()" title="取消选择">×</button>
+      <button class="ai-preview-clear" onclick="clearSelectedImg()">×</button>
     </div>
   </div>
 
-  <!-- 快捷需求标签 -->
   <div class="ai-shortcuts">
     <div class="ai-shortcuts-label">② 选择需求</div>
     <div class="ai-tags" id="aiTags">
@@ -1683,33 +1291,317 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click'
     </div>
   </div>
 
-  <!-- 消息区 -->
   <div class="ai-messages" id="aiMessages">
     <div class="ai-msg bot">
       <div class="ai-avatar">华</div>
-      <div class="ai-bubble">你好！我是迪尚华盛的 AI 助手。<br><br>请先选择上方的<b>款式图</b>和<b>需求标签</b>，或直接在输入框描述想要的效果，我会生成适合<b>即梦/可灵</b>等平台的中文提示词。</div>
+      <div class="ai-bubble">你好！选择上方<b>款式图</b>和<b>需求标签</b>，我会生成适合<b>即梦/可灵</b>等平台的中文提示词。</div>
     </div>
   </div>
 
-  <!-- 输入区 -->
   <div class="ai-input-area">
-    <textarea class="ai-input" id="aiTextInput" placeholder="补充说明，如：希望模特是亚洲女性，背景是干净白色..." rows="1"
+    <textarea class="ai-input" id="aiTextInput" placeholder="补充说明，如：亚洲女性模特，白色背景..." rows="1"
       onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendAiMsg();}"
-      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,90)+'px'"></textarea>
+      oninput="this.style.height='auto';this.style.height=Math.min(this.scrollHeight,80)+'px'"></textarea>
     <button class="ai-send" id="aiSendBtn" onclick="sendAiMsg()">
       <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
     </button>
   </div>
-</div>`;
-      document.body.appendChild(panelDiv.firstElementChild);
-    }
+</div>
+
+<script>
+(function(){
+  const PRODUCT_IMGS = [
+    { name:'西服', src:'https://i.ibb.co/zhNZgb2T/307.png', cat:'suit' },
+    { name:'西服', src:'https://i.ibb.co/Pv1xXydY/AI-2026-05-13.jpg', cat:'suit' },
+    { name:'西服', src:'https://i.ibb.co/XfrfzbgF/AI-2026-05-13-2.jpg', cat:'suit' },
+    { name:'西服', src:'https://i.ibb.co/wFbbgNLc/94ccfb90-4e67-11f1-8e84-4e4c8cfc4b0c.jpg', cat:'suit' },
+    { name:'西服', src:'https://i.ibb.co/YTKBSf9c/273.png', cat:'suit' },
+    { name:'西服', src:'https://i.ibb.co/cStcp8SP/c3627192-4e6c-11f1-8e84-4e4c8cfc4b0c.jpg', cat:'suit' },
+    { name:'西服', src:'https://i.ibb.co/Z6RVt2ZW/AI-2026-05-13-5.jpg', cat:'suit' },
+    { name:'西服', src:'https://i.ibb.co/qMqRwRTk/AI-2026-05-13-6.jpg', cat:'suit' },
+    { name:'西服', src:'https://i.ibb.co/5hdcM5vV/AI-2026-05-13-7.jpg', cat:'suit' },
+    { name:'西服', src:'https://i.ibb.co/V0sYRwhF/AI-2026-05-13-8.jpg', cat:'suit' },
+    { name:'西服', src:'https://i.ibb.co/3Prdyb5/AI-2026-05-13-9.jpg', cat:'suit' },
+    { name:'西服', src:'https://i.ibb.co/0pp4bJTY/AI-2026-05-13-10.jpg', cat:'suit' },
+    { name:'西服', src:'https://i.ibb.co/vvRPYQL5/AI-2026-05-13-11.jpg', cat:'suit' },
+    { name:'西服', src:'https://i.ibb.co/hx31Dfn7/AI-2026-05-13-17.jpg', cat:'suit' },
+    { name:'西服', src:'https://i.ibb.co/gLCRVrX0/AI-2026-05-13-16.jpg', cat:'suit' },
+    { name:'西服', src:'https://i.ibb.co/5XfPtDRS/AI-2026-05-13-15.jpg', cat:'suit' },
+    { name:'西服', src:'https://i.ibb.co/840RK0jf/AI-2026-05-13-14.jpg', cat:'suit' },
+    { name:'西服', src:'https://i.ibb.co/4ggVNdGw/AI-2026-05-13-13.jpg', cat:'suit' },
+    { name:'西服', src:'https://i.ibb.co/qLKQYcYP/AI-2026-05-13-12.jpg', cat:'suit' },
+    { name:'西服', src:'https://i.ibb.co/TD0JTnFV/AI-2026-05-13-23.jpg', cat:'suit' },
+    { name:'西服', src:'https://i.ibb.co/Nd8MmVR9/AI-2026-05-13-22.jpg', cat:'suit' },
+    { name:'西服', src:'https://i.ibb.co/CKcs5NNy/AI-2026-05-13-21.jpg', cat:'suit' },
+    { name:'西服', src:'https://i.ibb.co/FLC4p30P/AI-2026-05-13-20.jpg', cat:'suit' },
+    { name:'西服', src:'https://i.ibb.co/TDfQg1Pb/AI-2026-05-13-19.jpg', cat:'suit' },
+    { name:'西服', src:'https://i.ibb.co/S45CHV1r/AI-2026-05-13-18.jpg', cat:'suit' },
+    { name:'西服', src:'https://i.ibb.co/7xT5YnPM/AI-2026-05-13-29.jpg', cat:'suit' },
+    { name:'西服', src:'https://i.ibb.co/7JMfwnGS/AI-2026-05-13-28.jpg', cat:'suit' },
+    { name:'西服', src:'https://i.ibb.co/fd36B3hx/AI-2026-05-13-27.jpg', cat:'suit' },
+    { name:'西服', src:'https://i.ibb.co/y73Kpcn/AI-2026-05-13-26.jpg', cat:'suit' },
+    { name:'西服', src:'https://i.ibb.co/GQFt4ydy/AI-2026-05-13-25.jpg', cat:'suit' },
+    { name:'西服', src:'https://i.ibb.co/rKXvR25z/AI-2026-05-13-24.jpg', cat:'suit' },
+    { name:'西服', src:'https://i.ibb.co/ymtS9tLv/AI-2026-05-13-35.jpg', cat:'suit' },
+    { name:'西服', src:'https://i.ibb.co/NgYzWhyt/AI-2026-05-13-34.jpg', cat:'suit' },
+    { name:'西服', src:'https://i.ibb.co/6RTHkDN9/AI-2026-05-13-33.jpg', cat:'suit' },
+    { name:'西服', src:'https://i.ibb.co/fdbdYnV3/AI-2026-05-13-32.jpg', cat:'suit' },
+    { name:'西服', src:'https://i.ibb.co/DPhxhT6v/AI-2026-05-13-31.jpg', cat:'suit' },
+    { name:'西服', src:'https://i.ibb.co/WWcZvC4p/AI-2026-05-13-30.jpg', cat:'suit' },
+    { name:'西服', src:'https://i.ibb.co/LD6qtjq9/AI-2026-05-13-38.jpg', cat:'suit' },
+    { name:'西服', src:'https://i.ibb.co/N25z3D2D/AI-2026-05-13-37.jpg', cat:'suit' },
+    { name:'西服', src:'https://i.ibb.co/zWQ7HjkH/AI-2026-05-13-36.jpg', cat:'suit' },
+    { name:'双面呢大衣', src:'https://i.ibb.co/TBMT1vvr/AI-2026-05-13-50.jpg', cat:'wool' },
+    { name:'双面呢大衣', src:'https://i.ibb.co/pBYsLxqJ/AI-2026-05-13-49.jpg', cat:'wool' },
+    { name:'双面呢大衣', src:'https://i.ibb.co/z0GNtJJ/AI-2026-05-13-48.jpg', cat:'wool' },
+    { name:'双面呢大衣', src:'https://i.ibb.co/dScxXPS/AI-2026-05-13-56.jpg', cat:'wool' },
+    { name:'双面呢大衣', src:'https://i.ibb.co/R4NcnSfM/AI-2026-05-13-55.jpg', cat:'wool' },
+    { name:'双面呢大衣', src:'https://i.ibb.co/sDQs2Tg/AI-2026-05-13-54.jpg', cat:'wool' },
+    { name:'双面呢大衣', src:'https://i.ibb.co/Gv33CFH5/AI-2026-05-14.jpg', cat:'wool' },
+    { name:'双面呢大衣', src:'https://i.ibb.co/yB8XgzgS/AI-2026-05-13-64.jpg', cat:'wool' },
+    { name:'双面呢大衣', src:'https://i.ibb.co/LdwzzCyV/AI-2026-05-13-74.jpg', cat:'wool' },
+    { name:'双面呢大衣', src:'https://i.ibb.co/kVk4PRTm/AI-2026-05-13-73.jpg', cat:'wool' },
+    { name:'双面呢大衣', src:'https://i.ibb.co/27h4cnSz/AI-2026-05-13-72.jpg', cat:'wool' },
+    { name:'双面呢大衣', src:'https://i.ibb.co/gcWQhKd/AI-2026-05-13-71.jpg', cat:'wool' },
+    { name:'双面呢大衣', src:'https://i.ibb.co/0p2dhMnF/AI-2026-05-13-70.jpg', cat:'wool' },
+    { name:'双面呢大衣', src:'https://i.ibb.co/p61bGHMW/AI-2026-05-13-69.jpg', cat:'wool' },
+    { name:'双面呢大衣', src:'https://i.ibb.co/R4gSmdDL/AI-2026-05-13-80.jpg', cat:'wool' },
+    { name:'双面呢大衣', src:'https://i.ibb.co/SDGchzhc/AI-2026-05-13-79.jpg', cat:'wool' },
+    { name:'双面呢大衣', src:'https://i.ibb.co/6RcWpT0y/AI-2026-05-13-78.jpg', cat:'wool' },
+    { name:'双面呢大衣', src:'https://i.ibb.co/8LWyQ2nj/AI-2026-05-13-77.jpg', cat:'wool' },
+    { name:'双面呢大衣', src:'https://i.ibb.co/Zzfv1myQ/AI-2026-05-13-76.jpg', cat:'wool' },
+    { name:'双面呢大衣', src:'https://i.ibb.co/Swbs9mft/AI-2026-05-13-75.jpg', cat:'wool' },
+    { name:'双面呢大衣', src:'https://i.ibb.co/jP1WVLT6/AI-2026-05-13-86.jpg', cat:'wool' },
+    { name:'双面呢大衣', src:'https://i.ibb.co/jkXf3PyJ/AI-2026-05-13-85.jpg', cat:'wool' },
+    { name:'双面呢大衣', src:'https://i.ibb.co/7dVtf6rw/AI-2026-05-13-84.jpg', cat:'wool' },
+    { name:'双面呢大衣', src:'https://i.ibb.co/TMLG2qnV/AI-2026-05-13-83.jpg', cat:'wool' },
+    { name:'双面呢大衣', src:'https://i.ibb.co/21RcqcCp/AI-2026-05-13-82.jpg', cat:'wool' },
+    { name:'双面呢大衣', src:'https://i.ibb.co/qFmH1FFk/AI-2026-05-13-81.jpg', cat:'wool' },
+    { name:'双面呢大衣', src:'https://i.ibb.co/3YNq6tw6/AI-2026-05-13-92.jpg', cat:'wool' },
+    { name:'双面呢大衣', src:'https://i.ibb.co/q2WNytx/AI-2026-05-13-91.jpg', cat:'wool' },
+    { name:'双面呢大衣', src:'https://i.ibb.co/XfBkBJBh/AI-2026-05-13-90.jpg', cat:'wool' },
+    { name:'双面呢大衣', src:'https://i.ibb.co/gFtcpfgG/AI-2026-05-13-89.jpg', cat:'wool' },
+    { name:'双面呢大衣', src:'https://i.ibb.co/Tq1Nr8Xz/AI-2026-05-13-88.jpg', cat:'wool' },
+    { name:'双面呢大衣', src:'https://i.ibb.co/VYZTvCS4/AI-2026-05-13-87.jpg', cat:'wool' },
+    { name:'双面呢大衣', src:'https://i.ibb.co/sv7NsXr2/AI-2026-05-13-100.jpg', cat:'wool' },
+    { name:'双面呢大衣', src:'https://i.ibb.co/zW1G2PcL/AI-2026-05-13-99.jpg', cat:'wool' },
+    { name:'双面呢大衣', src:'https://i.ibb.co/60grm0ks/AI-2026-05-13-98.jpg', cat:'wool' },
+    { name:'双面呢大衣', src:'https://i.ibb.co/RkFHQSP9/AI-2026-05-13-97.jpg', cat:'wool' },
+    { name:'双面呢大衣', src:'https://i.ibb.co/jc0KgNX/AI-2026-05-13-96.jpg', cat:'wool' },
+    { name:'双面呢大衣', src:'https://i.ibb.co/8DdrgYJT/AI-2026-05-13-95.jpg', cat:'wool' },
+    { name:'双面呢大衣', src:'https://i.ibb.co/sJvCnSXX/AI-2026-05-13-94.jpg', cat:'wool' },
+    { name:'双面呢大衣', src:'https://i.ibb.co/7tjV8GP8/AI-2026-05-13-93.jpg', cat:'wool' },
+    { name:'风衣', src:'https://i.ibb.co/4gwtKWHM/AI-2026-05-13-47.jpg', cat:'trench' },
+    { name:'风衣', src:'https://i.ibb.co/BppTpp4/AI-2026-05-13-52.jpg', cat:'trench' },
+    { name:'风衣', src:'https://i.ibb.co/DX01WpR/AI-2026-05-13-51.jpg', cat:'trench' },
+    { name:'风衣', src:'https://i.ibb.co/nvWzjX6/AI-2026-05-13-63.jpg', cat:'trench' },
+    { name:'风衣', src:'https://i.ibb.co/wrwx1TTt/AI-2026-05-13-68.jpg', cat:'trench' },
+    { name:'风衣', src:'https://i.ibb.co/zh0bvRtF/AI-2026-05-13-67.jpg', cat:'trench' },
+    { name:'风衣', src:'https://i.ibb.co/zh43NV4x/AI-2026-05-13-66.jpg', cat:'trench' },
+    { name:'风衣', src:'https://i.ibb.co/5XBtftWk/AI-2026-05-13-65.jpg', cat:'trench' },
+    { name:'风衣', src:'https://i.ibb.co/C38ck71v/IMG-0591.jpg', cat:'trench' },
+    { name:'风衣', src:'https://i.ibb.co/DNyF3qL/AI-2026-05-13-128.jpg', cat:'trench' },
+    { name:'风衣', src:'https://i.ibb.co/ds0QZY3p/AI-2026-05-13-127.jpg', cat:'trench' },
+    { name:'风衣', src:'https://i.ibb.co/Hf7SJhzy/AI-2026-05-13-126.jpg', cat:'trench' },
+    { name:'风衣', src:'https://i.ibb.co/1tKZTzgv/AI-2026-05-13-125.jpg', cat:'trench' },
+    { name:'风衣', src:'https://i.ibb.co/4RCNswgH/AI-2026-05-13-124.jpg', cat:'trench' },
+    { name:'风衣', src:'https://i.ibb.co/BVC0hXVN/AI-2026-05-13-123.jpg', cat:'trench' },
+    { name:'风衣', src:'https://i.ibb.co/8LwGxMf7/AI-2026-05-13-122.jpg', cat:'trench' },
+    { name:'风衣', src:'https://i.ibb.co/0ydSq9qK/AI-2026-05-14-19.jpg', cat:'trench' },
+    { name:'风衣', src:'https://i.ibb.co/nsBvwJhR/AI-2026-05-13-133.jpg', cat:'trench' },
+    { name:'风衣', src:'https://i.ibb.co/Xxr32BTR/AI-2026-05-13-132.jpg', cat:'trench' },
+    { name:'风衣', src:'https://i.ibb.co/mFdvFKwt/AI-2026-05-13-131.jpg', cat:'trench' },
+    { name:'风衣', src:'https://i.ibb.co/60GDjv00/AI-2026-05-13-130.jpg', cat:'trench' },
+    { name:'风衣', src:'https://i.ibb.co/bR6vkdT8/AI-2026-05-13-129.jpg', cat:'trench' },
+    { name:'风衣', src:'https://i.ibb.co/nqskYscL/AI-2026-05-14-7.jpg', cat:'trench' },
+    { name:'风衣', src:'https://i.ibb.co/tp75JzYS/AI-2026-05-14-6.jpg', cat:'trench' },
+    { name:'风衣', src:'https://i.ibb.co/DDkLddwr/AI-2026-05-14-5.jpg', cat:'trench' },
+    { name:'风衣', src:'https://i.ibb.co/27wwnWhB/AI-2026-05-14-4.jpg', cat:'trench' },
+    { name:'风衣', src:'https://i.ibb.co/9mYpHV1m/AI-2026-05-14-3.jpg', cat:'trench' },
+    { name:'风衣', src:'https://i.ibb.co/vCKsn5qs/AI-2026-05-14-2.jpg', cat:'trench' },
+    { name:'风衣', src:'https://i.ibb.co/C5VBQ3Gz/AI-2026-05-14-13.jpg', cat:'trench' },
+    { name:'风衣', src:'https://i.ibb.co/399R7TY4/AI-2026-05-14-12.jpg', cat:'trench' },
+    { name:'风衣', src:'https://i.ibb.co/C5SrqqMy/AI-2026-05-14-11.jpg', cat:'trench' },
+    { name:'风衣', src:'https://i.ibb.co/PZXKfg2s/AI-2026-05-14-10.jpg', cat:'trench' },
+    { name:'风衣', src:'https://i.ibb.co/1Gpnd9WK/AI-2026-05-14-9.jpg', cat:'trench' },
+    { name:'风衣', src:'https://i.ibb.co/vCTCW2jw/AI-2026-05-14-8.jpg', cat:'trench' },
+    { name:'风衣', src:'https://i.ibb.co/pjBpFtPX/AI-2026-05-14-18.jpg', cat:'trench' },
+    { name:'风衣', src:'https://i.ibb.co/tT17tFPb/AI-2026-05-14-17.jpg', cat:'trench' },
+    { name:'风衣', src:'https://i.ibb.co/zVTzxjxk/AI-2026-05-14-16.jpg', cat:'trench' },
+    { name:'风衣', src:'https://i.ibb.co/JwVB49qK/AI-2026-05-14-15.jpg', cat:'trench' },
+    { name:'风衣', src:'https://i.ibb.co/hJb8hh4q/AI-2026-05-14-14.jpg', cat:'trench' },
+    { name:'风衣', src:'https://i.ibb.co/bMRjmbNg/AI-2026-05-14-20.jpg', cat:'trench' },
+    { name:'羽绒服', src:'https://i.ibb.co/4wPn2wrn/AI-2026-05-13-3.jpg', cat:'down' },
+    { name:'羽绒服', src:'https://i.ibb.co/k2kWqLm1/AI-2026-05-13-4.jpg', cat:'down' },
+    { name:'羽绒服', src:'https://i.ibb.co/nMn9YyCx/a34c96e6-4e6a-11f1-b180-32122d3eb903.jpg', cat:'down' },
+    { name:'羽绒服', src:'https://i.ibb.co/mrDMd303/275.png', cat:'down' },
+    { name:'羽绒服', src:'https://i.ibb.co/S7QRqJzQ/AI-2026-05-13-44.jpg', cat:'down' },
+    { name:'羽绒服', src:'https://i.ibb.co/V0XqQmdD/AI-2026-05-13-43.jpg', cat:'down' },
+    { name:'羽绒服', src:'https://i.ibb.co/Y4Kzb2z1/AI-2026-05-13-42.jpg', cat:'down' },
+    { name:'羽绒服', src:'https://i.ibb.co/zT6bbxjv/AI-2026-05-13-41.jpg', cat:'down' },
+    { name:'羽绒服', src:'https://i.ibb.co/nsNwZqs6/AI-2026-05-13-40.jpg', cat:'down' },
+    { name:'羽绒服', src:'https://i.ibb.co/prRBFd96/AI-2026-05-13-39.jpg', cat:'down' },
+    { name:'羽绒服', src:'https://i.ibb.co/tMx2jH3x/AI-2026-05-13-46.jpg', cat:'down' },
+    { name:'羽绒服', src:'https://i.ibb.co/RTGvZZqF/AI-2026-05-13-45.jpg', cat:'down' },
+    { name:'羽绒服', src:'https://i.ibb.co/ks5w9HxL/AI-2026-05-13-62.jpg', cat:'down' },
+    { name:'羽绒服', src:'https://i.ibb.co/6JRS8N0j/AI-2026-05-13-61.jpg', cat:'down' },
+    { name:'羽绒服', src:'https://i.ibb.co/d0wnCb2m/AI-2026-05-13-60.jpg', cat:'down' },
+    { name:'羽绒服', src:'https://i.ibb.co/VY6SSXKZ/AI-2026-05-13-59.jpg', cat:'down' },
+    { name:'羽绒服', src:'https://i.ibb.co/cX7kv6Nv/AI-2026-05-13-58.jpg', cat:'down' },
+    { name:'羽绒服', src:'https://i.ibb.co/Gfh9tLRB/AI-2026-05-13-57.jpg', cat:'down' },
+    { name:'羽绒服', src:'https://i.ibb.co/1GJF8CGr/AI-2026-05-13-108.jpg', cat:'down' },
+    { name:'羽绒服', src:'https://i.ibb.co/99tm4XDS/AI-2026-05-13-107.jpg', cat:'down' },
+    { name:'羽绒服', src:'https://i.ibb.co/kg0KtwjM/AI-2026-05-13-106.jpg', cat:'down' },
+    { name:'羽绒服', src:'https://i.ibb.co/G3bC7gF3/AI-2026-05-13-105.jpg', cat:'down' },
+    { name:'羽绒服', src:'https://i.ibb.co/b5nQwMsv/AI-2026-05-13-104.jpg', cat:'down' },
+    { name:'羽绒服', src:'https://i.ibb.co/gb2k7Whm/AI-2026-05-13-103.jpg', cat:'down' },
+    { name:'羽绒服', src:'https://i.ibb.co/HpXncjKc/AI-2026-05-13-102.jpg', cat:'down' },
+    { name:'羽绒服', src:'https://i.ibb.co/YFVszR2G/AI-2026-05-13-101.jpg', cat:'down' },
+    { name:'羽绒服', src:'https://i.ibb.co/zTyBMVM9/AI-2026-05-13-116.jpg', cat:'down' },
+    { name:'羽绒服', src:'https://i.ibb.co/TBWMtYkQ/AI-2026-05-13-115.jpg', cat:'down' },
+    { name:'羽绒服', src:'https://i.ibb.co/KcZsLydW/AI-2026-05-13-114.jpg', cat:'down' },
+    { name:'羽绒服', src:'https://i.ibb.co/KcPHG1th/AI-2026-05-13-113.jpg', cat:'down' },
+    { name:'羽绒服', src:'https://i.ibb.co/Sw47WHrr/AI-2026-05-13-112.jpg', cat:'down' },
+    { name:'羽绒服', src:'https://i.ibb.co/TDQgQhHm/AI-2026-05-13-111.jpg', cat:'down' },
+    { name:'羽绒服', src:'https://i.ibb.co/zWNW4mTf/AI-2026-05-13-110.jpg', cat:'down' },
+    { name:'羽绒服', src:'https://i.ibb.co/vWKMtsh/AI-2026-05-13-109.jpg', cat:'down' },
+    { name:'羽绒服', src:'https://i.ibb.co/ch29zmBr/AI-2026-05-13-120.jpg', cat:'down' },
+    { name:'羽绒服', src:'https://i.ibb.co/PzJRkkXD/AI-2026-05-13-121.jpg', cat:'down' },
+    { name:'羽绒服', src:'https://i.ibb.co/ZzJnS3z1/AI-2026-05-13-119.jpg', cat:'down' },
+    { name:'羽绒服', src:'https://i.ibb.co/wrjxLq5H/AI-2026-05-13-118.jpg', cat:'down' },
+    { name:'羽绒服', src:'https://i.ibb.co/k2Z5nJj6/AI-2026-05-13-117.jpg', cat:'down' },
+  ];
+  let selectedImg=null, activeTags=[], isLoading=false;
+  let apiKey=localStorage.getItem('dsh_ai_key')||'';
+  let currentCat='all';
+
+  function init(){
+    renderThumbs('all');
+    if(apiKey) document.getElementById('aiKeyArea').style.display='none';
+    if(apiKey) document.getElementById('aiKeyInput').value=apiKey;
   }
 
-  /* ── 初始化 ── */
-  if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded', function(){ mountUI(); init(); });
-  } else {
-    mountUI(); init();
+  function renderThumbs(cat){
+    const scroll=document.getElementById('aiImgScroll');
+    scroll.innerHTML='';
+    const filtered = cat==='all' ? PRODUCT_IMGS : PRODUCT_IMGS.filter(p=>p.cat===cat);
+    filtered.forEach((p,i)=>{
+      const div=document.createElement('div');
+      div.className='ai-img-thumb';
+      div.dataset.src=p.src;
+      div.dataset.name=p.name;
+      div.innerHTML=`<img src="${p.src}" alt="${p.name}" loading="lazy"/>`;
+      div.onclick=()=>selectImg(p, div);
+      if(selectedImg && selectedImg.src===p.src) div.classList.add('selected');
+      scroll.appendChild(div);
+    });
   }
+
+  window.switchCat=function(cat,el){
+    currentCat=cat;
+    document.querySelectorAll('.ai-cat-tab').forEach(t=>t.classList.remove('active'));
+    el.classList.add('active');
+    renderThumbs(cat);
+  };
+
+  function selectImg(p, el){
+    document.querySelectorAll('.ai-img-thumb').forEach(t=>t.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedImg=p;
+    document.getElementById('aiPreviewImg').src=p.src;
+    document.getElementById('aiPreviewName').textContent=p.name;
+    document.getElementById('aiSelectedPreview').classList.add('show');
+  }
+
+  window.clearSelectedImg=function(){
+    selectedImg=null;
+    document.querySelectorAll('.ai-img-thumb').forEach(t=>t.classList.remove('selected'));
+    document.getElementById('aiSelectedPreview').classList.remove('show');
+  };
+
+  window.toggleTag=function(el){
+    el.classList.toggle('active');
+    const t=el.textContent;
+    activeTags=el.classList.contains('active')?[...activeTags,t]:activeTags.filter(x=>x!==t);
+  };
+
+  window.saveApiKey=function(){
+    const v=document.getElementById('aiKeyInput').value.trim();
+    if(!v){alert('请输入有效的 API Key');return;}
+    apiKey=v;localStorage.setItem('dsh_ai_key',v);
+    document.getElementById('aiKeyArea').style.display='none';
+    addBotMsg('✅ API Key 已保存！');
+  };
+
+  window.toggleAiPanel=function(){
+    const p=document.getElementById('aiPanel');
+    const isOpen=p.classList.toggle('open');
+    if(isOpen&&!apiKey) document.getElementById('aiKeyArea').style.display='';
+  };
+
+  function addBotMsg(html){
+    const msgs=document.getElementById('aiMessages');
+    const d=document.createElement('div');
+    d.className='ai-msg bot';
+    d.innerHTML=`<div class="ai-avatar">华</div><div class="ai-bubble">${html}</div>`;
+    msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;
+  }
+  function addUserMsg(t){
+    const msgs=document.getElementById('aiMessages');
+    const d=document.createElement('div');
+    d.className='ai-msg user';
+    d.innerHTML=`<div class="ai-bubble">${t}</div>`;
+    msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;
+  }
+  function addTyping(){
+    const msgs=document.getElementById('aiMessages');
+    const d=document.createElement('div');d.id='aiTyping';d.className='ai-msg bot';
+    d.innerHTML=`<div class="ai-avatar">华</div><div class="ai-bubble"><div class="ai-typing"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div></div></div>`;
+    msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;
+  }
+  function removeTyping(){const t=document.getElementById('aiTyping');if(t)t.remove();}
+  function addResultCard(text){
+    const msgs=document.getElementById('aiMessages');
+    const d=document.createElement('div');d.className='ai-msg bot';
+    const id='cp_'+Date.now();
+    d.innerHTML=`<div class="ai-avatar">华</div><div style="flex:1;max-width:88%;"><div class="ai-result-card"><div class="ai-result-head">生成的提示词（可复制到即梦/可灵）</div><div class="ai-result-body" id="${id}">${text.replace(/\n/g,'<br>')}</div><button class="ai-copy-btn" onclick="copyPrompt('${id}',this)">复制提示词</button></div></div>`;
+    msgs.appendChild(d);msgs.scrollTop=msgs.scrollHeight;
+  }
+  window.copyPrompt=function(id,btn){
+    navigator.clipboard.writeText(document.getElementById(id).innerText).then(()=>{
+      btn.classList.add('copied');btn.textContent='✓ 已复制！';
+      setTimeout(()=>{btn.classList.remove('copied');btn.textContent='复制提示词';},2000);
+    });
+  };
+
+  window.sendAiMsg=async function(){
+    if(isLoading)return;
+    if(!apiKey){addBotMsg('请先填写并保存 Claude API Key。');document.getElementById('aiKeyArea').style.display='';return;}
+    const input=document.getElementById('aiTextInput');
+    const userText=input.value.trim();
+    if(!selectedImg&&activeTags.length===0&&!userText){addBotMsg('请先选择款式图，或描述想要的效果 😊');return;}
+    let desc='';
+    if(selectedImg)desc+=`款式：${selectedImg.name}`;
+    if(activeTags.length)desc+=(desc?'，':'')+'需求：'+activeTags.join('、');
+    if(userText)desc+=(desc?'。\n补充：':'')+userText;
+    addUserMsg(desc.replace(/\n/g,'<br>'));
+    input.value='';input.style.height='auto';
+    isLoading=true;document.getElementById('aiSendBtn').disabled=true;addTyping();
+    const sys=`你是专业服装产品摄影师兼AI生图提示词专家，专为即梦AI、可灵AI、海螺AI等国内平台优化。根据服装信息和需求生成120-200字中文提示词，包含：服装类型、颜色面料、拍摄角度、光线背景、风格定义。直接输出提示词，不加解释。品牌背景：大连迪尚华盛时装，高端时装，品类含双面呢大衣、风衣、西服、羽绒服。`;
+    const imgNote=selectedImg?`服装图片：${selectedImg.src}\n类别：${selectedImg.name}\n`:'';
+    try{
+      const res=await fetch('https://api.anthropic.com/v1/messages',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+        body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:600,system:sys,messages:[{role:'user',content:imgNote+'需求：'+desc}]})
+      });
+      const data=await res.json();removeTyping();
+      if(data.error){addBotMsg(`❌ 请求失败：${data.error.message}`);}
+      else{addResultCard(data.content[0].text.trim());document.querySelectorAll('.ai-tag').forEach(t=>t.classList.remove('active'));activeTags=[];}
+    }catch(e){removeTyping();addBotMsg(`❌ 网络错误：${e.message}`);}
+    isLoading=false;document.getElementById('aiSendBtn').disabled=false;
+  };
+
+  if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);}else{init();}
 })();
 </script>
