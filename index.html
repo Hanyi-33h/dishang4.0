@@ -216,7 +216,7 @@ footer{background:#1a4fa8;padding:80px 60px 40px;}
 
 /* ── VIEW TOGGLE BUTTON ── */
 #viewToggle{
-  position:fixed;bottom:28px;right:28px;z-index:9999;
+  position:static;z-index:9999;
   display:flex;align-items:center;gap:7px;
   padding:9px 16px;
   background:rgba(255,255,255,.14);
@@ -734,8 +734,8 @@ body.force-mobile .h-scroll-hint{display:none!important;}
 </footer>
 </div>
 
-<!-- VIEW TOGGLE BUTTON -->
-<button id="viewToggle" aria-label="切换视图">
+<!-- VIEW TOGGLE BUTTON (moved into FAB by JS) -->
+<button id="viewToggle" aria-label="切换视图" style="display:none">
   <svg id="vtIcon" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="14" rx="2"/><line x1="8" y1="20" x2="16" y2="20"/><line x1="12" y1="18" x2="12" y2="20"/></svg>
   <span id="vtLabel">PC版</span>
 </button>
@@ -1110,7 +1110,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click'
 <style>
 /* ── 悬浮按钮 ── */
 #aiAssistBtn{
-  position:fixed;bottom:90px;right:28px;z-index:9998;
+  position:static;z-index:9998;
   width:52px;height:52px;border-radius:50%;border:none;cursor:pointer;
   background:linear-gradient(135deg,#1C2B3A 0%,#B8976A 100%);
   box-shadow:0 4px 20px rgba(28,43,58,.35);
@@ -1304,15 +1304,26 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click'
 /* 响应式 */
 @media(max-width:600px){
   #aiPanel{right:12px;width:calc(100vw - 24px);bottom:140px;}
-  #aiAssistBtn{right:16px;bottom:80px;}
+  #aiAssistBtn{}
 }
 </style>
 
-<!-- 悬浮按钮 -->
-<button id="aiAssistBtn" onclick="toggleAiPanel()" title="AI 提示词助手">
-  <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" stroke-width="1.2"/><path d="M8 12h.01M12 12h.01M16 12h.01" stroke-width="2.5" stroke-linecap="round"/></svg>
-  <div class="ai-badge">AI</div>
-</button>
+<!-- FAB 展开菜单（包含 AI助手 + 视图切换） -->
+<div id="fabWrap">
+  <div id="fabChildren">
+    <div class="fab-row">
+      <span class="fab-label">AI 提示词助手</span>
+      <button id="aiAssistBtn" onclick="toggleAiPanel()" title="AI 提示词助手">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" stroke-width="1.2"/><path d="M8 12h.01M12 12h.01M16 12h.01" stroke-width="2.5" stroke-linecap="round"/></svg>
+        <div class="ai-badge">AI</div>
+      </button>
+    </div>
+    <div class="fab-row" id="fabVtRow"></div>
+  </div>
+  <button id="fabMain" onclick="toggleFab()" title="工具菜单">
+    <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
+</div>
 
 <!-- 聊天面板 -->
 <div id="aiPanel">
@@ -1412,6 +1423,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click'
     buildThumbStrip();
     if(apiKey) hideKeyArea();
     restoreKeyInput();
+    mountViewToggle();
   }
 
   function buildThumbStrip(){
@@ -1636,6 +1648,38 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click'
     isLoading = false;
     document.getElementById('aiSendBtn').disabled = false;
   };
+
+  /* ── FAB 菜单逻辑 ── */
+  window.toggleFab = function(){
+    const children = document.getElementById('fabChildren');
+    const main = document.getElementById('fabMain');
+    const isOpen = children.classList.toggle('open');
+    main.classList.toggle('open', isOpen);
+  };
+  // 把 viewToggle 移入 FAB 的视图切换行
+  function mountViewToggle(){
+    const vt = document.getElementById('viewToggle');
+    const row = document.getElementById('fabVtRow');
+    if(!vt||!row) return;
+    vt.style.display='';
+    const label = document.createElement('span');
+    label.className='fab-label';
+    label.id='fabVtLabel';
+    label.textContent='切换视图';
+    row.appendChild(label);
+    row.appendChild(vt);
+  }
+  // 点击面板外关闭 FAB
+  document.addEventListener('click', function(e){
+    const wrap = document.getElementById('fabWrap');
+    const panel = document.getElementById('aiPanel');
+    if(wrap && !wrap.contains(e.target) && panel && !panel.contains(e.target)){
+      const children = document.getElementById('fabChildren');
+      const main = document.getElementById('fabMain');
+      if(children) children.classList.remove('open');
+      if(main) main.classList.remove('open');
+    }
+  });
 
   /* ── 初始化 ── */
   if(document.readyState==='loading'){
